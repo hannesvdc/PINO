@@ -10,6 +10,8 @@ from DeepONet import DeepONet
 from Dataset import DeepONetDataset
 import ElasticPDE as pde
 import GaussianProces as gp
+
+import argparse
     
 # No need for gradients in test script
 pt.set_grad_enabled(False)
@@ -25,10 +27,10 @@ dataset = DeepONetDataset(config, device, dtype)
 # Initialize the Network and the Optimizer (Adam)
 print('\nLoading the DeepONet...')
 p = 300
-branch_layers = [202, 512, 512, 2*p]
-trunk_layers = [2, 512, 512, 2*p]
+branch_layers = [202, 512, 512, 512, 512, 2*p]
+trunk_layers = [2, 512, 512, 512, 512, 2*p]
 network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers)
-network.load_state_dict(pt.load(store_directory + 'model_vanilla.pth', weights_only=True))
+network.load_state_dict(pt.load(store_directory + 'model_many_layers.pth', weights_only=True))
 
 # Evaluate network by generating a test forcing
 l = 0.12

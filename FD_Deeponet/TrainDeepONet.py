@@ -4,9 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as sch
 from torch.utils.data import DataLoader
-
 import matplotlib.pyplot as plt
-import argparse
 
 from DeepONet import DeepONet
 from Dataset import DeepONetDataset
@@ -34,16 +32,8 @@ n_data_points = len(dataset) * 101**2
 
 # Read the command line arguments
 p = 300
-parser = argparse.ArgumentParser()
-parser.add_argument('--experiment', dest='experiment', nargs='?')
-args = parser.parse_args()
-file_name = args.experiment
-if args.experiment == 'vanilla':
-    branch_layers = [202, 512, 512, 2*p]
-    trunk_layers = [2, 512, 512, 2*p]
-elif args.experiment == 'many_layers':
-    branch_layers = [202, 512, 512, 512, 512, 2*p]
-    trunk_layers = [2, 512, 512, 512, 512, 2*p]
+branch_layers = [202, 512, 512, 512, 512, 2*p]
+trunk_layers = [2, 512, 512, 512, 512, 2*p]
 network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
 optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
 step = 250
@@ -61,12 +51,6 @@ def getGradient():
         grads.append(param.grad.view(-1))
     grads = pt.cat(grads)
     return pt.norm(grads)
-def getTrunkGradient():
-    grads = []
-    for param in network.trunk_net.parameters():
-        grads.append(param.grad.view(-1))
-    grads = pt.cat(grads)
-    return pt.norm(grads)
 def train(epoch):
     network.train()
     for batch_idx, (branch_input, target_u, target_v) in enumerate(train_loader):
@@ -81,21 +65,20 @@ def train(epoch):
 
         # Compute loss gradient and do one optimization step
         loss.backward()
-        trunk_grad = getTrunkGradient()
         grad = getGradient()
         optimizer.step()
 
         # Some housekeeping
-        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6E} \tLoss Gradient: {:.6E} \tTrunk Gradient: {:.6E} \tlr: {:.4E}'.format(
+        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6E} \tLoss Gradient: {:.6E} \tlr: {:.4E}'.format(
                         epoch, batch_idx * len(branch_input), len(train_loader.dataset),
-                        100. * batch_idx / len(train_loader), loss.item(), grad, trunk_grad, optimizer.param_groups[0]['lr']))
+                        100. * batch_idx / len(train_loader), loss.item(), grad, optimizer.param_groups[0]['lr']))
         train_losses.append(loss.item())
         train_grads.append(grad.cpu())
         train_counter.append((1.0*batch_idx)/len(train_loader) + epoch-1)
 
         # Store the temporary state
-        pt.save(network.state_dict(), store_directory + 'model_' + file_name + '.pth')
-        pt.save(optimizer.state_dict(), store_directory + 'optimizer_' + file_name + '.pth')
+        pt.save(network.state_dict(), store_directory + 'model_vanilla.pth')
+        pt.save(optimizer.state_dict(), store_directory + 'optimizer_vanilla.pth')
 
 # Do the actual training
 print('\nStarting Training Procedure...')
