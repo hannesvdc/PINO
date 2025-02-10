@@ -32,8 +32,8 @@ train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 # Read the command line arguments
 p = 300
-branch_layers = [202, 512, 512, 2*p]
-trunk_layers = [2, 512, 512, 2*p]
+branch_layers = [202, 512, 512, 512, 512, 2*p]
+trunk_layers = [2, 512, 512, 512, 512, 2*p]
 network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
 optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
 step = 250
@@ -48,12 +48,6 @@ train_counter = []
 def getGradient():
     grads = []
     for param in network.parameters():
-        grads.append(param.grad.view(-1))
-    grads = pt.cat(grads)
-    return pt.norm(grads)
-def getTrunkGradient():
-    grads = []
-    for param in network.trunk_net.parameters():
         grads.append(param.grad.view(-1))
     grads = pt.cat(grads)
     return pt.norm(grads)
@@ -74,14 +68,13 @@ def train(epoch):
 
         # Compute loss gradient and do one optimization step
         loss.backward()
-        trunk_grad = getTrunkGradient()
         grad = getGradient()
         optimizer.step()
 
         # Some housekeeping
-        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6E} \tLoss Gradient: {:.6E} \tTrunk Gradient: {:.6E} \tlr: {:.4E}'.format(
+        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6E} \tLoss Gradient: {:.6E} \tlr: {:.4E}'.format(
                         epoch, batch_idx * len(branch_input), len(train_loader.dataset),
-                        100. * batch_idx / len(train_loader), loss.item(), grad, trunk_grad, optimizer.param_groups[0]['lr']))
+                        100. * batch_idx / len(train_loader), loss.item(), grad, optimizer.param_groups[0]['lr']))
         train_losses.append(loss.item())
         train_grads.append(grad.cpu())
         train_counter.append((1.0*batch_idx)/len(train_loader) + epoch-1)
