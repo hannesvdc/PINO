@@ -28,7 +28,7 @@ p = 300
 branch_layers = [202, 512, 512, 2*p]
 trunk_layers = [2, 512, 512, 2*p]
 network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers)
-network.load_state_dict(pt.load(store_directory + 'model.pth', weights_only=True))
+network.load_state_dict(pt.load(store_directory + 'model_vanilla.pth', weights_only=True))
 
 # Evaluate network by generating a test forcing
 l = 0.12

@@ -41,4 +41,4 @@ class DeepONetDataset(Dataset):
 if __name__ == '__main__':
     config_file = 'DataConfig.json'
     config = json.load(open(config_file))
-    DeepONetDataset(config)
+    DeepONetDataset(config, pt.device('cpu'), pt.float32)
