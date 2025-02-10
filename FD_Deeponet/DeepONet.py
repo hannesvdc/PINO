@@ -39,7 +39,9 @@ class DeepONet(nn.Module):
         self.params.extend(self.branch_net.parameters())
         self.params.extend(self.trunk_net.parameters())
         print('Number of DeepONet Parameters:', sum(p.numel() for p in self.parameters()))
-
+    
+    def getNumberofParameters(self):
+        return sum(p.numel() for p in self.parameters())
 
     # The input data: branch_input with shape (batch_size, len(f)), and trunk_input with shape (N^2, 2)
     def forward(self, branch_input, trunk_input):

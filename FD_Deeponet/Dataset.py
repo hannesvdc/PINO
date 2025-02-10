@@ -15,6 +15,7 @@ class DeepONetDataset(Dataset):
         G_v_filename = 'output_data_v.npy'
 
         print('Loading Data...')
+        self.N = 100
         self.branch_input_data = pt.tensor(np.load(directory + branch_filename).transpose(), requires_grad=False, device=device, dtype=dtype) # Transpose to make data row-major
         self.trunk_input_data = pt.tensor(np.load(directory + trunk_filename).transpose(), requires_grad=False, device=device, dtype=dtype)
         self.output_data_u = pt.tensor(np.load(directory + G_u_filename), requires_grad=False, device=device, dtype=dtype)

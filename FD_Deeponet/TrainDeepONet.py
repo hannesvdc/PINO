@@ -6,6 +6,7 @@ import torch.optim.lr_scheduler as sch
 from torch.utils.data import DataLoader
 
 import matplotlib.pyplot as plt
+import argparse
 
 from DeepONet import DeepONet
 from Dataset import DeepONetDataset
@@ -31,15 +32,32 @@ dataset = DeepONetDataset(config, device, dtype)
 train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 trunk_input = dataset.trunk_input_data
 
-# Initialize the Network and the Optimizer (Adam)
-print('\nSetting Up DeepONet Neural Net...')
+# Read the command line arguments
 p = 300
-branch_layers = [202, 512, 512, 2*p]
-trunk_layers = [2, 512, 512, 2*p]
-network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
-optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
+parser = argparse.ArgumentParser()
+parser.add_argument('--experiment', dest='experiment', nargs='?')
+args = parser.parse_args()
+if args.experiment == 'vanilla':
+    file_name = 'vanilla'
+    n_data_points = len(dataset) * 101**2
+    branch_layers = [202, 512, 512, 2*p]
+    trunk_layers = [2, 512, 512, 2*p]
+    network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
+    optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
+elif args.experiment == 'many_layers':
+    file_name = 'many_layers'
+    n_data_points = len(dataset) * 101**2
+    branch_layers = [202, 512, 512, 512, 512, 2*p]
+    trunk_layers = [2, 512, 512, 512, 512, 2*p]
+    network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
+    optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
+elif args.experiment == 'trunk_batch':
+    pass
+elif args.experiment == 'Broyden':
+    pass
 step = 250
 scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.1)
+print('Number of Data Points per Parameter: ', n_data_points / (1.0 * network.getNumberofParameters()))
 
 # Training Routine
 loss_fn = nn.MSELoss()
@@ -84,8 +102,8 @@ def train(epoch):
         train_counter.append((1.0*batch_idx)/len(train_loader) + epoch-1)
 
         # Store the temporary state
-        pt.save(network.state_dict(), store_directory + 'model.pth')
-        pt.save(optimizer.state_dict(), store_directory + 'optimizer.pth')
+        pt.save(network.state_dict(), store_directory + 'model_' + file_name + '.pth')
+        pt.save(optimizer.state_dict(), store_directory + 'optimizer_' + file_name + '.pth')
 
 # Do the actual training
 print('\nStarting Training Procedure...')
