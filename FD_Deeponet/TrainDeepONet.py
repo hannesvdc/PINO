@@ -30,31 +30,22 @@ store_directory = config['Store Directory']
 batch_size = 128
 dataset = DeepONetDataset(config, device, dtype)
 train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-trunk_input = dataset.trunk_input_data
+n_data_points = len(dataset) * 101**2
 
 # Read the command line arguments
 p = 300
 parser = argparse.ArgumentParser()
 parser.add_argument('--experiment', dest='experiment', nargs='?')
 args = parser.parse_args()
+file_name = args.experiment
 if args.experiment == 'vanilla':
-    file_name = 'vanilla'
-    n_data_points = len(dataset) * 101**2
     branch_layers = [202, 512, 512, 2*p]
     trunk_layers = [2, 512, 512, 2*p]
-    network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
-    optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
 elif args.experiment == 'many_layers':
-    file_name = 'many_layers'
-    n_data_points = len(dataset) * 101**2
     branch_layers = [202, 512, 512, 512, 512, 2*p]
     trunk_layers = [2, 512, 512, 512, 512, 2*p]
-    network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
-    optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
-elif args.experiment == 'trunk_batch':
-    pass
-elif args.experiment == 'Broyden':
-    pass
+network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
+optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
 step = 250
 scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.1)
 print('Number of Data Points per Parameter: ', n_data_points / (1.0 * network.getNumberofParameters()))
@@ -82,6 +73,7 @@ def train(epoch):
         optimizer.zero_grad()
 
         # Compute Loss
+        trunk_input = dataset.trunk_input_data
         output_u, output_v = network(branch_input, trunk_input)
         loss_u = loss_fn(output_u, target_u)
         loss_v = loss_fn(output_v, target_v)

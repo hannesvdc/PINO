@@ -40,8 +40,7 @@ class MultiIndexDeepONetDataset(Dataset):
     def __getitem__(self, idx):
         branch_idx = idx % self.N_branch_datapoints
         trunk_idx = idx // self.N_branch_datapoints
-        print(branch_idx, self.N_branch_datapoints, trunk_idx, self.N_trunk_datapoints)
-        return self.branch_input_data[branch_idx,:], self.trunk_input_data[trunk_idx, :], self.output_data_u[branch_idx,trunk_idx], self.output_data_v[branch_idx,trunk_idx]
+        return self.branch_input_data[branch_idx,:], self.trunk_input_data[trunk_idx, :], branch_idx, trunk_idx
     
 if __name__ == '__main__':
     config_file = 'DataConfig.json'
