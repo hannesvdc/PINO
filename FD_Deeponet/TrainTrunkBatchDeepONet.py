@@ -51,6 +51,7 @@ def getGradient():
         grads.append(param.grad.view(-1))
     grads = pt.cat(grads)
     return pt.norm(grads)
+log_rate = 100
 def train(epoch):
     network.train()
     for batch_idx, (branch_input, trunk_input, branch_indices, trunk_indices) in enumerate(train_loader):
@@ -72,9 +73,10 @@ def train(epoch):
         optimizer.step()
 
         # Some housekeeping
-        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6E} \tLoss Gradient: {:.6E} \tlr: {:.4E}'.format(
-                        epoch, batch_idx * len(branch_input), len(train_loader.dataset),
-                        100. * batch_idx / len(train_loader), loss.item(), grad, optimizer.param_groups[0]['lr']))
+        if batch_idx % log_rate == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6E} \tLoss Gradient: {:.6E} \tlr: {:.4E}'.format(
+                            epoch, batch_idx * len(branch_input), len(train_loader.dataset),
+                            100. * batch_idx / len(train_loader), loss.item(), grad, optimizer.param_groups[0]['lr']))
         train_losses.append(loss.item())
         train_grads.append(grad.cpu())
         train_counter.append((1.0*batch_idx)/len(train_loader) + epoch-1)

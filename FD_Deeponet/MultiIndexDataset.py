@@ -25,9 +25,17 @@ class MultiIndexDeepONetDataset(Dataset):
         self.output_data_u = self.output_data_u / self.scale_u
         self.output_data_v = self.output_data_v / self.scale_v
 
+        # Subsample the data for faster training
+        self.N_branch_datapoints = 1000
+        self.N_trunk_datapoints = 101**2 // 2
+        random_branch_indices = pt.randperm(self.branch_input_data.size(0))[0:self.N_branch_datapoints]
+        random_trunk_indices = pt.randperm(self.trunk_input_data.size(0))[:self.N_trunk_datapoints]
+        self.branch_input_data = self.branch_input_data[random_branch_indices,:]
+        self.trunk_input_data = self.trunk_input_data[random_trunk_indices,:]
+        self.output_data_u = self.output_data_u[random_branch_indices,:][:,random_trunk_indices]
+        self.output_data_v = self.output_data_v[random_branch_indices,:][:,random_trunk_indices]
+
         # Print the total memory consumption
-        self.N_branch_datapoints = self.branch_input_data.shape[0]
-        self.N_trunk_datapoints = self.trunk_input_data.shape[0]
         memory_usage = self.branch_input_data.numel() * self.branch_input_data.element_size() \
                      + self.trunk_input_data.numel() * self.trunk_input_data.element_size() \
                      + self.output_data_u.numel() * self.output_data_u.element_size() \
