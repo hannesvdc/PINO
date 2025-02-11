@@ -14,5 +14,3 @@ def gp(y_points, K):
     f_1 = rng.multivariate_normal(mean=np.zeros_like(y_points), cov=K)
     f_2 = rng.multivariate_normal(mean=np.zeros_like(y_points), cov=K)
     return f_1, f_2
-
-

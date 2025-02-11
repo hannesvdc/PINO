@@ -1,7 +1,8 @@
 from dolfin import *
 import numpy as np
-from scipy.linalg import cholesky
 import matplotlib.pyplot as plt
+
+import FD_Deeponet.GaussianProces as gp
 
 # Setup the Geometry, Trial, and Test functions
 N = 100
@@ -33,40 +34,41 @@ def stress(u, E, nu):
 
 # Define the random forcing on the right boundary
 class RandomForce(UserExpression):
-    def __init__(self, mesh, correlation_length=0.12, **kwargs):
+    def __init__(self, mesh, l=0.12, **kwargs):
         super().__init__(**kwargs)
         self.mesh = mesh
-        self.correlation_length = correlation_length
-        self.kernel = lambda y, yp: np.exp(-0.5 * (y - yp) ** 2 / correlation_length ** 2)
-        self.boundary_points, self.forces = self._generate_correlated_forces()
+        self.l = l
+        self.forces = {}
 
-    def _generate_correlated_forces(self):
-        # Extract boundary points on x = 1
-        boundary_points = sorted([f.midpoint()[1] for f in facets(self.mesh) if near(f.midpoint()[0], 1.0)])
-        n = len(boundary_points)
+        # Gather all boundary y-values
+        y_coords = []
+        facet_to_y = {}
+        for f in facets(mesh):
+            if near(f.midpoint()[0], 1.0):
+                print(f.midpoint()[0])
+                y = f.midpoint()[1]
+                y_coords.append(y)
+                facet_to_y[f.index()] = y
+        y_points = np.sort(np.unique(y_coords))
 
-        # Construct covariance matrix
-        K = np.zeros((n, n))
-        for i in range(n):
-            for j in range(n):
-                K[i, j] = self.kernel(boundary_points[i], boundary_points[j])
+        # Generate the Gaussian Process and apply it to every boundary facet
+        K = gp.precompute_covariance(y_points, self.l)
+        f_1, f_2 = gp.gp(y_points, K)
+        for f in facets(mesh):
+            if f.index() in facet_to_y:
+                y = facet_to_y[f.index()]
+                idx = np.searchsorted(y_points, y)  # Find index in sorted y_points
+                self.forces[f.index()] = (f_1[idx], f_2[idx])
+        print('f_1', f_1)
+        print('f_2', f_2)
 
-        # Cholesky decomposition to sample correlated values
-        L = cholesky(K + 1e-6 * np.eye(n), lower=True)  # Add small noise for numerical stability
-        uncorrelated_samples = np.random.normal(0, 0.1, (n, 2))  # Two components (x and y)
-        correlated_samples = L @ uncorrelated_samples
-
-        # Store the forces mapped to boundary points
-        forces = {boundary_points[i]: correlated_samples[i, :] for i in range(n)}
-        return boundary_points, forces
-
+    # Quickly evaluate the random forcing
     def eval(self, values, x):
-        if near(x[0], 1.0):
-            # Find the closest boundary point in the precomputed list
-            closest_y = min(self.boundary_points, key=lambda yp: abs(yp - x[1]))
-            values[:] = self.forces[closest_y]
-        else:
-            values[:] = (0.0, 0.0)  # No force elsewhere
+        for f in facets(self.mesh):
+            if near(f.midpoint()[0], 1.0):
+                values[0], values[1] = self.forces.get(f.index(), (0.0, 0.0))
+                return
+        values[0], values[1] = (0.0, 0.0)
 
     def value_shape(self):
         return (2,)
@@ -95,7 +97,7 @@ u_x_values = u_x.compute_vertex_values()
 u_x_grid = np.reshape(u_x_values, (N+1, N+1))
 
 # Make a color plot
-plt.pcolor(X_plot, Y_plot, u_x_grid, shading="auto")
+plt.pcolor(X_plot, Y_plot, u_x_grid, shading="auto", cmap='jet')
 plt.colorbar()
 plt.title("X-Displacement Field")
 plt.xlabel("X")

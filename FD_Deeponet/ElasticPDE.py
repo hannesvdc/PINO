@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.linalg as lg
 
-
 def counter_to_index(counter):
     N=100
     i = counter // (N+1)
@@ -97,8 +96,3 @@ def solveElasticPDE(lu, pivot, E, mu, f, N): # f has shape (N+1, 2)
 
     # return the tuple (u, v)
     return (u, v)
-
-
-
-
-
