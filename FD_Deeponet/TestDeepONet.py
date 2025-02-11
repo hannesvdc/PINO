@@ -31,7 +31,7 @@ p = 300
 branch_layers = [202, 512, 512, 512, 512, 2*p]
 trunk_layers = [2, 512, 512, 512, 512, 2*p]
 network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers)
-network.load_state_dict(pt.load(store_directory + 'model_many_layers.pth', weights_only=True))
+network.load_state_dict(pt.load(store_directory + 'model_vanilla.pth', weights_only=True))
 
 # Generate a proper forcing, on average 3 standard deviations away from the mean
 l = 0.12
