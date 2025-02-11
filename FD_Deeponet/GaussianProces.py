@@ -1,5 +1,5 @@
-import autograd.numpy as np
-import autograd.numpy.random as rd
+import numpy as np
+import numpy.random as rd
 
 rng = rd.RandomState()
 

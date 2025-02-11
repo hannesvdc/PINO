@@ -1,7 +1,6 @@
 import json
 import torch as pt
 import torch.nn as nn
-from torch.utils.data import DataLoader
 
 import matplotlib.pyplot as plt
 
@@ -27,7 +26,6 @@ store_directory = config['Store Directory']
 # Load the data in memory
 batch_size = 128
 dataset = DeepONetDataset(config, device, dtype)
-train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 n_data_points = len(dataset) * 101**2
 trunk_input = dataset.trunk_input_data
 
@@ -41,38 +39,39 @@ print('Number of Data Points per Parameter: ', n_data_points / (1.0 * network.ge
 
 # Training Routine
 loss_fn = nn.MSELoss()
+def closure():
+    optimizer.zero_grad()
+
+    # Compute Loss
+    output_u, output_v = network(dataset.branch_input_data, dataset.trunk_input_data)
+    loss_u = loss_fn(output_u, dataset.output_data_u)
+    loss_v = loss_fn(output_v, dataset.output_data_v)
+    loss = loss_u + loss_v
+
+    # Compute loss gradient and do one optimization step
+    loss.backward()
+    return loss
+
 train_losses = []
 train_grads = []
 train_counter = []
 def train(epoch):
     network.train()
-    for batch_idx, (branch_input, target_u, target_v) in enumerate(train_loader):
-        def closure():
-            optimizer.zero_grad()
 
-            # Compute Loss
-            output_u, output_v = network(branch_input, trunk_input)
-            loss_u = loss_fn(output_u, target_u)
-            loss_v = loss_fn(output_v, target_v)
-            loss = loss_u + loss_v
+    # Perform one optimization step per epoch
+    loss = optimizer.step(closure=closure)
+    grad_norm = pt.norm(pt.cat([p.grad.view(-1) for p in network.parameters()]))
 
-            # Compute loss gradient and do one optimization step
-            loss.backward()
-            return loss
-        loss = optimizer.step(closure=closure)
-        grad_norm = pt.norm(pt.cat([p.grad.view(-1) for p in network.parameters()]))
+    # Print and store the current state.
+    print('Train Epoch: {} \tLoss: {:.6E} \tLoss Gradient: {:.6E}'.format(
+                    epoch, loss.item(), grad_norm))
+    train_losses.append(loss.item())
+    train_grads.append(grad_norm.cpu())
+    train_counter.append(epoch-1)
 
-        # Print and store the current state TODO: Can we not redo these loss and gradient computations?
-        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6E} \tLoss Gradient: {:.6E}'.format(
-                        epoch, batch_idx * len(branch_input), len(train_loader.dataset),
-                        100. * batch_idx / len(train_loader), loss.item(), grad_norm))
-        train_losses.append(loss.item())
-        train_grads.append(grad_norm.cpu())
-        train_counter.append((1.0*batch_idx)/len(train_loader) + epoch-1)
-
-        # Store the temporary state
-        pt.save(network.state_dict(), store_directory + 'model_broyden.pth')
-        pt.save(optimizer.state_dict(), store_directory + 'optimizer_broyden.pth')
+    # Store the temporary state
+    pt.save(network.state_dict(), store_directory + 'model_broyden.pth')
+    pt.save(optimizer.state_dict(), store_directory + 'optimizer_broyden.pth')
 
 # Do the actual training
 print('\nStarting Training Procedure...')

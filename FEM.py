@@ -1,7 +1,7 @@
 from dolfin import *
 import numpy as np
+from scipy.linalg import cholesky
 import matplotlib.pyplot as plt
-from dolfin import plot
 
 # Setup the Geometry, Trial, and Test functions
 N = 100
@@ -33,22 +33,40 @@ def stress(u, E, nu):
 
 # Define the random forcing on the right boundary
 class RandomForce(UserExpression):
-    def __init__(self, mesh, **kwargs):
+    def __init__(self, mesh, correlation_length=0.12, **kwargs):
         super().__init__(**kwargs)
-        np.random.seed()
-        self.forces = {}
+        self.mesh = mesh
+        self.correlation_length = correlation_length
+        self.kernel = lambda y, yp: np.exp(-0.5 * (y - yp) ** 2 / correlation_length ** 2)
+        self.boundary_points, self.forces = self._generate_correlated_forces()
 
-        for f in facets(mesh):
-            if near(f.midpoint()[0], 1.0):  # Only on the right boundary
-                self.forces[f.index()] = (np.random.normal(0, 0.1), np.random.normal(0, 0.1))
+    def _generate_correlated_forces(self):
+        # Extract boundary points on x = 1
+        boundary_points = sorted([f.midpoint()[1] for f in facets(self.mesh) if near(f.midpoint()[0], 1.0)])
+        n = len(boundary_points)
+
+        # Construct covariance matrix
+        K = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                K[i, j] = self.kernel(boundary_points[i], boundary_points[j])
+
+        # Cholesky decomposition to sample correlated values
+        L = cholesky(K + 1e-6 * np.eye(n), lower=True)  # Add small noise for numerical stability
+        uncorrelated_samples = np.random.normal(0, 0.1, (n, 2))  # Two components (x and y)
+        correlated_samples = L @ uncorrelated_samples
+
+        # Store the forces mapped to boundary points
+        forces = {boundary_points[i]: correlated_samples[i, :] for i in range(n)}
+        return boundary_points, forces
 
     def eval(self, values, x):
-        # Find the closest facet and apply the random force
-        for f in facets(mesh):
-            if near(f.midpoint()[0], 1.0):
-                values[0], values[1] = self.forces.get(f.index(), (0.0, 0.0))
-                return
-        values[0], values[1] = (0.0, 0.0)  # Default zero force
+        if near(x[0], 1.0):
+            # Find the closest boundary point in the precomputed list
+            closest_y = min(self.boundary_points, key=lambda yp: abs(yp - x[1]))
+            values[:] = self.forces[closest_y]
+        else:
+            values[:] = (0.0, 0.0)  # No force elsewhere
 
     def value_shape(self):
         return (2,)
