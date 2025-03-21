@@ -1,2 +1,2 @@
-# DeepONets-for-FEM
-Exploring DeepONets trained on Finite Element Data
+# PINO - Physics-Informed Neural Operators
+Exploring DeepONets for solving equations with parameters and forcings.
