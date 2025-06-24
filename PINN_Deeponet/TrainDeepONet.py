@@ -3,7 +3,7 @@ import torch as pt
 import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as sch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 
 from model import ConvDeepONet, PhysicsLoss
@@ -25,17 +25,24 @@ config = json.load(open(config_file))
 store_directory = config['Store Directory']
 
 # Load the data in memory
-batch_size = 128
-dataset = DeepONetDataset(config, device, dtype)
-train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-n_data_points = len(dataset) * 101**2
+batch_size = 64
+forcing_dataset = DeepONetDataset(config, device, dtype)
+forcing_loader = DataLoader(forcing_dataset, batch_size=batch_size, shuffle=True)
+internal_dataset = TensorDataset(forcing_dataset.xy_int)
+batch_xy = 1024
+internal_loader = DataLoader(internal_dataset, batch_size=batch_xy, shuffle=True)
+n_chunks = len(internal_loader)
+n_data_points = len(forcing_dataset) * len(internal_dataset)
+xy_left = forcing_dataset.xy_left
+xy_forcing = forcing_dataset.xy_forcing
+
 
 # Read the command line arguments
 n_branch_conv = 3
 kernel_size = 5
 p = 25
-network = ConvDeepONet(n_branch_conv, kernel_size, p)
-optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
+network = ConvDeepONet(n_branch_conv, kernel_size, p).to(device)
+optimizer = optim.Adam(network.parameters(), lr=1.e-3)
 step = 250
 scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.1)
 print('Number of Data Points per Parameter: ', n_data_points / (1.0 * network.getNumberofParameters()))
@@ -57,29 +64,34 @@ def getGradient():
     grads = pt.cat(grads)
     return pt.norm(grads)
 
+xy_empty = pt.empty((0,2), device=device, dtype=pt.float32)
 def train(epoch):
     network.train()
-    for batch_idx, branch_input in enumerate(train_loader):
+
+    for f_batch_idx, f_batch in enumerate(forcing_loader):
         optimizer.zero_grad()
 
-        # Compute Loss
-        xy_int = dataset.xy_int
-        xy_left = dataset.xy_left
-        xy_forcing = dataset.xy_forcing
-        loss = loss_fn.forward(network, branch_input, xy_int, xy_left, xy_forcing)
+        # Do the boundary losses once
+        loss_bc = loss_fn(network, f_batch, xy_empty, xy_left, xy_forcing)
+        loss_bc.backward()
 
-        # Compute loss gradient and do one optimization step
-        loss.backward()
+        physics_loss : float = 0.0
+        for xy_batch_idx, (xy_batch,) in enumerate(internal_loader):
+            loss_int = loss_fn.forward(network, f_batch, xy_batch, xy_empty, xy_empty) / n_chunks
+            loss_int.backward()
+            physics_loss += loss_int.item()
+
+        # Do an optimizer step
         grad = getGradient()
         optimizer.step()
 
         # Some housekeeping
-        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6E} \tLoss Gradient: {:.6E} \tlr: {:.4E}'.format(
-                        epoch, batch_idx * len(branch_input), len(train_loader),
-                        100. * batch_idx / len(train_loader), loss.item(), grad, optimizer.param_groups[0]['lr']))
-        train_losses.append(loss.item())
+        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tBoundary Loss: {:.4E} \tPhysics Loss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
+                        epoch, f_batch_idx * len(f_batch), len(forcing_dataset),
+                        100. * f_batch_idx / len(forcing_loader), loss_bc.item(), physics_loss, grad, optimizer.param_groups[0]['lr']))
+        train_losses.append(loss_bc.item() + physics_loss)
         train_grads.append(grad.cpu())
-        train_counter.append((1.0*batch_idx)/len(train_loader) + epoch-1)
+        train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)
 
         # Store the temporary state
         pt.save(network.state_dict(), store_directory + 'model.pth')

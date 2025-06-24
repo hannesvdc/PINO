@@ -44,7 +44,7 @@ class TrunkModel(nn.Module):
 
         # Define two linear layers with activation
         layer_list = list()
-        layer_list.append(("linear1", nn.Linear(2*p, 2*p)))
+        layer_list.append(("linear1", nn.Linear(2, 2*p)))
         layer_list.append((f"act1", nn.Tanh()))
         layer_list.append(("linear2", nn.Linear(2*p, 2*p)))
         layer_list.append((f"act2", nn.Tanh()))
@@ -99,32 +99,41 @@ class PhysicsLoss(nn.Module):
     def forward(self, model : ConvDeepONet, f_batch : pt.Tensor, xy_int : pt.Tensor, xy_diriclet : pt.Tensor, xy_forcing : pt.Tensor):
 
         # PDE residual inside the domain
-        _, H_int = self.grads_and_hess(model, f_batch, xy_int)
-        u_xx = H_int[:,:,0,0,0]
-        u_xy = H_int[:,:,0,0,1]
-        u_yy = H_int[:,:,0,1,1]
-        v_xx = H_int[:,:,1,0,0]
-        v_xy = H_int[:,:,1,0,1]
-        v_yy = H_int[:,:,1,1,1]
-        loss_int_u = self.pref * (u_xx + 0.5*(1.0 + self.nu)*v_xy + 0.5*(1.0 - self.nu)*u_yy)
-        loss_int_v = self.pref * (v_yy + 0.5*(1.0 + self.nu)*u_xy + 0.5*(1.0 - self.nu)*v_xx)
-        loss_int = loss_int_u.square().mean() + loss_int_v.square().mean()
+        if xy_int.numel() != 0:
+            _, H_int = self.grads_and_hess(model, f_batch, xy_int)
+            u_xx = H_int[:,:,0,0,0]
+            u_xy = H_int[:,:,0,0,1]
+            u_yy = H_int[:,:,0,1,1]
+            v_xx = H_int[:,:,1,0,0]
+            v_xy = H_int[:,:,1,0,1]
+            v_yy = H_int[:,:,1,1,1]
+            loss_int_u = self.pref * (u_xx + 0.5*(1.0 + self.nu)*v_xy + 0.5*(1.0 - self.nu)*u_yy)
+            loss_int_v = self.pref * (v_yy + 0.5*(1.0 + self.nu)*u_xy + 0.5*(1.0 - self.nu)*v_xx)
+            loss_int = loss_int_u.square().mean() + loss_int_v.square().mean()
+        else:
+            loss_int = pt.zeros(1, device=f_batch.device, dtype=f_batch.dtype, requires_grad=False).squeeze()
         
         # Dirichlet boundary conditions on the left
-        u_left, v_left = model.forward(f_batch, xy_diriclet)
-        loss_left = u_left.square().mean() + v_left.square().mean()
+        if xy_diriclet.numel() != 0:
+            u_left, v_left = model.forward(f_batch, xy_diriclet)
+            loss_left = u_left.square().mean() + v_left.square().mean()
+        else:
+            loss_left = pt.zeros(1, device=f_batch.device, dtype=f_batch.dtype, requires_grad=False).squeeze()
 
         # Forcing (Neumann) boundary conditions on the right
-        g_x = f_batch[:, :101]
-        g_y = f_batch[:, 101:]
-        J_forcing, _ = self.grads_and_hess(model, f_batch, xy_forcing)
-        u_x = J_forcing[:,:,0,0] # Shape (B, 101) because Nc = 101 on rhe right boundary
-        u_y = J_forcing[:,:,0,1]
-        v_x = J_forcing[:,:,1,0]
-        v_y = J_forcing[:,:,1,1]
-        loss_forcing_u = self.pref * (u_x + self.nu * v_y) + g_x
-        loss_forcing_v = self.pref * (1.0 - self.nu) / 2.0 * (u_y + v_x) + g_y
-        loss_forcing = loss_forcing_u.square().mean() + loss_forcing_v.square().mean()
+        if xy_forcing.numel() != 0:
+            g_x = f_batch[:, :101]
+            g_y = f_batch[:, 101:]
+            J_forcing, _ = self.grads_and_hess(model, f_batch, xy_forcing)
+            u_x = J_forcing[:,:,0,0] # Shape (B, 101) because Nc = 101 on rhe right boundary
+            u_y = J_forcing[:,:,0,1]
+            v_x = J_forcing[:,:,1,0]
+            v_y = J_forcing[:,:,1,1]
+            loss_forcing_u = self.pref * (u_x + self.nu * v_y) + g_x
+            loss_forcing_v = self.pref * (1.0 - self.nu) / 2.0 * (u_y + v_x) + g_y
+            loss_forcing = loss_forcing_u.square().mean() + loss_forcing_v.square().mean()
+        else:
+            loss_forcing = pt.zeros(1, device=f_batch.device, dtype=f_batch.dtype, requires_grad=False).squeeze()
 
         return self.w_int * loss_int + self.w_dirichlet * loss_left + self.w_forcing * loss_forcing
 

@@ -25,7 +25,7 @@ class DeepONetDataset(Dataset):
                      + self.xy_left.numel() * self.xy_left.element_size() \
                      + self.xy_forcing.numel() * self.xy_forcing.element_size() \
                      + self.xy_int.numel() * self.xy_int.element_size()
-        print('Total Memory Consumption: ', round(memory_usage / (1024.0)**2, 2), 'MB')
+        print('Total Data Memory Consumption: ', round(memory_usage / 1024.0**2, 2), 'MB')
 
     def __len__(self):
         return self.branch_input_data.shape[0]
