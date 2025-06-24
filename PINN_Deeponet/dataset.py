@@ -31,7 +31,7 @@ class DeepONetDataset(Dataset):
         return self.branch_input_data.shape[0]
 	
     def __getitem__(self, idx):
-        return self.branch_input_data[idx,:], self.xy_int, self.xy_left, self.xy_forcing
+        return self.branch_input_data[idx,:]
     
 if __name__ == '__main__':
     config_file = 'DataConfig.json'

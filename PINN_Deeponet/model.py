@@ -90,9 +90,9 @@ class ConvDeepONet(nn.Module):
         return u, v
     
 class PhysicsLoss(nn.Module):
-    def __init__(self, E, nu, w_int=1.0, w_dirichlet=1.0, w_forcing=1.0):
+    def __init__(self, E_train, nu, w_int=1.0, w_dirichlet=1.0, w_forcing=1.0):
         super().__init__()
-        self.E, self.nu = E, nu
+        self.E, self.nu = E_train, nu
         self.pref = self.E / (1.0 - self.nu**2)
         self.w_int, self.w_dirichlet, self.w_forcing = w_int, w_dirichlet, w_forcing
 
