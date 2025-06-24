@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../')
 import json
 import torch as pt
 import torch.nn as nn
@@ -30,9 +32,9 @@ n_data_points = len(dataset) * 101**2
 trunk_input = dataset.trunk_input_data
 
 # Read the command line arguments
-p = 300
-branch_layers = [202, 512, 512, 512, 512, 2*p]
-trunk_layers = [2, 512, 512, 512, 512, 2*p]
+p = 200
+branch_layers = [202, 128, 2*p]
+trunk_layers = [2, 128, 2*p]
 network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
 optimizer = SelfScaledBroyden(network.parameters())
 print('Number of Data Points per Parameter: ', n_data_points / (1.0 * network.getNumberofParameters()))

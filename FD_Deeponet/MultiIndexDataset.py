@@ -26,14 +26,14 @@ class MultiIndexDeepONetDataset(Dataset):
         self.output_data_v = self.output_data_v / self.scale_v
 
         # Subsample the data for faster training
-        self.N_branch_datapoints = 1000
-        self.N_trunk_datapoints = 101**2 // 2
-        random_branch_indices = pt.randperm(self.branch_input_data.size(0))[0:self.N_branch_datapoints]
-        random_trunk_indices = pt.randperm(self.trunk_input_data.size(0))[:self.N_trunk_datapoints]
-        self.branch_input_data = self.branch_input_data[random_branch_indices,:]
-        self.trunk_input_data = self.trunk_input_data[random_trunk_indices,:]
-        self.output_data_u = self.output_data_u[random_branch_indices,:][:,random_trunk_indices]
-        self.output_data_v = self.output_data_v[random_branch_indices,:][:,random_trunk_indices]
+        self.N_branch_datapoints = 10000
+        self.N_trunk_datapoints = 101**2
+        #random_branch_indices = pt.randperm(self.branch_input_data.size(0))[0:self.N_branch_datapoints]
+        #random_trunk_indices = pt.randperm(self.trunk_input_data.size(0))[:self.N_trunk_datapoints]
+        #self.branch_input_data = self.branch_input_data[random_branch_indices,:]
+        #self.trunk_input_data = self.trunk_input_data[random_trunk_indices,:]
+        #self.output_data_u = self.output_data_u[random_branch_indices,:][:,random_trunk_indices]
+        #self.output_data_v = self.output_data_v[random_branch_indices,:][:,random_trunk_indices]
 
         # Print the total memory consumption
         memory_usage = self.branch_input_data.numel() * self.branch_input_data.element_size() \

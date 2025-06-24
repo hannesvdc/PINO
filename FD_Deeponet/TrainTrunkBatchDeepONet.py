@@ -36,7 +36,7 @@ branch_layers = [202, 512, 512, 512, 512, 2*p]
 trunk_layers = [2, 512, 512, 512, 512, 2*p]
 network = DeepONet(branch_layers=branch_layers, trunk_layers=trunk_layers).to(device, dtype=dtype)
 optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
-step = 2
+step = 1
 scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.1)
 print('Number of Data Points per Parameter: ', len(dataset) / (1.0 * network.getNumberofParameters()))
 

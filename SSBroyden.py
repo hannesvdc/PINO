@@ -4,11 +4,13 @@ from torch.optim.optimizer import Optimizer
 
 class SelfScaledBroyden(Optimizer):
     def __init__(self, params):
-        super().__init__(params, dict())  # Register the parameter groups
+        super().__init__(params, dict())
 
         self.params = list(params)
-        self.n_params = sum(p.numel() for p in self.parameters())
+        print('len(self.params)', len(self.params))
+        self.n_params = sum(p.numel() for group in self.params for p in group['params'])
         self.Hk = pt.eye(self.n_params)
+        print('number of params', self.n_params)
 
         # Line search hyperparameters
         self.c1 = 1.e-4
@@ -23,7 +25,7 @@ class SelfScaledBroyden(Optimizer):
         """
         Performs a single optimization step.
         """
-        assert closure is not None, "SSBroyden requires a closure function that reevaluates the model and returns the loss."
+        assert closure is not None, "SSBroyden requires a closure function that re-evaluates the model and returns the loss."
 
         # Compute the current loss, gradient and search direction
         x_k = parameters_to_vector(self.params).detach()
@@ -57,8 +59,8 @@ class SelfScaledBroyden(Optimizer):
 
         # Update the inverse Hessian approximation
         term1 = pt.outer(Hkyk, pt.mv(self.Hk.T, y_k)) / pt.inner(y_k, Hkyk)
-        term2 = pt.outer(s_k, s_k) / yksk
-        term3 = phi_k * ykHkyk * pt.outer(v_k, v_k)
+        term2 = phi_k * ykHkyk * pt.outer(v_k, v_k)
+        term3 = pt.outer(s_k, s_k) / yksk
         self.Hk = 1.0/tau_k * (self.Hk - term1 + term2) + term3
 
         # Return the new loss, maybe it is useful
