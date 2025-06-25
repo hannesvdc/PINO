@@ -45,7 +45,7 @@ kernel_size = 7
 n_branch_nonlinear = 3
 p = 100
 network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_nonlinear, p)
-network.load_state_dict(pt.load(store_directory + 'pretrained_model.pht', weights_only=True))
+network.load_state_dict(pt.load(store_directory + 'pretrained_model.pth', weights_only=True))
 network.to(device)
 
 # Create the Adam optimizer and LR scheduler
@@ -115,7 +115,7 @@ def train(epoch):
         # Some housekeeping
         print('Train Epoch: {} [{}/{} ({:.0f}%)]\tDirichlet Loss: {:.4E} (w = {:.1E}) \tForcing Loss: {:.4E} (w = {:.1E}) \tPhysics Loss: {:.4E} (w = {:.1E}) \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
                         epoch, f_batch_idx * len(f_batch), len(forcing_dataset),
-                        100. * f_batch_idx / len(forcing_loader), 0.0, w_dirichlet, loss_forcing.item(), w_forcing, physics_loss, w_int, grad, optimizer.param_groups[0]['lr']))
+                        100. * f_batch_idx / len(forcing_loader), loss_dirichlet.item(), w_dirichlet, loss_forcing.item(), w_forcing, physics_loss, w_int, grad, optimizer.param_groups[0]['lr']))
         train_losses.append(0.0 + loss_forcing.item() + physics_loss)
         train_grads.append(grad.cpu())
         train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)
@@ -126,19 +126,49 @@ def train(epoch):
 
 # Increase the physics weights first with a constant learning rate.
 print('\nStarting Training Procedure...')
-n_epochs_per_weight = 10
-delta_weight = 0.1
-n_epochs = int(n_epochs_per_weight / delta_weight) - n_epochs_per_weight
-try:
-    for epoch in range(1, n_epochs + 1):
-        weight = (epoch // n_epochs_per_weight + 1) * delta_weight
-        w_dirichlet = weight
-        w_int = weight
-        loss_fn.setWeights(w_int, w_dirichlet, w_forcing)
+# ----------------------------------------------
+# curriculum hyper-parameters
+# ----------------------------------------------
+w_forc   = 1.0                     # always 1
+w_dir_0  = 1e-4                    # start value
+w_pde_0  = 1e-5
+w_dir_max = 1.0                    # final value you want
+w_pde_max = 1e-1
 
+warm_epochs   = 10                 # low-LR period just after the switch
+ramp_step     = 50                 # how often to multiply by 10
+base_lr       = 1e-3               # your usual LR
+low_lr_factor = 0.2                # LR multiplier during warm-up
+max_epochs    = 300                # run as long as you like
+clip_val      = 5.0                # keep your current clip
+def ramp_weight(init, max_, epoch, step):
+    """log-ramp: multiply by 10 every <step> epochs until max is reached"""
+    k = epoch // step           # how many steps have passed
+    w = init * (10.0 ** k)
+    return min(w, max_)
+def set_lr(optim, factor):
+    for g in optim.param_groups:
+        g['lr'] = base_lr * factor
+print("\nStarting curriculum-phase training...")
+try:
+    for epoch in range(1, max_epochs + 1):
+
+        # --- LR handling ---------------------------------------------
+        if epoch <= warm_epochs:
+            set_lr(optimizer, low_lr_factor)
+        else:
+            set_lr(optimizer, 1.0)
+
+        # --- task weights --------------------------------------------
+        w_dirichlet = ramp_weight(w_dir_0, w_dir_max, epoch, ramp_step)
+        w_int = ramp_weight(w_pde_0, w_pde_max, epoch, ramp_step)
+
+        loss_fn.setWeights(w_int = w_int,
+                           w_dirichlet = w_dirichlet,
+                           w_forcing = w_forcing)
         train(epoch)
 except KeyboardInterrupt:
-    print('Aborting Training. Plotting Training Convergence.')
+    print('Moving on to post training.')
 
 # Post-training: slowly decrease the learing rate to obtain the optimal fit.
 step = 10
