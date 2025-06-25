@@ -19,6 +19,7 @@ class DeepONetDataset(Dataset):
         self.xy_left = trunk_input_data[0:self.grid_points, :]
         self.xy_forcing = trunk_input_data[-self.grid_points:, :]
         self.xy_int = trunk_input_data[self.grid_points:-self.grid_points, :]
+        print(self.branch_input_data)
 
         # Print the total memory consumption
         memory_usage = self.branch_input_data.numel() * self.branch_input_data.element_size() \
