@@ -106,6 +106,11 @@ class PhysicsLoss(nn.Module):
         self.pref = self.E / (1.0 - self.nu**2)
         self.w_int, self.w_dirichlet, self.w_forcing = w_int, w_dirichlet, w_forcing
 
+    def setWeights(self, w_int : float, w_dirichlet : float, w_forcing : float):
+        self.w_int = w_int
+        self.w_dirichlet = w_dirichlet
+        self.w_forcing = w_forcing
+
     def forward(self, model : ConvDeepONet, f_batch : pt.Tensor, xy_int : pt.Tensor, xy_diriclet : pt.Tensor, xy_forcing : pt.Tensor):
 
         # PDE residual inside the domain

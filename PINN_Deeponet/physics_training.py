@@ -45,12 +45,11 @@ kernel_size = 7
 n_branch_nonlinear = 3
 p = 100
 network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_nonlinear, p)
+network.load_state_dict(pt.load(store_directory + 'pretrained_model.pht', weights_only=True))
 network.to(device)
 
 # Create the Adam optimizer and LR scheduler
-optimizer = optim.Adam(network.parameters(), lr=10**(-2.5), amsgrad=True)
-step = 25
-scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.5)
+optimizer = optim.Adam(network.parameters(), lr=1.e-3, amsgrad=True)
 print('Number of Data Points per Parameter: ', n_data_points / (1.0 * network.getNumberofParameters()))
 
 # Training Routine
@@ -84,7 +83,7 @@ def train(epoch):
             g_y = f_batch[:, 101:]
 
             # forward pass on the right boundary only
-            J, _ = loss_fn.grads_and_hess(network, f_batch, xy_forcing)
+            J, _ = loss_fn.grads_and_hess(network, f_batch, xy_forcing, needsHessian=False)
             u_x = J[:,:,0,0];  u_y = J[:,:,0,1]
             v_x = J[:,:,1,0];  v_y = J[:,:,1,1]
 
@@ -103,10 +102,10 @@ def train(epoch):
         loss_forcing.backward()
 
         physics_loss : float = 0.0
-        #for xy_batch_idx, (xy_batch,) in enumerate(internal_loader):
-        #    loss_int = loss_fn.forward(network, f_batch, xy_batch, xy_empty, xy_empty) / n_chunks
-        #    loss_int.backward()
-        #    physics_loss += loss_int.item()
+        for xy_batch_idx, (xy_batch,) in enumerate(internal_loader):
+            loss_int = loss_fn.forward(network, f_batch, xy_batch, xy_empty, xy_empty) / n_chunks
+            loss_int.backward()
+            physics_loss += loss_int.item()
 
         # Do an optimizer step
         pt.nn.utils.clip_grad_norm_(network.parameters(), max_norm=clip_level)
@@ -114,26 +113,43 @@ def train(epoch):
         optimizer.step()
 
         # Some housekeeping
-        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tDirichlet Loss: {:.4E} \tForcing Loss: {:.4E} \tPhysics Loss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
+        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tDirichlet Loss: {:.4E} (w = {:.1E}) \tForcing Loss: {:.4E} (w = {:.1E}) \tPhysics Loss: {:.4E} (w = {:.1E}) \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
                         epoch, f_batch_idx * len(f_batch), len(forcing_dataset),
-                        100. * f_batch_idx / len(forcing_loader), 0.0, loss_forcing.item(), physics_loss, grad, optimizer.param_groups[0]['lr']))
+                        100. * f_batch_idx / len(forcing_loader), 0.0, w_dirichlet, loss_forcing.item(), w_forcing, physics_loss, w_int, grad, optimizer.param_groups[0]['lr']))
         train_losses.append(0.0 + loss_forcing.item() + physics_loss)
         train_grads.append(grad.cpu())
         train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)
 
         # Store the temporary state
-        pt.save(network.state_dict(), store_directory + 'pretrained_model.pth')
-        pt.save(optimizer.state_dict(), store_directory + 'pretrained_optimizer.pth')
+        pt.save(network.state_dict(), store_directory + 'physics_model.pth')
+        pt.save(optimizer.state_dict(), store_directory + 'physics_optimizer.pth')
 
-# Do the actual training
+# Increase the physics weights first with a constant learning rate.
 print('\nStarting Training Procedure...')
-n_epochs = 10 * step # Do a max of 250 epochs pre-training. Should be enough convergence.
+n_epochs_per_weight = 10
+delta_weight = 0.1
+n_epochs = int(n_epochs_per_weight / delta_weight) - n_epochs_per_weight
+try:
+    for epoch in range(1, n_epochs + 1):
+        weight = (epoch // n_epochs_per_weight + 1) * delta_weight
+        w_dirichlet = weight
+        w_int = weight
+        loss_fn.setWeights(w_int, w_dirichlet, w_forcing)
+
+        train(epoch)
+except KeyboardInterrupt:
+    print('Aborting Training. Plotting Training Convergence.')
+
+# Post-training: slowly decrease the learing rate to obtain the optimal fit.
+step = 10
+scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.5)
+n_epochs = 10 * step # Do a max of 100 epochs post-training. Should be enough convergence.
 try:
     for epoch in range(1, n_epochs + 1):
         train(epoch)
         scheduler.step()
 except KeyboardInterrupt:
-    print('Aborting Training. Plotting Training Convergence.')
+    print('Stopping Post-Trainig. Plotting Training Convergence.')
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, color='tab:blue', label='Training Loss', alpha=0.5)
