@@ -68,7 +68,7 @@ def getGradient():
 
 pref = loss_fn.pref
 xy_empty = pt.empty((0,2), device=device, dtype=pt.float32)
-def train(epoch):
+def train(epoch, filename):
     network.train()
 
     forcing_sum = 0.0
@@ -116,8 +116,8 @@ def train(epoch):
         train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)
 
     # Store the temporary state
-    pt.save(network.state_dict(), store_directory + 'physics_model.pth')
-    pt.save(optimizer.state_dict(), store_directory + 'physics_optimizer.pth')
+    pt.save(network.state_dict(), store_directory + f"{filename}_model.pth")
+    pt.save(optimizer.state_dict(), store_directory + f"{filename}_optimizer.pth")
 
     # Return the averaged forcing and physics losses for weight calculations
     n_batches = len(forcing_loader)
@@ -156,7 +156,7 @@ try:
 
         # Do one epoch with these weights
         loss_fn.setWeights(w_int = current_w_int, w_forcing = w_forcing)
-        forcing_term, physics_term = train(epoch)
+        forcing_term, physics_term = train(epoch, "physics")
         weighted_ratio = physics_term / forcing_term
         print(f"epoch {epoch:3d} | ratio={weighted_ratio:.2f} "
           f"| w_int={current_w_int:.1e} | LR={optimizer.param_groups[0]['lr']:.1e}")
@@ -169,7 +169,7 @@ try:
             print(f" ↑ increased w_int to {current_w_int:.1e}, "
                 f"low-LR for {warm_left} epochs")
         elif target_band[0] <= weighted_ratio <= target_band[1]:
-            print(" ✓ losses balanced – stop ramping")
+            print(" ✓ losses balanced - stop ramping")
             ramping_done = True
 except KeyboardInterrupt:
     print('Moving on to post training.')
@@ -181,7 +181,7 @@ last_epoch = epoch
 n_epochs = 10 * step
 try:
     for epoch in range(1, n_epochs + 1):
-        train(last_epoch + epoch)
+        train(last_epoch + epoch, "post")
         scheduler.step()
 except KeyboardInterrupt:
     print('Stopping Post-Trainig. Plotting Training Convergence.')
