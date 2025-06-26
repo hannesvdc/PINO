@@ -173,18 +173,7 @@ try:
             ramping_done = True
 except KeyboardInterrupt:
     print('Moving on to post training.')
-
-# Post-training: slowly decrease the learing rate to obtain the optimal fit.
-step = 10
-scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.5)
-last_epoch = epoch
-n_epochs = 10 * step
-try:
-    for epoch in range(1, n_epochs + 1):
-        train(last_epoch + epoch, "post")
-        scheduler.step()
-except KeyboardInterrupt:
-    print('Stopping Post-Trainig. Plotting Training Convergence.')
+print('Final Physics Weight: ', current_w_int)
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, color='tab:blue', label='Training Loss', alpha=0.5)
