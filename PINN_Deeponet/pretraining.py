@@ -66,11 +66,8 @@ train_losses = []
 train_grads = []
 train_counter = []
 def getGradient():
-    grads = []
-    for param in network.parameters():
-        grads.append(param.grad.view(-1)) # type: ignore
-    grads = pt.cat(grads)
-    return pt.norm(grads)
+    grads = [p.grad.view(-1) for p in network.parameters() if p.grad is not None]
+    return pt.norm(pt.cat(grads))
 
 pref = loss_fn.pref
 xy_empty = pt.empty((0,2), device=device, dtype=pt.float32)
@@ -114,9 +111,9 @@ def train(epoch):
         train_grads.append(grad.cpu())
         train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)
 
-        # Store the pretrained state
-        pt.save(network.state_dict(), store_directory + 'pretrained_model.pth')
-        pt.save(optimizer.state_dict(), store_directory + 'pretrained_optimizer.pth')
+    # Store the pretrained state
+    pt.save(network.state_dict(), store_directory + 'pretrained_model.pth')
+    pt.save(optimizer.state_dict(), store_directory + 'pretrained_optimizer.pth')
 
 # Do the actual training
 print('\nStarting Training Procedure...')
