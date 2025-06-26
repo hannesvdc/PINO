@@ -1,0 +1,67 @@
+import json
+import torch as pt
+import numpy as np
+import matplotlib.pyplot as plt
+
+from model import ConvDeepONet
+from dataset import DeepONetDataset
+
+# Just some sanity pytorch settings
+pt.set_grad_enabled(True)
+pt.set_default_dtype(pt.float32)
+device = pt.device('cpu')
+dtype = pt.float32
+
+# Load the data configuration
+config_file = 'DataConfig.json'
+config = json.load(open(config_file))
+store_directory = config['Store Directory']
+
+# Load the data in memory
+forcing_dataset = DeepONetDataset(config, device, dtype)
+f_sample = pt.unsqueeze(forcing_dataset.branch_input_data[101,:], dim=0) # Take a random forcing from the dataset, doesn't matter
+xy_all = forcing_dataset.trunk_input_data
+
+# Create and initialize the model
+n_branch_conv = 5
+n_branch_channels = 8
+kernel_size = 7
+n_branch_nonlinear = 3
+p = 100
+network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_nonlinear, p)
+network.load_state_dict(pt.load(store_directory + 'posttrain_model.pth', map_location=device, weights_only=True))
+network.to(device)
+
+# Push the data through the network
+E_train = 1.0
+E_material = 300 * 1.e6
+nu = 0.3
+u, v = network.forward(f_sample, xy_all)
+u /= (E_material / E_train)
+v /= (E_material / E_train)
+u = u.reshape((forcing_dataset.grid_points, forcing_dataset.grid_points))
+v = v.reshape((forcing_dataset.grid_points, forcing_dataset.grid_points))
+
+# Plot the displacement field
+X_lin = np.linspace(0.0, 1.0, forcing_dataset.grid_points)
+Y_lin = np.linspace(0.0, 1.0, forcing_dataset.grid_points)
+X, Y = np.meshgrid(X_lin, Y_lin)
+plt.pcolor(X, Y, u.detach().numpy().T, cmap='jet')
+plt.xlabel(r"$x$")
+plt.ylabel(r"$y$")
+plt.title(r'$x$-displacements $u(x, y)$')
+plt.colorbar()
+plt.figure()
+plt.pcolor(X, Y, v.detach().numpy().T, cmap='jet')
+plt.xlabel(r"$x$")
+plt.ylabel(r"$y$")
+plt.title(r'$y$-displacements $v(x, y)$')
+plt.colorbar()
+
+# Plot the forcing vector f
+plt.figure()
+plt.plot(Y_lin, f_sample[0,0:101], label=r'$f_1$')
+plt.plot(Y_lin, f_sample[0,101:], label=r'$f_2$')
+plt.legend()
+plt.xlabel(r'$y$')
+plt.show()
