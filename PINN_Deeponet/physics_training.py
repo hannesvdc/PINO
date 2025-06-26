@@ -56,9 +56,8 @@ print('Number of Data Points per Parameter: ', n_data_points / (1.0 * network.ge
 E_train = 1.0 
 nu = 0.3
 w_int = 0.0
-w_dirichlet = 0.0
 w_forcing = 1.0
-loss_fn = PhysicsLoss(E_train, nu, w_int, w_dirichlet, w_forcing)
+loss_fn = PhysicsLoss(E_train, nu, w_int, w_forcing)
 train_losses = []
 train_grads = []
 train_counter = []
@@ -96,14 +95,12 @@ def train(epoch):
             print("corr(σ_xx, g_x) =", pt.corrcoef(pt.stack((sig_x.flatten(), g_x.flatten())))[0,1].item())
 
         # Do the boundary losses once
-        loss_dirichlet = loss_fn(network, f_batch, xy_empty, xy_left, xy_empty)
-        loss_dirichlet.backward()
-        loss_forcing = loss_fn(network, f_batch, xy_empty, xy_empty, xy_forcing)
+        loss_forcing = loss_fn(network, f_batch, xy_empty, xy_forcing)
         loss_forcing.backward()
 
         physics_loss : float = 0.0
         for xy_batch_idx, (xy_batch,) in enumerate(internal_loader):
-            loss_int = loss_fn.forward(network, f_batch, xy_batch, xy_empty, xy_empty) / n_chunks
+            loss_int = loss_fn.forward(network, f_batch, xy_batch, xy_empty) / n_chunks
             loss_int.backward()
             physics_loss += loss_int.item()
 
@@ -113,9 +110,9 @@ def train(epoch):
         optimizer.step()
 
         # Some housekeeping
-        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tDirichlet Loss: {:.4E} (w = {:.1E}) \tForcing Loss: {:.4E} (w = {:.1E}) \tPhysics Loss: {:.4E} (w = {:.1E}) \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
+        print('Train Epoch: {} [{}/{} ({:.0f}%)] \tForcing Loss: {:.4E} (w = {:.1E}) \tPhysics Loss: {:.4E} (w = {:.1E}) \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
                         epoch, f_batch_idx * len(f_batch), len(forcing_dataset),
-                        100. * f_batch_idx / len(forcing_loader), loss_dirichlet.item(), w_dirichlet, loss_forcing.item(), w_forcing, physics_loss, w_int, grad, optimizer.param_groups[0]['lr']))
+                        100. * f_batch_idx / len(forcing_loader), loss_forcing.item(), w_forcing, physics_loss, w_int, grad, optimizer.param_groups[0]['lr']))
         train_losses.append(0.0 + loss_forcing.item() + physics_loss)
         train_grads.append(grad.cpu())
         train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)
@@ -126,20 +123,15 @@ def train(epoch):
 
 # Increase the physics weights first with a constant learning rate.
 print('\nStarting Training Procedure...')
-# ----------------------------------------------
-# curriculum hyper-parameters
-# ----------------------------------------------
 w_forc   = 1.0                     # always 1
-w_dir_0  = 1e-4                    # start value
 w_pde_0  = 1e-5
-w_dir_max = 1.0                    # final value you want
 w_pde_max = 1e-1
 
 warm_epochs   = 10                 # low-LR period just after the switch
-ramp_step     = 50                 # how often to multiply by 10
+ramp_step     = 10                 # how often to multiply by 10
 base_lr       = 1e-3               # your usual LR
 low_lr_factor = 0.2                # LR multiplier during warm-up
-max_epochs    = 300                # run as long as you like
+max_epochs    = 100                # run as long as you like
 clip_val      = 5.0                # keep your current clip
 def ramp_weight(init, max_, epoch, step):
     """log-ramp: multiply by 10 every <step> epochs until max is reached"""
@@ -153,18 +145,15 @@ print("\nStarting curriculum-phase training...")
 try:
     for epoch in range(1, max_epochs + 1):
 
-        # --- LR handling ---------------------------------------------
+        # LR handling
         if epoch <= warm_epochs:
             set_lr(optimizer, low_lr_factor)
         else:
             set_lr(optimizer, 1.0)
 
-        # --- task weights --------------------------------------------
-        w_dirichlet = ramp_weight(w_dir_0, w_dir_max, epoch, ramp_step)
+        # task weights
         w_int = ramp_weight(w_pde_0, w_pde_max, epoch, ramp_step)
-
         loss_fn.setWeights(w_int = w_int,
-                           w_dirichlet = w_dirichlet,
                            w_forcing = w_forcing)
         train(epoch)
 except KeyboardInterrupt:
@@ -173,10 +162,10 @@ except KeyboardInterrupt:
 # Post-training: slowly decrease the learing rate to obtain the optimal fit.
 step = 10
 scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.5)
-n_epochs = 10 * step # Do a max of 100 epochs post-training. Should be enough convergence.
+n_epochs = 10 * step
 try:
     for epoch in range(1, n_epochs + 1):
-        train(epoch)
+        train(max_epochs + epoch)
         scheduler.step()
 except KeyboardInterrupt:
     print('Stopping Post-Trainig. Plotting Training Convergence.')
