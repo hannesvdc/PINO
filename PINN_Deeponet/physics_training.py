@@ -112,7 +112,7 @@ def train(epoch):
 
 # Increase the physics weights first with a constant learning rate.
 print('\nStarting Training Procedure...')
-w_int_0  = 1e-5
+w_int_0  = 1e-7 # Very small
 w_int_max = 1e-1
 warm_epochs   = 2        # low-LR period just after the switch
 ramp_step     = 10       # how often to multiply by 10
