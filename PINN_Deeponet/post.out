@@ -4475,3 +4475,1143 @@ Train Epoch: 10 [4672/10000 (46%)] 	Forcing Loss: 1.2810E-04 (w = 1.0E+00) 	Phys
 Train Epoch: 10 [4736/10000 (47%)] 	Forcing Loss: 1.0684E-04 (w = 1.0E+00) 	Physics Loss: 2.4214E-04 (w = 1.0E-06) 	Loss Gradient: 1.3637E-01 	lr: 7.46E-05
 
 ⟨|s_xx+g_x|⟩=5.860e-03   ⟨|s_xy+g_y|⟩=5.256e-03
+Train Epoch: 10 [4800/10000 (48%)] 	Forcing Loss: 1.0491E-04 (w = 1.0E+00) 	Physics Loss: 2.4762E-04 (w = 1.0E-06) 	Loss Gradient: 1.6720E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.621e-03   ⟨|s_xy+g_y|⟩=5.636e-03
+Train Epoch: 10 [4864/10000 (48%)] 	Forcing Loss: 1.0492E-04 (w = 1.0E+00) 	Physics Loss: 2.3353E-04 (w = 1.0E-06) 	Loss Gradient: 2.0689E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=4.946e-03   ⟨|s_xy+g_y|⟩=5.671e-03
+Train Epoch: 10 [4928/10000 (49%)] 	Forcing Loss: 9.5992E-05 (w = 1.0E+00) 	Physics Loss: 2.6680E-04 (w = 1.0E-06) 	Loss Gradient: 1.4782E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.018e-03   ⟨|s_xy+g_y|⟩=5.619e-03
+Train Epoch: 10 [4992/10000 (50%)] 	Forcing Loss: 9.6428E-05 (w = 1.0E+00) 	Physics Loss: 2.4538E-04 (w = 1.0E-06) 	Loss Gradient: 1.0632E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.252e-03   ⟨|s_xy+g_y|⟩=5.659e-03
+Train Epoch: 10 [5056/10000 (50%)] 	Forcing Loss: 1.0180E-04 (w = 1.0E+00) 	Physics Loss: 2.6354E-04 (w = 1.0E-06) 	Loss Gradient: 1.5162E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.477e-03   ⟨|s_xy+g_y|⟩=5.426e-03
+Train Epoch: 10 [5120/10000 (51%)] 	Forcing Loss: 1.0348E-04 (w = 1.0E+00) 	Physics Loss: 2.6867E-04 (w = 1.0E-06) 	Loss Gradient: 1.8170E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=4.727e-03   ⟨|s_xy+g_y|⟩=5.395e-03
+Train Epoch: 10 [5184/10000 (52%)] 	Forcing Loss: 8.7436E-05 (w = 1.0E+00) 	Physics Loss: 2.5893E-04 (w = 1.0E-06) 	Loss Gradient: 1.2608E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.449e-03   ⟨|s_xy+g_y|⟩=5.173e-03
+Train Epoch: 10 [5248/10000 (52%)] 	Forcing Loss: 9.4439E-05 (w = 1.0E+00) 	Physics Loss: 2.3585E-04 (w = 1.0E-06) 	Loss Gradient: 1.3647E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.723e-03   ⟨|s_xy+g_y|⟩=5.529e-03
+Train Epoch: 10 [5312/10000 (53%)] 	Forcing Loss: 1.0546E-04 (w = 1.0E+00) 	Physics Loss: 2.7891E-04 (w = 1.0E-06) 	Loss Gradient: 1.3761E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.548e-03   ⟨|s_xy+g_y|⟩=6.133e-03
+Train Epoch: 10 [5376/10000 (54%)] 	Forcing Loss: 1.1387E-04 (w = 1.0E+00) 	Physics Loss: 2.8414E-04 (w = 1.0E-06) 	Loss Gradient: 1.2677E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.494e-03   ⟨|s_xy+g_y|⟩=5.513e-03
+Train Epoch: 10 [5440/10000 (54%)] 	Forcing Loss: 1.0648E-04 (w = 1.0E+00) 	Physics Loss: 2.4118E-04 (w = 1.0E-06) 	Loss Gradient: 1.5684E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=6.036e-03   ⟨|s_xy+g_y|⟩=5.489e-03
+Train Epoch: 10 [5504/10000 (55%)] 	Forcing Loss: 1.1101E-04 (w = 1.0E+00) 	Physics Loss: 2.9334E-04 (w = 1.0E-06) 	Loss Gradient: 1.5535E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.729e-03   ⟨|s_xy+g_y|⟩=5.755e-03
+Train Epoch: 10 [5568/10000 (55%)] 	Forcing Loss: 1.1257E-04 (w = 1.0E+00) 	Physics Loss: 2.6512E-04 (w = 1.0E-06) 	Loss Gradient: 1.6960E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.758e-03   ⟨|s_xy+g_y|⟩=5.589e-03
+Train Epoch: 10 [5632/10000 (56%)] 	Forcing Loss: 1.0652E-04 (w = 1.0E+00) 	Physics Loss: 2.7230E-04 (w = 1.0E-06) 	Loss Gradient: 1.4513E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.141e-03   ⟨|s_xy+g_y|⟩=5.259e-03
+Train Epoch: 10 [5696/10000 (57%)] 	Forcing Loss: 9.0292E-05 (w = 1.0E+00) 	Physics Loss: 2.5659E-04 (w = 1.0E-06) 	Loss Gradient: 1.4916E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.376e-03   ⟨|s_xy+g_y|⟩=5.881e-03
+Train Epoch: 10 [5760/10000 (57%)] 	Forcing Loss: 1.0692E-04 (w = 1.0E+00) 	Physics Loss: 2.3228E-04 (w = 1.0E-06) 	Loss Gradient: 1.4029E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.345e-03   ⟨|s_xy+g_y|⟩=5.274e-03
+Train Epoch: 10 [5824/10000 (58%)] 	Forcing Loss: 9.3683E-05 (w = 1.0E+00) 	Physics Loss: 2.4721E-04 (w = 1.0E-06) 	Loss Gradient: 1.5474E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.947e-03   ⟨|s_xy+g_y|⟩=5.959e-03
+Train Epoch: 10 [5888/10000 (59%)] 	Forcing Loss: 1.1944E-04 (w = 1.0E+00) 	Physics Loss: 2.8015E-04 (w = 1.0E-06) 	Loss Gradient: 1.7278E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.123e-03   ⟨|s_xy+g_y|⟩=5.085e-03
+Train Epoch: 10 [5952/10000 (59%)] 	Forcing Loss: 9.0074E-05 (w = 1.0E+00) 	Physics Loss: 2.6459E-04 (w = 1.0E-06) 	Loss Gradient: 1.2102E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=6.071e-03   ⟨|s_xy+g_y|⟩=4.986e-03
+Train Epoch: 10 [6016/10000 (60%)] 	Forcing Loss: 1.0284E-04 (w = 1.0E+00) 	Physics Loss: 2.8830E-04 (w = 1.0E-06) 	Loss Gradient: 1.5763E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.636e-03   ⟨|s_xy+g_y|⟩=5.645e-03
+Train Epoch: 10 [6080/10000 (61%)] 	Forcing Loss: 1.0795E-04 (w = 1.0E+00) 	Physics Loss: 2.5153E-04 (w = 1.0E-06) 	Loss Gradient: 1.5383E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.040e-03   ⟨|s_xy+g_y|⟩=5.385e-03
+Train Epoch: 10 [6144/10000 (61%)] 	Forcing Loss: 9.1215E-05 (w = 1.0E+00) 	Physics Loss: 2.5566E-04 (w = 1.0E-06) 	Loss Gradient: 8.9397E-02 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.787e-03   ⟨|s_xy+g_y|⟩=6.378e-03
+Train Epoch: 10 [6208/10000 (62%)] 	Forcing Loss: 1.3844E-04 (w = 1.0E+00) 	Physics Loss: 2.8808E-04 (w = 1.0E-06) 	Loss Gradient: 1.6920E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.788e-03   ⟨|s_xy+g_y|⟩=6.127e-03
+Train Epoch: 10 [6272/10000 (62%)] 	Forcing Loss: 1.1829E-04 (w = 1.0E+00) 	Physics Loss: 2.6426E-04 (w = 1.0E-06) 	Loss Gradient: 1.7175E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.490e-03   ⟨|s_xy+g_y|⟩=5.711e-03
+Train Epoch: 10 [6336/10000 (63%)] 	Forcing Loss: 1.1227E-04 (w = 1.0E+00) 	Physics Loss: 2.4922E-04 (w = 1.0E-06) 	Loss Gradient: 1.4584E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.935e-03   ⟨|s_xy+g_y|⟩=5.968e-03
+Train Epoch: 10 [6400/10000 (64%)] 	Forcing Loss: 1.1830E-04 (w = 1.0E+00) 	Physics Loss: 2.5023E-04 (w = 1.0E-06) 	Loss Gradient: 1.4576E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=6.300e-03   ⟨|s_xy+g_y|⟩=5.741e-03
+Train Epoch: 10 [6464/10000 (64%)] 	Forcing Loss: 1.2598E-04 (w = 1.0E+00) 	Physics Loss: 2.7068E-04 (w = 1.0E-06) 	Loss Gradient: 1.3654E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.182e-03   ⟨|s_xy+g_y|⟩=5.663e-03
+Train Epoch: 10 [6528/10000 (65%)] 	Forcing Loss: 1.0029E-04 (w = 1.0E+00) 	Physics Loss: 2.5399E-04 (w = 1.0E-06) 	Loss Gradient: 1.5370E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.664e-03   ⟨|s_xy+g_y|⟩=5.275e-03
+Train Epoch: 10 [6592/10000 (66%)] 	Forcing Loss: 1.0088E-04 (w = 1.0E+00) 	Physics Loss: 2.3283E-04 (w = 1.0E-06) 	Loss Gradient: 1.1971E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.229e-03   ⟨|s_xy+g_y|⟩=5.093e-03
+Train Epoch: 10 [6656/10000 (66%)] 	Forcing Loss: 8.9144E-05 (w = 1.0E+00) 	Physics Loss: 2.3299E-04 (w = 1.0E-06) 	Loss Gradient: 1.2213E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.265e-03   ⟨|s_xy+g_y|⟩=5.833e-03
+Train Epoch: 10 [6720/10000 (67%)] 	Forcing Loss: 1.0715E-04 (w = 1.0E+00) 	Physics Loss: 2.3910E-04 (w = 1.0E-06) 	Loss Gradient: 1.4392E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.095e-03   ⟨|s_xy+g_y|⟩=5.071e-03
+Train Epoch: 10 [6784/10000 (68%)] 	Forcing Loss: 8.8399E-05 (w = 1.0E+00) 	Physics Loss: 2.5686E-04 (w = 1.0E-06) 	Loss Gradient: 7.6242E-02 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.161e-03   ⟨|s_xy+g_y|⟩=5.443e-03
+Train Epoch: 10 [6848/10000 (68%)] 	Forcing Loss: 1.0032E-04 (w = 1.0E+00) 	Physics Loss: 2.2983E-04 (w = 1.0E-06) 	Loss Gradient: 1.3247E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.786e-03   ⟨|s_xy+g_y|⟩=6.186e-03
+Train Epoch: 10 [6912/10000 (69%)] 	Forcing Loss: 1.1929E-04 (w = 1.0E+00) 	Physics Loss: 2.5603E-04 (w = 1.0E-06) 	Loss Gradient: 1.4696E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.685e-03   ⟨|s_xy+g_y|⟩=4.982e-03
+Train Epoch: 10 [6976/10000 (69%)] 	Forcing Loss: 9.9628E-05 (w = 1.0E+00) 	Physics Loss: 2.7783E-04 (w = 1.0E-06) 	Loss Gradient: 1.1140E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.286e-03   ⟨|s_xy+g_y|⟩=5.575e-03
+Train Epoch: 10 [7040/10000 (70%)] 	Forcing Loss: 9.6844E-05 (w = 1.0E+00) 	Physics Loss: 2.5520E-04 (w = 1.0E-06) 	Loss Gradient: 1.3394E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=6.081e-03   ⟨|s_xy+g_y|⟩=5.628e-03
+Train Epoch: 10 [7104/10000 (71%)] 	Forcing Loss: 1.1715E-04 (w = 1.0E+00) 	Physics Loss: 2.6362E-04 (w = 1.0E-06) 	Loss Gradient: 1.6384E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.419e-03   ⟨|s_xy+g_y|⟩=5.534e-03
+Train Epoch: 10 [7168/10000 (71%)] 	Forcing Loss: 9.9500E-05 (w = 1.0E+00) 	Physics Loss: 2.6775E-04 (w = 1.0E-06) 	Loss Gradient: 1.3075E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=6.373e-03   ⟨|s_xy+g_y|⟩=5.379e-03
+Train Epoch: 10 [7232/10000 (72%)] 	Forcing Loss: 1.1608E-04 (w = 1.0E+00) 	Physics Loss: 2.6687E-04 (w = 1.0E-06) 	Loss Gradient: 1.5174E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.226e-03   ⟨|s_xy+g_y|⟩=5.331e-03
+Train Epoch: 10 [7296/10000 (73%)] 	Forcing Loss: 9.3593E-05 (w = 1.0E+00) 	Physics Loss: 2.7340E-04 (w = 1.0E-06) 	Loss Gradient: 1.2405E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.359e-03   ⟨|s_xy+g_y|⟩=5.332e-03
+Train Epoch: 10 [7360/10000 (73%)] 	Forcing Loss: 9.4991E-05 (w = 1.0E+00) 	Physics Loss: 2.6153E-04 (w = 1.0E-06) 	Loss Gradient: 1.2650E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.955e-03   ⟨|s_xy+g_y|⟩=5.500e-03
+Train Epoch: 10 [7424/10000 (74%)] 	Forcing Loss: 1.1173E-04 (w = 1.0E+00) 	Physics Loss: 2.7122E-04 (w = 1.0E-06) 	Loss Gradient: 1.5472E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.335e-03   ⟨|s_xy+g_y|⟩=5.377e-03
+Train Epoch: 10 [7488/10000 (75%)] 	Forcing Loss: 9.5644E-05 (w = 1.0E+00) 	Physics Loss: 2.6060E-04 (w = 1.0E-06) 	Loss Gradient: 1.2383E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.706e-03   ⟨|s_xy+g_y|⟩=5.767e-03
+Train Epoch: 10 [7552/10000 (75%)] 	Forcing Loss: 1.1029E-04 (w = 1.0E+00) 	Physics Loss: 2.6566E-04 (w = 1.0E-06) 	Loss Gradient: 1.0353E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.822e-03   ⟨|s_xy+g_y|⟩=6.022e-03
+Train Epoch: 10 [7616/10000 (76%)] 	Forcing Loss: 1.1817E-04 (w = 1.0E+00) 	Physics Loss: 2.6979E-04 (w = 1.0E-06) 	Loss Gradient: 1.4912E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=6.476e-03   ⟨|s_xy+g_y|⟩=5.612e-03
+Train Epoch: 10 [7680/10000 (76%)] 	Forcing Loss: 1.2041E-04 (w = 1.0E+00) 	Physics Loss: 2.7644E-04 (w = 1.0E-06) 	Loss Gradient: 1.5020E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.386e-03   ⟨|s_xy+g_y|⟩=4.756e-03
+Train Epoch: 10 [7744/10000 (77%)] 	Forcing Loss: 8.5153E-05 (w = 1.0E+00) 	Physics Loss: 2.3354E-04 (w = 1.0E-06) 	Loss Gradient: 9.0500E-02 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.651e-03   ⟨|s_xy+g_y|⟩=5.764e-03
+Train Epoch: 10 [7808/10000 (78%)] 	Forcing Loss: 1.0974E-04 (w = 1.0E+00) 	Physics Loss: 2.5293E-04 (w = 1.0E-06) 	Loss Gradient: 1.7638E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.507e-03   ⟨|s_xy+g_y|⟩=6.196e-03
+Train Epoch: 10 [7872/10000 (78%)] 	Forcing Loss: 1.1399E-04 (w = 1.0E+00) 	Physics Loss: 2.5506E-04 (w = 1.0E-06) 	Loss Gradient: 1.6969E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.391e-03   ⟨|s_xy+g_y|⟩=5.392e-03
+Train Epoch: 10 [7936/10000 (79%)] 	Forcing Loss: 9.6302E-05 (w = 1.0E+00) 	Physics Loss: 2.6359E-04 (w = 1.0E-06) 	Loss Gradient: 1.2132E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.776e-03   ⟨|s_xy+g_y|⟩=5.942e-03
+Train Epoch: 10 [8000/10000 (80%)] 	Forcing Loss: 1.1462E-04 (w = 1.0E+00) 	Physics Loss: 2.8103E-04 (w = 1.0E-06) 	Loss Gradient: 1.7023E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.296e-03   ⟨|s_xy+g_y|⟩=5.536e-03
+Train Epoch: 10 [8064/10000 (80%)] 	Forcing Loss: 9.7819E-05 (w = 1.0E+00) 	Physics Loss: 2.9339E-04 (w = 1.0E-06) 	Loss Gradient: 1.5035E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.705e-03   ⟨|s_xy+g_y|⟩=5.656e-03
+Train Epoch: 10 [8128/10000 (81%)] 	Forcing Loss: 1.0960E-04 (w = 1.0E+00) 	Physics Loss: 2.5218E-04 (w = 1.0E-06) 	Loss Gradient: 1.3868E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.368e-03   ⟨|s_xy+g_y|⟩=5.661e-03
+Train Epoch: 10 [8192/10000 (82%)] 	Forcing Loss: 1.0605E-04 (w = 1.0E+00) 	Physics Loss: 2.5992E-04 (w = 1.0E-06) 	Loss Gradient: 1.3255E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.798e-03   ⟨|s_xy+g_y|⟩=5.259e-03
+Train Epoch: 10 [8256/10000 (82%)] 	Forcing Loss: 1.0424E-04 (w = 1.0E+00) 	Physics Loss: 2.5686E-04 (w = 1.0E-06) 	Loss Gradient: 1.7633E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.873e-03   ⟨|s_xy+g_y|⟩=5.457e-03
+Train Epoch: 10 [8320/10000 (83%)] 	Forcing Loss: 1.1286E-04 (w = 1.0E+00) 	Physics Loss: 2.6782E-04 (w = 1.0E-06) 	Loss Gradient: 1.6856E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=6.121e-03   ⟨|s_xy+g_y|⟩=5.612e-03
+Train Epoch: 10 [8384/10000 (83%)] 	Forcing Loss: 1.1902E-04 (w = 1.0E+00) 	Physics Loss: 2.3632E-04 (w = 1.0E-06) 	Loss Gradient: 1.1171E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.740e-03   ⟨|s_xy+g_y|⟩=5.016e-03
+Train Epoch: 10 [8448/10000 (84%)] 	Forcing Loss: 9.7934E-05 (w = 1.0E+00) 	Physics Loss: 2.5635E-04 (w = 1.0E-06) 	Loss Gradient: 1.6942E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.470e-03   ⟨|s_xy+g_y|⟩=5.845e-03
+Train Epoch: 10 [8512/10000 (85%)] 	Forcing Loss: 1.0541E-04 (w = 1.0E+00) 	Physics Loss: 2.4494E-04 (w = 1.0E-06) 	Loss Gradient: 1.6045E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.599e-03   ⟨|s_xy+g_y|⟩=5.272e-03
+Train Epoch: 10 [8576/10000 (85%)] 	Forcing Loss: 1.0108E-04 (w = 1.0E+00) 	Physics Loss: 2.6035E-04 (w = 1.0E-06) 	Loss Gradient: 1.3747E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.333e-03   ⟨|s_xy+g_y|⟩=5.332e-03
+Train Epoch: 10 [8640/10000 (86%)] 	Forcing Loss: 9.5620E-05 (w = 1.0E+00) 	Physics Loss: 2.6361E-04 (w = 1.0E-06) 	Loss Gradient: 1.2263E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.724e-03   ⟨|s_xy+g_y|⟩=5.577e-03
+Train Epoch: 10 [8704/10000 (87%)] 	Forcing Loss: 1.1177E-04 (w = 1.0E+00) 	Physics Loss: 2.7814E-04 (w = 1.0E-06) 	Loss Gradient: 1.5814E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.664e-03   ⟨|s_xy+g_y|⟩=6.341e-03
+Train Epoch: 10 [8768/10000 (87%)] 	Forcing Loss: 1.2306E-04 (w = 1.0E+00) 	Physics Loss: 2.5779E-04 (w = 1.0E-06) 	Loss Gradient: 1.7166E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.227e-03   ⟨|s_xy+g_y|⟩=5.326e-03
+Train Epoch: 10 [8832/10000 (88%)] 	Forcing Loss: 9.6161E-05 (w = 1.0E+00) 	Physics Loss: 2.5243E-04 (w = 1.0E-06) 	Loss Gradient: 7.3532E-02 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.503e-03   ⟨|s_xy+g_y|⟩=5.597e-03
+Train Epoch: 10 [8896/10000 (89%)] 	Forcing Loss: 1.0291E-04 (w = 1.0E+00) 	Physics Loss: 2.5778E-04 (w = 1.0E-06) 	Loss Gradient: 1.4442E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.622e-03   ⟨|s_xy+g_y|⟩=5.609e-03
+Train Epoch: 10 [8960/10000 (89%)] 	Forcing Loss: 1.0675E-04 (w = 1.0E+00) 	Physics Loss: 2.6769E-04 (w = 1.0E-06) 	Loss Gradient: 1.7058E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.417e-03   ⟨|s_xy+g_y|⟩=5.582e-03
+Train Epoch: 10 [9024/10000 (90%)] 	Forcing Loss: 1.0364E-04 (w = 1.0E+00) 	Physics Loss: 2.5465E-04 (w = 1.0E-06) 	Loss Gradient: 1.0361E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.596e-03   ⟨|s_xy+g_y|⟩=5.485e-03
+Train Epoch: 10 [9088/10000 (90%)] 	Forcing Loss: 1.0377E-04 (w = 1.0E+00) 	Physics Loss: 2.4770E-04 (w = 1.0E-06) 	Loss Gradient: 1.2219E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.187e-03   ⟨|s_xy+g_y|⟩=5.230e-03
+Train Epoch: 10 [9152/10000 (91%)] 	Forcing Loss: 9.4482E-05 (w = 1.0E+00) 	Physics Loss: 2.7577E-04 (w = 1.0E-06) 	Loss Gradient: 1.0530E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.484e-03   ⟨|s_xy+g_y|⟩=5.462e-03
+Train Epoch: 10 [9216/10000 (92%)] 	Forcing Loss: 1.0332E-04 (w = 1.0E+00) 	Physics Loss: 2.3600E-04 (w = 1.0E-06) 	Loss Gradient: 1.9982E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.450e-03   ⟨|s_xy+g_y|⟩=5.586e-03
+Train Epoch: 10 [9280/10000 (92%)] 	Forcing Loss: 1.0782E-04 (w = 1.0E+00) 	Physics Loss: 2.8188E-04 (w = 1.0E-06) 	Loss Gradient: 1.6636E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.172e-03   ⟨|s_xy+g_y|⟩=5.235e-03
+Train Epoch: 10 [9344/10000 (93%)] 	Forcing Loss: 9.3318E-05 (w = 1.0E+00) 	Physics Loss: 2.4896E-04 (w = 1.0E-06) 	Loss Gradient: 1.1259E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.831e-03   ⟨|s_xy+g_y|⟩=5.262e-03
+Train Epoch: 10 [9408/10000 (94%)] 	Forcing Loss: 1.0444E-04 (w = 1.0E+00) 	Physics Loss: 2.4445E-04 (w = 1.0E-06) 	Loss Gradient: 1.9973E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.374e-03   ⟨|s_xy+g_y|⟩=5.376e-03
+Train Epoch: 10 [9472/10000 (94%)] 	Forcing Loss: 9.6417E-05 (w = 1.0E+00) 	Physics Loss: 2.5137E-04 (w = 1.0E-06) 	Loss Gradient: 2.1778E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.124e-03   ⟨|s_xy+g_y|⟩=5.130e-03
+Train Epoch: 10 [9536/10000 (95%)] 	Forcing Loss: 8.9647E-05 (w = 1.0E+00) 	Physics Loss: 2.6203E-04 (w = 1.0E-06) 	Loss Gradient: 7.7377E-02 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.509e-03   ⟨|s_xy+g_y|⟩=5.741e-03
+Train Epoch: 10 [9600/10000 (96%)] 	Forcing Loss: 1.0779E-04 (w = 1.0E+00) 	Physics Loss: 2.5363E-04 (w = 1.0E-06) 	Loss Gradient: 1.4512E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.938e-03   ⟨|s_xy+g_y|⟩=5.380e-03
+Train Epoch: 10 [9664/10000 (96%)] 	Forcing Loss: 1.0973E-04 (w = 1.0E+00) 	Physics Loss: 2.5217E-04 (w = 1.0E-06) 	Loss Gradient: 1.2437E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.470e-03   ⟨|s_xy+g_y|⟩=5.554e-03
+Train Epoch: 10 [9728/10000 (97%)] 	Forcing Loss: 1.0421E-04 (w = 1.0E+00) 	Physics Loss: 2.4932E-04 (w = 1.0E-06) 	Loss Gradient: 1.7200E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.863e-03   ⟨|s_xy+g_y|⟩=5.062e-03
+Train Epoch: 10 [9792/10000 (97%)] 	Forcing Loss: 1.0398E-04 (w = 1.0E+00) 	Physics Loss: 2.7098E-04 (w = 1.0E-06) 	Loss Gradient: 1.1756E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.273e-03   ⟨|s_xy+g_y|⟩=5.569e-03
+Train Epoch: 10 [9856/10000 (98%)] 	Forcing Loss: 9.6472E-05 (w = 1.0E+00) 	Physics Loss: 2.4944E-04 (w = 1.0E-06) 	Loss Gradient: 2.0348E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.400e-03   ⟨|s_xy+g_y|⟩=5.314e-03
+Train Epoch: 10 [9920/10000 (99%)] 	Forcing Loss: 9.6111E-05 (w = 1.0E+00) 	Physics Loss: 2.7763E-04 (w = 1.0E-06) 	Loss Gradient: 1.1318E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=4.968e-03   ⟨|s_xy+g_y|⟩=5.822e-03
+Train Epoch: 10 [2496/10000 (99%)] 	Forcing Loss: 9.7747E-05 (w = 1.0E+00) 	Physics Loss: 2.6357E-04 (w = 1.0E-06) 	Loss Gradient: 1.2761E-01 	lr: 7.46E-05
+
+⟨|s_xx+g_x|⟩=5.209e-03   ⟨|s_xy+g_y|⟩=4.985e-03
+Train Epoch: 11 [0/10000 (0%)] 	Forcing Loss: 8.8950E-05 (w = 1.0E+00) 	Physics Loss: 2.4831E-04 (w = 1.0E-06) 	Loss Gradient: 9.3598E-02 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.554e-03   ⟨|s_xy+g_y|⟩=5.698e-03
+Train Epoch: 11 [64/10000 (1%)] 	Forcing Loss: 1.0801E-04 (w = 1.0E+00) 	Physics Loss: 2.7280E-04 (w = 1.0E-06) 	Loss Gradient: 2.0934E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.574e-03   ⟨|s_xy+g_y|⟩=6.338e-03
+Train Epoch: 11 [128/10000 (1%)] 	Forcing Loss: 1.1994E-04 (w = 1.0E+00) 	Physics Loss: 2.8112E-04 (w = 1.0E-06) 	Loss Gradient: 1.9061E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.401e-03   ⟨|s_xy+g_y|⟩=5.141e-03
+Train Epoch: 11 [192/10000 (2%)] 	Forcing Loss: 9.6095E-05 (w = 1.0E+00) 	Physics Loss: 2.6315E-04 (w = 1.0E-06) 	Loss Gradient: 1.2709E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.922e-03   ⟨|s_xy+g_y|⟩=5.732e-03
+Train Epoch: 11 [256/10000 (3%)] 	Forcing Loss: 1.1131E-04 (w = 1.0E+00) 	Physics Loss: 2.6220E-04 (w = 1.0E-06) 	Loss Gradient: 2.2252E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.622e-03   ⟨|s_xy+g_y|⟩=5.833e-03
+Train Epoch: 11 [320/10000 (3%)] 	Forcing Loss: 1.0797E-04 (w = 1.0E+00) 	Physics Loss: 2.4577E-04 (w = 1.0E-06) 	Loss Gradient: 2.0307E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.573e-03   ⟨|s_xy+g_y|⟩=6.076e-03
+Train Epoch: 11 [384/10000 (4%)] 	Forcing Loss: 1.1337E-04 (w = 1.0E+00) 	Physics Loss: 2.5226E-04 (w = 1.0E-06) 	Loss Gradient: 1.4521E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.484e-03   ⟨|s_xy+g_y|⟩=5.361e-03
+Train Epoch: 11 [448/10000 (4%)] 	Forcing Loss: 9.9224E-05 (w = 1.0E+00) 	Physics Loss: 2.6913E-04 (w = 1.0E-06) 	Loss Gradient: 1.8201E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.803e-03   ⟨|s_xy+g_y|⟩=5.997e-03
+Train Epoch: 11 [512/10000 (5%)] 	Forcing Loss: 1.2338E-04 (w = 1.0E+00) 	Physics Loss: 2.4851E-04 (w = 1.0E-06) 	Loss Gradient: 2.4469E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.238e-03   ⟨|s_xy+g_y|⟩=5.418e-03
+Train Epoch: 11 [576/10000 (6%)] 	Forcing Loss: 9.6629E-05 (w = 1.0E+00) 	Physics Loss: 2.2156E-04 (w = 1.0E-06) 	Loss Gradient: 1.0081E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.689e-03   ⟨|s_xy+g_y|⟩=5.447e-03
+Train Epoch: 11 [640/10000 (6%)] 	Forcing Loss: 1.0266E-04 (w = 1.0E+00) 	Physics Loss: 2.8055E-04 (w = 1.0E-06) 	Loss Gradient: 1.4398E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.904e-03   ⟨|s_xy+g_y|⟩=5.797e-03
+Train Epoch: 11 [704/10000 (7%)] 	Forcing Loss: 1.1156E-04 (w = 1.0E+00) 	Physics Loss: 2.4476E-04 (w = 1.0E-06) 	Loss Gradient: 2.2980E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.641e-03   ⟨|s_xy+g_y|⟩=5.629e-03
+Train Epoch: 11 [768/10000 (8%)] 	Forcing Loss: 1.0454E-04 (w = 1.0E+00) 	Physics Loss: 2.4096E-04 (w = 1.0E-06) 	Loss Gradient: 1.5554E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.493e-03   ⟨|s_xy+g_y|⟩=5.451e-03
+Train Epoch: 11 [832/10000 (8%)] 	Forcing Loss: 1.0239E-04 (w = 1.0E+00) 	Physics Loss: 2.7878E-04 (w = 1.0E-06) 	Loss Gradient: 1.6914E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.698e-03   ⟨|s_xy+g_y|⟩=5.393e-03
+Train Epoch: 11 [896/10000 (9%)] 	Forcing Loss: 1.0721E-04 (w = 1.0E+00) 	Physics Loss: 2.6889E-04 (w = 1.0E-06) 	Loss Gradient: 1.0051E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.041e-03   ⟨|s_xy+g_y|⟩=6.377e-03
+Train Epoch: 11 [960/10000 (10%)] 	Forcing Loss: 1.2970E-04 (w = 1.0E+00) 	Physics Loss: 2.6537E-04 (w = 1.0E-06) 	Loss Gradient: 2.2238E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.537e-03   ⟨|s_xy+g_y|⟩=5.638e-03
+Train Epoch: 11 [1024/10000 (10%)] 	Forcing Loss: 1.0746E-04 (w = 1.0E+00) 	Physics Loss: 2.6834E-04 (w = 1.0E-06) 	Loss Gradient: 1.0247E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.675e-03   ⟨|s_xy+g_y|⟩=4.951e-03
+Train Epoch: 11 [1088/10000 (11%)] 	Forcing Loss: 9.7003E-05 (w = 1.0E+00) 	Physics Loss: 2.5513E-04 (w = 1.0E-06) 	Loss Gradient: 1.3117E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.818e-03   ⟨|s_xy+g_y|⟩=5.756e-03
+Train Epoch: 11 [1152/10000 (11%)] 	Forcing Loss: 1.1027E-04 (w = 1.0E+00) 	Physics Loss: 2.4994E-04 (w = 1.0E-06) 	Loss Gradient: 1.6697E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.801e-03   ⟨|s_xy+g_y|⟩=5.474e-03
+Train Epoch: 11 [1216/10000 (12%)] 	Forcing Loss: 1.0483E-04 (w = 1.0E+00) 	Physics Loss: 2.6058E-04 (w = 1.0E-06) 	Loss Gradient: 1.4131E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.442e-03   ⟨|s_xy+g_y|⟩=5.226e-03
+Train Epoch: 11 [1280/10000 (13%)] 	Forcing Loss: 9.7048E-05 (w = 1.0E+00) 	Physics Loss: 2.4975E-04 (w = 1.0E-06) 	Loss Gradient: 9.6001E-02 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.819e-03   ⟨|s_xy+g_y|⟩=5.718e-03
+Train Epoch: 11 [1344/10000 (13%)] 	Forcing Loss: 1.2452E-04 (w = 1.0E+00) 	Physics Loss: 2.4192E-04 (w = 1.0E-06) 	Loss Gradient: 1.3756E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.723e-03   ⟨|s_xy+g_y|⟩=5.621e-03
+Train Epoch: 11 [1408/10000 (14%)] 	Forcing Loss: 1.1304E-04 (w = 1.0E+00) 	Physics Loss: 2.5989E-04 (w = 1.0E-06) 	Loss Gradient: 1.4156E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.637e-03   ⟨|s_xy+g_y|⟩=5.261e-03
+Train Epoch: 11 [1472/10000 (15%)] 	Forcing Loss: 9.8739E-05 (w = 1.0E+00) 	Physics Loss: 2.5940E-04 (w = 1.0E-06) 	Loss Gradient: 9.3101E-02 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.906e-03   ⟨|s_xy+g_y|⟩=5.618e-03
+Train Epoch: 11 [1536/10000 (15%)] 	Forcing Loss: 1.1134E-04 (w = 1.0E+00) 	Physics Loss: 2.6436E-04 (w = 1.0E-06) 	Loss Gradient: 1.0957E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.657e-03   ⟨|s_xy+g_y|⟩=5.717e-03
+Train Epoch: 11 [1600/10000 (16%)] 	Forcing Loss: 1.0883E-04 (w = 1.0E+00) 	Physics Loss: 2.5638E-04 (w = 1.0E-06) 	Loss Gradient: 1.5157E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.070e-03   ⟨|s_xy+g_y|⟩=5.901e-03
+Train Epoch: 11 [1664/10000 (17%)] 	Forcing Loss: 1.0533E-04 (w = 1.0E+00) 	Physics Loss: 2.6995E-04 (w = 1.0E-06) 	Loss Gradient: 1.1178E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.485e-03   ⟨|s_xy+g_y|⟩=5.956e-03
+Train Epoch: 11 [1728/10000 (17%)] 	Forcing Loss: 1.1297E-04 (w = 1.0E+00) 	Physics Loss: 3.0544E-04 (w = 1.0E-06) 	Loss Gradient: 1.2164E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.635e-03   ⟨|s_xy+g_y|⟩=5.208e-03
+Train Epoch: 11 [1792/10000 (18%)] 	Forcing Loss: 1.0207E-04 (w = 1.0E+00) 	Physics Loss: 2.5858E-04 (w = 1.0E-06) 	Loss Gradient: 1.6387E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.506e-03   ⟨|s_xy+g_y|⟩=5.721e-03
+Train Epoch: 11 [1856/10000 (18%)] 	Forcing Loss: 1.0518E-04 (w = 1.0E+00) 	Physics Loss: 2.4732E-04 (w = 1.0E-06) 	Loss Gradient: 1.2842E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.732e-03   ⟨|s_xy+g_y|⟩=5.424e-03
+Train Epoch: 11 [1920/10000 (19%)] 	Forcing Loss: 1.0828E-04 (w = 1.0E+00) 	Physics Loss: 2.5300E-04 (w = 1.0E-06) 	Loss Gradient: 9.6051E-02 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.833e-03   ⟨|s_xy+g_y|⟩=5.380e-03
+Train Epoch: 11 [1984/10000 (20%)] 	Forcing Loss: 1.0807E-04 (w = 1.0E+00) 	Physics Loss: 2.7590E-04 (w = 1.0E-06) 	Loss Gradient: 1.6229E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.191e-03   ⟨|s_xy+g_y|⟩=5.067e-03
+Train Epoch: 11 [2048/10000 (20%)] 	Forcing Loss: 1.0919E-04 (w = 1.0E+00) 	Physics Loss: 2.6795E-04 (w = 1.0E-06) 	Loss Gradient: 9.8646E-02 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.273e-03   ⟨|s_xy+g_y|⟩=5.942e-03
+Train Epoch: 11 [2112/10000 (21%)] 	Forcing Loss: 1.0593E-04 (w = 1.0E+00) 	Physics Loss: 2.7672E-04 (w = 1.0E-06) 	Loss Gradient: 1.2860E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.045e-03   ⟨|s_xy+g_y|⟩=6.214e-03
+Train Epoch: 11 [2176/10000 (22%)] 	Forcing Loss: 1.2570E-04 (w = 1.0E+00) 	Physics Loss: 2.4487E-04 (w = 1.0E-06) 	Loss Gradient: 2.0357E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.462e-03   ⟨|s_xy+g_y|⟩=5.320e-03
+Train Epoch: 11 [2240/10000 (22%)] 	Forcing Loss: 9.8396E-05 (w = 1.0E+00) 	Physics Loss: 2.8951E-04 (w = 1.0E-06) 	Loss Gradient: 1.3486E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.745e-03   ⟨|s_xy+g_y|⟩=5.244e-03
+Train Epoch: 11 [2304/10000 (23%)] 	Forcing Loss: 9.8702E-05 (w = 1.0E+00) 	Physics Loss: 2.6963E-04 (w = 1.0E-06) 	Loss Gradient: 1.0809E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.922e-03   ⟨|s_xy+g_y|⟩=5.527e-03
+Train Epoch: 11 [2368/10000 (24%)] 	Forcing Loss: 1.1417E-04 (w = 1.0E+00) 	Physics Loss: 2.8242E-04 (w = 1.0E-06) 	Loss Gradient: 1.7617E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.472e-03   ⟨|s_xy+g_y|⟩=5.378e-03
+Train Epoch: 11 [2432/10000 (24%)] 	Forcing Loss: 1.0083E-04 (w = 1.0E+00) 	Physics Loss: 2.6084E-04 (w = 1.0E-06) 	Loss Gradient: 1.1625E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.759e-03   ⟨|s_xy+g_y|⟩=5.909e-03
+Train Epoch: 11 [2496/10000 (25%)] 	Forcing Loss: 1.1415E-04 (w = 1.0E+00) 	Physics Loss: 2.6387E-04 (w = 1.0E-06) 	Loss Gradient: 1.1413E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.974e-03   ⟨|s_xy+g_y|⟩=5.720e-03
+Train Epoch: 11 [2560/10000 (25%)] 	Forcing Loss: 1.1011E-04 (w = 1.0E+00) 	Physics Loss: 2.1687E-04 (w = 1.0E-06) 	Loss Gradient: 1.6724E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.248e-03   ⟨|s_xy+g_y|⟩=5.902e-03
+Train Epoch: 11 [2624/10000 (26%)] 	Forcing Loss: 1.0474E-04 (w = 1.0E+00) 	Physics Loss: 2.4202E-04 (w = 1.0E-06) 	Loss Gradient: 1.2259E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.231e-03   ⟨|s_xy+g_y|⟩=5.171e-03
+Train Epoch: 11 [2688/10000 (27%)] 	Forcing Loss: 9.1259E-05 (w = 1.0E+00) 	Physics Loss: 2.5764E-04 (w = 1.0E-06) 	Loss Gradient: 1.2134E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.564e-03   ⟨|s_xy+g_y|⟩=5.404e-03
+Train Epoch: 11 [2752/10000 (27%)] 	Forcing Loss: 1.0582E-04 (w = 1.0E+00) 	Physics Loss: 2.6904E-04 (w = 1.0E-06) 	Loss Gradient: 1.1154E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.815e-03   ⟨|s_xy+g_y|⟩=5.975e-03
+Train Epoch: 11 [2816/10000 (28%)] 	Forcing Loss: 1.1644E-04 (w = 1.0E+00) 	Physics Loss: 2.5206E-04 (w = 1.0E-06) 	Loss Gradient: 1.0826E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.697e-03   ⟨|s_xy+g_y|⟩=6.130e-03
+Train Epoch: 11 [2880/10000 (29%)] 	Forcing Loss: 1.1455E-04 (w = 1.0E+00) 	Physics Loss: 2.5815E-04 (w = 1.0E-06) 	Loss Gradient: 1.6269E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.957e-03   ⟨|s_xy+g_y|⟩=5.413e-03
+Train Epoch: 11 [2944/10000 (29%)] 	Forcing Loss: 1.0760E-04 (w = 1.0E+00) 	Physics Loss: 2.7372E-04 (w = 1.0E-06) 	Loss Gradient: 1.4275E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.867e-03   ⟨|s_xy+g_y|⟩=5.943e-03
+Train Epoch: 11 [3008/10000 (30%)] 	Forcing Loss: 1.1759E-04 (w = 1.0E+00) 	Physics Loss: 2.5900E-04 (w = 1.0E-06) 	Loss Gradient: 1.8990E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.530e-03   ⟨|s_xy+g_y|⟩=5.555e-03
+Train Epoch: 11 [3072/10000 (31%)] 	Forcing Loss: 1.0199E-04 (w = 1.0E+00) 	Physics Loss: 2.6162E-04 (w = 1.0E-06) 	Loss Gradient: 1.3196E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.702e-03   ⟨|s_xy+g_y|⟩=5.586e-03
+Train Epoch: 11 [3136/10000 (31%)] 	Forcing Loss: 1.0650E-04 (w = 1.0E+00) 	Physics Loss: 2.7773E-04 (w = 1.0E-06) 	Loss Gradient: 1.4855E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.817e-03   ⟨|s_xy+g_y|⟩=5.768e-03
+Train Epoch: 11 [3200/10000 (32%)] 	Forcing Loss: 1.1437E-04 (w = 1.0E+00) 	Physics Loss: 2.6016E-04 (w = 1.0E-06) 	Loss Gradient: 1.3738E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.693e-03   ⟨|s_xy+g_y|⟩=6.153e-03
+Train Epoch: 11 [3264/10000 (32%)] 	Forcing Loss: 1.1654E-04 (w = 1.0E+00) 	Physics Loss: 2.5791E-04 (w = 1.0E-06) 	Loss Gradient: 1.3654E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.756e-03   ⟨|s_xy+g_y|⟩=6.054e-03
+Train Epoch: 11 [3328/10000 (33%)] 	Forcing Loss: 1.1621E-04 (w = 1.0E+00) 	Physics Loss: 2.3986E-04 (w = 1.0E-06) 	Loss Gradient: 1.6679E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.074e-03   ⟨|s_xy+g_y|⟩=5.775e-03
+Train Epoch: 11 [3392/10000 (34%)] 	Forcing Loss: 1.1559E-04 (w = 1.0E+00) 	Physics Loss: 2.6277E-04 (w = 1.0E-06) 	Loss Gradient: 1.5509E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.663e-03   ⟨|s_xy+g_y|⟩=5.726e-03
+Train Epoch: 11 [3456/10000 (34%)] 	Forcing Loss: 1.0807E-04 (w = 1.0E+00) 	Physics Loss: 2.7813E-04 (w = 1.0E-06) 	Loss Gradient: 1.5501E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.712e-03   ⟨|s_xy+g_y|⟩=5.682e-03
+Train Epoch: 11 [3520/10000 (35%)] 	Forcing Loss: 1.0956E-04 (w = 1.0E+00) 	Physics Loss: 2.4327E-04 (w = 1.0E-06) 	Loss Gradient: 1.6981E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.317e-03   ⟨|s_xy+g_y|⟩=6.223e-03
+Train Epoch: 11 [3584/10000 (36%)] 	Forcing Loss: 1.3017E-04 (w = 1.0E+00) 	Physics Loss: 2.8944E-04 (w = 1.0E-06) 	Loss Gradient: 2.3182E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.784e-03   ⟨|s_xy+g_y|⟩=5.793e-03
+Train Epoch: 11 [3648/10000 (36%)] 	Forcing Loss: 1.1240E-04 (w = 1.0E+00) 	Physics Loss: 2.4445E-04 (w = 1.0E-06) 	Loss Gradient: 1.5927E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.694e-03   ⟨|s_xy+g_y|⟩=5.703e-03
+Train Epoch: 11 [3712/10000 (37%)] 	Forcing Loss: 1.0858E-04 (w = 1.0E+00) 	Physics Loss: 2.8587E-04 (w = 1.0E-06) 	Loss Gradient: 1.9501E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.304e-03   ⟨|s_xy+g_y|⟩=5.846e-03
+Train Epoch: 11 [3776/10000 (38%)] 	Forcing Loss: 1.2126E-04 (w = 1.0E+00) 	Physics Loss: 2.6724E-04 (w = 1.0E-06) 	Loss Gradient: 2.0466E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.317e-03   ⟨|s_xy+g_y|⟩=6.080e-03
+Train Epoch: 11 [3840/10000 (38%)] 	Forcing Loss: 1.2781E-04 (w = 1.0E+00) 	Physics Loss: 2.6264E-04 (w = 1.0E-06) 	Loss Gradient: 2.1438E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.111e-03   ⟨|s_xy+g_y|⟩=5.784e-03
+Train Epoch: 11 [3904/10000 (39%)] 	Forcing Loss: 1.1754E-04 (w = 1.0E+00) 	Physics Loss: 2.7075E-04 (w = 1.0E-06) 	Loss Gradient: 1.8043E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.973e-03   ⟨|s_xy+g_y|⟩=5.238e-03
+Train Epoch: 11 [3968/10000 (39%)] 	Forcing Loss: 1.0376E-04 (w = 1.0E+00) 	Physics Loss: 2.4975E-04 (w = 1.0E-06) 	Loss Gradient: 1.7149E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=7.314e-03   ⟨|s_xy+g_y|⟩=5.513e-03
+Train Epoch: 11 [4032/10000 (40%)] 	Forcing Loss: 1.4391E-04 (w = 1.0E+00) 	Physics Loss: 2.5719E-04 (w = 1.0E-06) 	Loss Gradient: 3.0225E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.595e-03   ⟨|s_xy+g_y|⟩=5.898e-03
+Train Epoch: 11 [4096/10000 (41%)] 	Forcing Loss: 1.3673E-04 (w = 1.0E+00) 	Physics Loss: 2.5783E-04 (w = 1.0E-06) 	Loss Gradient: 2.2381E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.467e-03   ⟨|s_xy+g_y|⟩=6.057e-03
+Train Epoch: 11 [4160/10000 (41%)] 	Forcing Loss: 1.3152E-04 (w = 1.0E+00) 	Physics Loss: 2.5659E-04 (w = 1.0E-06) 	Loss Gradient: 1.9595E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=7.423e-03   ⟨|s_xy+g_y|⟩=6.005e-03
+Train Epoch: 11 [4224/10000 (42%)] 	Forcing Loss: 1.4560E-04 (w = 1.0E+00) 	Physics Loss: 2.5795E-04 (w = 1.0E-06) 	Loss Gradient: 3.2004E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.856e-03   ⟨|s_xy+g_y|⟩=5.973e-03
+Train Epoch: 11 [4288/10000 (43%)] 	Forcing Loss: 1.1582E-04 (w = 1.0E+00) 	Physics Loss: 2.6361E-04 (w = 1.0E-06) 	Loss Gradient: 2.1576E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.758e-03   ⟨|s_xy+g_y|⟩=5.802e-03
+Train Epoch: 11 [4352/10000 (43%)] 	Forcing Loss: 1.1013E-04 (w = 1.0E+00) 	Physics Loss: 2.5379E-04 (w = 1.0E-06) 	Loss Gradient: 1.5748E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.698e-03   ⟨|s_xy+g_y|⟩=5.660e-03
+Train Epoch: 11 [4416/10000 (44%)] 	Forcing Loss: 1.3469E-04 (w = 1.0E+00) 	Physics Loss: 2.6865E-04 (w = 1.0E-06) 	Loss Gradient: 2.6067E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.212e-03   ⟨|s_xy+g_y|⟩=5.498e-03
+Train Epoch: 11 [4480/10000 (45%)] 	Forcing Loss: 1.1354E-04 (w = 1.0E+00) 	Physics Loss: 2.3886E-04 (w = 1.0E-06) 	Loss Gradient: 2.1661E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.098e-03   ⟨|s_xy+g_y|⟩=6.113e-03
+Train Epoch: 11 [4544/10000 (45%)] 	Forcing Loss: 1.2372E-04 (w = 1.0E+00) 	Physics Loss: 2.3257E-04 (w = 1.0E-06) 	Loss Gradient: 1.1552E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.840e-03   ⟨|s_xy+g_y|⟩=6.411e-03
+Train Epoch: 11 [4608/10000 (46%)] 	Forcing Loss: 1.4484E-04 (w = 1.0E+00) 	Physics Loss: 2.7652E-04 (w = 1.0E-06) 	Loss Gradient: 2.8244E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.173e-03   ⟨|s_xy+g_y|⟩=5.892e-03
+Train Epoch: 11 [4672/10000 (46%)] 	Forcing Loss: 1.1995E-04 (w = 1.0E+00) 	Physics Loss: 2.2585E-04 (w = 1.0E-06) 	Loss Gradient: 1.6902E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.950e-03   ⟨|s_xy+g_y|⟩=5.762e-03
+Train Epoch: 11 [4736/10000 (47%)] 	Forcing Loss: 1.1042E-04 (w = 1.0E+00) 	Physics Loss: 2.5869E-04 (w = 1.0E-06) 	Loss Gradient: 1.8070E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.313e-03   ⟨|s_xy+g_y|⟩=6.214e-03
+Train Epoch: 11 [4800/10000 (48%)] 	Forcing Loss: 1.3271E-04 (w = 1.0E+00) 	Physics Loss: 2.3097E-04 (w = 1.0E-06) 	Loss Gradient: 2.5085E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.173e-03   ⟨|s_xy+g_y|⟩=5.855e-03
+Train Epoch: 11 [4864/10000 (48%)] 	Forcing Loss: 1.2096E-04 (w = 1.0E+00) 	Physics Loss: 2.7296E-04 (w = 1.0E-06) 	Loss Gradient: 1.4231E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.520e-03   ⟨|s_xy+g_y|⟩=6.319e-03
+Train Epoch: 11 [4928/10000 (49%)] 	Forcing Loss: 1.4510E-04 (w = 1.0E+00) 	Physics Loss: 2.8811E-04 (w = 1.0E-06) 	Loss Gradient: 2.8185E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.458e-03   ⟨|s_xy+g_y|⟩=5.284e-03
+Train Epoch: 11 [4992/10000 (50%)] 	Forcing Loss: 1.1573E-04 (w = 1.0E+00) 	Physics Loss: 2.6174E-04 (w = 1.0E-06) 	Loss Gradient: 1.9058E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.962e-03   ⟨|s_xy+g_y|⟩=5.719e-03
+Train Epoch: 11 [5056/10000 (50%)] 	Forcing Loss: 1.3282E-04 (w = 1.0E+00) 	Physics Loss: 2.4680E-04 (w = 1.0E-06) 	Loss Gradient: 2.0390E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.562e-03   ⟨|s_xy+g_y|⟩=6.195e-03
+Train Epoch: 11 [5120/10000 (51%)] 	Forcing Loss: 1.3343E-04 (w = 1.0E+00) 	Physics Loss: 2.4612E-04 (w = 1.0E-06) 	Loss Gradient: 2.0471E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.028e-03   ⟨|s_xy+g_y|⟩=5.686e-03
+Train Epoch: 11 [5184/10000 (52%)] 	Forcing Loss: 1.1259E-04 (w = 1.0E+00) 	Physics Loss: 2.6344E-04 (w = 1.0E-06) 	Loss Gradient: 1.4869E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.569e-03   ⟨|s_xy+g_y|⟩=5.887e-03
+Train Epoch: 11 [5248/10000 (52%)] 	Forcing Loss: 1.2805E-04 (w = 1.0E+00) 	Physics Loss: 3.0338E-04 (w = 1.0E-06) 	Loss Gradient: 2.2278E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.773e-03   ⟨|s_xy+g_y|⟩=5.889e-03
+Train Epoch: 11 [5312/10000 (53%)] 	Forcing Loss: 1.3486E-04 (w = 1.0E+00) 	Physics Loss: 2.6760E-04 (w = 1.0E-06) 	Loss Gradient: 1.9948E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.675e-03   ⟨|s_xy+g_y|⟩=5.705e-03
+Train Epoch: 11 [5376/10000 (54%)] 	Forcing Loss: 1.0955E-04 (w = 1.0E+00) 	Physics Loss: 2.2987E-04 (w = 1.0E-06) 	Loss Gradient: 1.1097E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.256e-03   ⟨|s_xy+g_y|⟩=5.301e-03
+Train Epoch: 11 [5440/10000 (54%)] 	Forcing Loss: 1.1318E-04 (w = 1.0E+00) 	Physics Loss: 2.6707E-04 (w = 1.0E-06) 	Loss Gradient: 2.1812E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.885e-03   ⟨|s_xy+g_y|⟩=6.285e-03
+Train Epoch: 11 [5504/10000 (55%)] 	Forcing Loss: 1.2360E-04 (w = 1.0E+00) 	Physics Loss: 2.6838E-04 (w = 1.0E-06) 	Loss Gradient: 1.9493E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.079e-03   ⟨|s_xy+g_y|⟩=5.778e-03
+Train Epoch: 11 [5568/10000 (55%)] 	Forcing Loss: 1.1517E-04 (w = 1.0E+00) 	Physics Loss: 2.7038E-04 (w = 1.0E-06) 	Loss Gradient: 1.5458E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.559e-03   ⟨|s_xy+g_y|⟩=5.554e-03
+Train Epoch: 11 [5632/10000 (56%)] 	Forcing Loss: 1.2133E-04 (w = 1.0E+00) 	Physics Loss: 2.7262E-04 (w = 1.0E-06) 	Loss Gradient: 2.6012E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.342e-03   ⟨|s_xy+g_y|⟩=5.764e-03
+Train Epoch: 11 [5696/10000 (57%)] 	Forcing Loss: 1.2071E-04 (w = 1.0E+00) 	Physics Loss: 2.6594E-04 (w = 1.0E-06) 	Loss Gradient: 1.6152E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.700e-03   ⟨|s_xy+g_y|⟩=5.813e-03
+Train Epoch: 11 [5760/10000 (57%)] 	Forcing Loss: 1.3172E-04 (w = 1.0E+00) 	Physics Loss: 2.7500E-04 (w = 1.0E-06) 	Loss Gradient: 2.3521E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.194e-03   ⟨|s_xy+g_y|⟩=5.112e-03
+Train Epoch: 11 [5824/10000 (58%)] 	Forcing Loss: 1.0594E-04 (w = 1.0E+00) 	Physics Loss: 2.4018E-04 (w = 1.0E-06) 	Loss Gradient: 1.7321E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.895e-03   ⟨|s_xy+g_y|⟩=5.925e-03
+Train Epoch: 11 [5888/10000 (59%)] 	Forcing Loss: 1.1888E-04 (w = 1.0E+00) 	Physics Loss: 2.4702E-04 (w = 1.0E-06) 	Loss Gradient: 1.6574E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.002e-03   ⟨|s_xy+g_y|⟩=5.653e-03
+Train Epoch: 11 [5952/10000 (59%)] 	Forcing Loss: 1.1007E-04 (w = 1.0E+00) 	Physics Loss: 2.5574E-04 (w = 1.0E-06) 	Loss Gradient: 1.5733E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.294e-03   ⟨|s_xy+g_y|⟩=5.706e-03
+Train Epoch: 11 [6016/10000 (60%)] 	Forcing Loss: 1.2053E-04 (w = 1.0E+00) 	Physics Loss: 2.7452E-04 (w = 1.0E-06) 	Loss Gradient: 2.1774E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.027e-03   ⟨|s_xy+g_y|⟩=6.136e-03
+Train Epoch: 11 [6080/10000 (61%)] 	Forcing Loss: 1.2451E-04 (w = 1.0E+00) 	Physics Loss: 2.4967E-04 (w = 1.0E-06) 	Loss Gradient: 1.5724E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.705e-03   ⟨|s_xy+g_y|⟩=6.407e-03
+Train Epoch: 11 [6144/10000 (61%)] 	Forcing Loss: 1.4752E-04 (w = 1.0E+00) 	Physics Loss: 2.7528E-04 (w = 1.0E-06) 	Loss Gradient: 2.4224E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.246e-03   ⟨|s_xy+g_y|⟩=5.824e-03
+Train Epoch: 11 [6208/10000 (62%)] 	Forcing Loss: 1.2486E-04 (w = 1.0E+00) 	Physics Loss: 2.4980E-04 (w = 1.0E-06) 	Loss Gradient: 1.9971E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.006e-03   ⟨|s_xy+g_y|⟩=5.695e-03
+Train Epoch: 11 [6272/10000 (62%)] 	Forcing Loss: 1.1624E-04 (w = 1.0E+00) 	Physics Loss: 2.4640E-04 (w = 1.0E-06) 	Loss Gradient: 1.3643E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.127e-03   ⟨|s_xy+g_y|⟩=6.610e-03
+Train Epoch: 11 [6336/10000 (63%)] 	Forcing Loss: 1.3557E-04 (w = 1.0E+00) 	Physics Loss: 2.6222E-04 (w = 1.0E-06) 	Loss Gradient: 1.9266E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.574e-03   ⟨|s_xy+g_y|⟩=6.194e-03
+Train Epoch: 11 [6400/10000 (64%)] 	Forcing Loss: 1.3503E-04 (w = 1.0E+00) 	Physics Loss: 2.7096E-04 (w = 1.0E-06) 	Loss Gradient: 2.4340E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.641e-03   ⟨|s_xy+g_y|⟩=5.719e-03
+Train Epoch: 11 [6464/10000 (64%)] 	Forcing Loss: 1.2868E-04 (w = 1.0E+00) 	Physics Loss: 2.6021E-04 (w = 1.0E-06) 	Loss Gradient: 1.4258E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.579e-03   ⟨|s_xy+g_y|⟩=5.907e-03
+Train Epoch: 11 [6528/10000 (65%)] 	Forcing Loss: 1.1398E-04 (w = 1.0E+00) 	Physics Loss: 2.7371E-04 (w = 1.0E-06) 	Loss Gradient: 1.8519E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.012e-03   ⟨|s_xy+g_y|⟩=5.938e-03
+Train Epoch: 11 [6592/10000 (66%)] 	Forcing Loss: 1.1771E-04 (w = 1.0E+00) 	Physics Loss: 2.7516E-04 (w = 1.0E-06) 	Loss Gradient: 1.8529E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.450e-03   ⟨|s_xy+g_y|⟩=6.407e-03
+Train Epoch: 11 [6656/10000 (66%)] 	Forcing Loss: 1.3622E-04 (w = 1.0E+00) 	Physics Loss: 2.7904E-04 (w = 1.0E-06) 	Loss Gradient: 2.0309E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.170e-03   ⟨|s_xy+g_y|⟩=6.548e-03
+Train Epoch: 11 [6720/10000 (67%)] 	Forcing Loss: 1.3312E-04 (w = 1.0E+00) 	Physics Loss: 2.7908E-04 (w = 1.0E-06) 	Loss Gradient: 2.3938E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.879e-03   ⟨|s_xy+g_y|⟩=5.459e-03
+Train Epoch: 11 [6784/10000 (68%)] 	Forcing Loss: 1.0625E-04 (w = 1.0E+00) 	Physics Loss: 2.3424E-04 (w = 1.0E-06) 	Loss Gradient: 1.7157E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.199e-03   ⟨|s_xy+g_y|⟩=5.776e-03
+Train Epoch: 11 [6848/10000 (68%)] 	Forcing Loss: 1.1767E-04 (w = 1.0E+00) 	Physics Loss: 3.0144E-04 (w = 1.0E-06) 	Loss Gradient: 1.7294E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.669e-03   ⟨|s_xy+g_y|⟩=6.135e-03
+Train Epoch: 11 [6912/10000 (69%)] 	Forcing Loss: 1.1784E-04 (w = 1.0E+00) 	Physics Loss: 2.6053E-04 (w = 1.0E-06) 	Loss Gradient: 2.0633E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.123e-03   ⟨|s_xy+g_y|⟩=6.027e-03
+Train Epoch: 11 [6976/10000 (69%)] 	Forcing Loss: 1.2105E-04 (w = 1.0E+00) 	Physics Loss: 2.7197E-04 (w = 1.0E-06) 	Loss Gradient: 1.8779E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.930e-03   ⟨|s_xy+g_y|⟩=5.453e-03
+Train Epoch: 11 [7040/10000 (70%)] 	Forcing Loss: 1.0991E-04 (w = 1.0E+00) 	Physics Loss: 2.6952E-04 (w = 1.0E-06) 	Loss Gradient: 1.6168E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.770e-03   ⟨|s_xy+g_y|⟩=6.619e-03
+Train Epoch: 11 [7104/10000 (71%)] 	Forcing Loss: 1.2667E-04 (w = 1.0E+00) 	Physics Loss: 2.5198E-04 (w = 1.0E-06) 	Loss Gradient: 2.1642E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.415e-03   ⟨|s_xy+g_y|⟩=6.214e-03
+Train Epoch: 11 [7168/10000 (71%)] 	Forcing Loss: 1.1121E-04 (w = 1.0E+00) 	Physics Loss: 2.5643E-04 (w = 1.0E-06) 	Loss Gradient: 2.1022E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.115e-03   ⟨|s_xy+g_y|⟩=5.400e-03
+Train Epoch: 11 [7232/10000 (72%)] 	Forcing Loss: 1.1131E-04 (w = 1.0E+00) 	Physics Loss: 2.7111E-04 (w = 1.0E-06) 	Loss Gradient: 1.6243E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.656e-03   ⟨|s_xy+g_y|⟩=5.906e-03
+Train Epoch: 11 [7296/10000 (73%)] 	Forcing Loss: 1.0906E-04 (w = 1.0E+00) 	Physics Loss: 2.3911E-04 (w = 1.0E-06) 	Loss Gradient: 2.0536E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.868e-03   ⟨|s_xy+g_y|⟩=5.777e-03
+Train Epoch: 11 [7360/10000 (73%)] 	Forcing Loss: 1.1311E-04 (w = 1.0E+00) 	Physics Loss: 2.6163E-04 (w = 1.0E-06) 	Loss Gradient: 1.5596E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.275e-03   ⟨|s_xy+g_y|⟩=5.984e-03
+Train Epoch: 11 [7424/10000 (74%)] 	Forcing Loss: 1.2554E-04 (w = 1.0E+00) 	Physics Loss: 2.5872E-04 (w = 1.0E-06) 	Loss Gradient: 2.0246E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.291e-03   ⟨|s_xy+g_y|⟩=5.918e-03
+Train Epoch: 11 [7488/10000 (75%)] 	Forcing Loss: 1.0336E-04 (w = 1.0E+00) 	Physics Loss: 2.3804E-04 (w = 1.0E-06) 	Loss Gradient: 1.6304E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.479e-03   ⟨|s_xy+g_y|⟩=6.375e-03
+Train Epoch: 11 [7552/10000 (75%)] 	Forcing Loss: 1.1475E-04 (w = 1.0E+00) 	Physics Loss: 2.4894E-04 (w = 1.0E-06) 	Loss Gradient: 2.0399E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.125e-03   ⟨|s_xy+g_y|⟩=5.568e-03
+Train Epoch: 11 [7616/10000 (76%)] 	Forcing Loss: 1.1603E-04 (w = 1.0E+00) 	Physics Loss: 2.6599E-04 (w = 1.0E-06) 	Loss Gradient: 1.3138E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.298e-03   ⟨|s_xy+g_y|⟩=6.162e-03
+Train Epoch: 11 [7680/10000 (76%)] 	Forcing Loss: 1.2938E-04 (w = 1.0E+00) 	Physics Loss: 2.4956E-04 (w = 1.0E-06) 	Loss Gradient: 1.8384E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.551e-03   ⟨|s_xy+g_y|⟩=6.626e-03
+Train Epoch: 11 [7744/10000 (77%)] 	Forcing Loss: 1.2981E-04 (w = 1.0E+00) 	Physics Loss: 2.5998E-04 (w = 1.0E-06) 	Loss Gradient: 2.0687E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.274e-03   ⟨|s_xy+g_y|⟩=5.517e-03
+Train Epoch: 11 [7808/10000 (78%)] 	Forcing Loss: 1.1512E-04 (w = 1.0E+00) 	Physics Loss: 2.8052E-04 (w = 1.0E-06) 	Loss Gradient: 1.7892E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.635e-03   ⟨|s_xy+g_y|⟩=6.316e-03
+Train Epoch: 11 [7872/10000 (78%)] 	Forcing Loss: 1.1767E-04 (w = 1.0E+00) 	Physics Loss: 2.6377E-04 (w = 1.0E-06) 	Loss Gradient: 2.0806E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.334e-03   ⟨|s_xy+g_y|⟩=6.820e-03
+Train Epoch: 11 [7936/10000 (79%)] 	Forcing Loss: 1.4304E-04 (w = 1.0E+00) 	Physics Loss: 2.4605E-04 (w = 1.0E-06) 	Loss Gradient: 2.2938E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.671e-03   ⟨|s_xy+g_y|⟩=5.866e-03
+Train Epoch: 11 [8000/10000 (80%)] 	Forcing Loss: 1.1283E-04 (w = 1.0E+00) 	Physics Loss: 2.5907E-04 (w = 1.0E-06) 	Loss Gradient: 1.7715E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.579e-03   ⟨|s_xy+g_y|⟩=6.133e-03
+Train Epoch: 11 [8064/10000 (80%)] 	Forcing Loss: 1.1874E-04 (w = 1.0E+00) 	Physics Loss: 2.5285E-04 (w = 1.0E-06) 	Loss Gradient: 1.9003E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.723e-03   ⟨|s_xy+g_y|⟩=6.603e-03
+Train Epoch: 11 [8128/10000 (81%)] 	Forcing Loss: 1.2907E-04 (w = 1.0E+00) 	Physics Loss: 2.6260E-04 (w = 1.0E-06) 	Loss Gradient: 2.4187E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.292e-03   ⟨|s_xy+g_y|⟩=6.757e-03
+Train Epoch: 11 [8192/10000 (82%)] 	Forcing Loss: 1.5360E-04 (w = 1.0E+00) 	Physics Loss: 2.6965E-04 (w = 1.0E-06) 	Loss Gradient: 2.3920E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.075e-03   ⟨|s_xy+g_y|⟩=6.352e-03
+Train Epoch: 11 [8256/10000 (82%)] 	Forcing Loss: 1.2755E-04 (w = 1.0E+00) 	Physics Loss: 2.3851E-04 (w = 1.0E-06) 	Loss Gradient: 2.4418E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.290e-03   ⟨|s_xy+g_y|⟩=6.829e-03
+Train Epoch: 11 [8320/10000 (83%)] 	Forcing Loss: 1.4252E-04 (w = 1.0E+00) 	Physics Loss: 2.4558E-04 (w = 1.0E-06) 	Loss Gradient: 2.6753E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.505e-03   ⟨|s_xy+g_y|⟩=6.606e-03
+Train Epoch: 11 [8384/10000 (83%)] 	Forcing Loss: 1.1990E-04 (w = 1.0E+00) 	Physics Loss: 2.7579E-04 (w = 1.0E-06) 	Loss Gradient: 2.0674E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.942e-03   ⟨|s_xy+g_y|⟩=6.506e-03
+Train Epoch: 11 [8448/10000 (84%)] 	Forcing Loss: 1.3110E-04 (w = 1.0E+00) 	Physics Loss: 2.5038E-04 (w = 1.0E-06) 	Loss Gradient: 2.0700E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.982e-03   ⟨|s_xy+g_y|⟩=5.917e-03
+Train Epoch: 11 [8512/10000 (85%)] 	Forcing Loss: 1.1666E-04 (w = 1.0E+00) 	Physics Loss: 2.5046E-04 (w = 1.0E-06) 	Loss Gradient: 2.0820E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.200e-03   ⟨|s_xy+g_y|⟩=6.626e-03
+Train Epoch: 11 [8576/10000 (85%)] 	Forcing Loss: 1.3764E-04 (w = 1.0E+00) 	Physics Loss: 2.4672E-04 (w = 1.0E-06) 	Loss Gradient: 1.7300E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.091e-03   ⟨|s_xy+g_y|⟩=5.692e-03
+Train Epoch: 11 [8640/10000 (86%)] 	Forcing Loss: 1.1861E-04 (w = 1.0E+00) 	Physics Loss: 2.3874E-04 (w = 1.0E-06) 	Loss Gradient: 1.8232E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.151e-03   ⟨|s_xy+g_y|⟩=6.450e-03
+Train Epoch: 11 [8704/10000 (87%)] 	Forcing Loss: 1.3018E-04 (w = 1.0E+00) 	Physics Loss: 2.6346E-04 (w = 1.0E-06) 	Loss Gradient: 1.9648E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.402e-03   ⟨|s_xy+g_y|⟩=5.807e-03
+Train Epoch: 11 [8768/10000 (87%)] 	Forcing Loss: 1.0659E-04 (w = 1.0E+00) 	Physics Loss: 2.5053E-04 (w = 1.0E-06) 	Loss Gradient: 1.1073E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.125e-03   ⟨|s_xy+g_y|⟩=6.473e-03
+Train Epoch: 11 [8832/10000 (88%)] 	Forcing Loss: 1.3489E-04 (w = 1.0E+00) 	Physics Loss: 2.3299E-04 (w = 1.0E-06) 	Loss Gradient: 1.9218E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.558e-03   ⟨|s_xy+g_y|⟩=6.303e-03
+Train Epoch: 11 [8896/10000 (89%)] 	Forcing Loss: 1.4262E-04 (w = 1.0E+00) 	Physics Loss: 2.5651E-04 (w = 1.0E-06) 	Loss Gradient: 1.9427E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=4.968e-03   ⟨|s_xy+g_y|⟩=5.759e-03
+Train Epoch: 11 [8960/10000 (89%)] 	Forcing Loss: 9.8672E-05 (w = 1.0E+00) 	Physics Loss: 2.3562E-04 (w = 1.0E-06) 	Loss Gradient: 1.0747E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.773e-03   ⟨|s_xy+g_y|⟩=5.567e-03
+Train Epoch: 11 [9024/10000 (90%)] 	Forcing Loss: 1.0734E-04 (w = 1.0E+00) 	Physics Loss: 2.6725E-04 (w = 1.0E-06) 	Loss Gradient: 1.4005E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.392e-03   ⟨|s_xy+g_y|⟩=6.009e-03
+Train Epoch: 11 [9088/10000 (90%)] 	Forcing Loss: 1.2841E-04 (w = 1.0E+00) 	Physics Loss: 2.7013E-04 (w = 1.0E-06) 	Loss Gradient: 2.3114E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.275e-03   ⟨|s_xy+g_y|⟩=5.768e-03
+Train Epoch: 11 [9152/10000 (91%)] 	Forcing Loss: 1.0757E-04 (w = 1.0E+00) 	Physics Loss: 2.3863E-04 (w = 1.0E-06) 	Loss Gradient: 1.1552E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.402e-03   ⟨|s_xy+g_y|⟩=5.737e-03
+Train Epoch: 11 [9216/10000 (92%)] 	Forcing Loss: 1.0349E-04 (w = 1.0E+00) 	Physics Loss: 2.5301E-04 (w = 1.0E-06) 	Loss Gradient: 1.1660E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.464e-03   ⟨|s_xy+g_y|⟩=6.009e-03
+Train Epoch: 11 [9280/10000 (92%)] 	Forcing Loss: 1.3464E-04 (w = 1.0E+00) 	Physics Loss: 2.4281E-04 (w = 1.0E-06) 	Loss Gradient: 2.1923E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.492e-03   ⟨|s_xy+g_y|⟩=5.621e-03
+Train Epoch: 11 [9344/10000 (93%)] 	Forcing Loss: 1.0449E-04 (w = 1.0E+00) 	Physics Loss: 2.5030E-04 (w = 1.0E-06) 	Loss Gradient: 1.1304E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.881e-03   ⟨|s_xy+g_y|⟩=5.310e-03
+Train Epoch: 11 [9408/10000 (94%)] 	Forcing Loss: 1.0959E-04 (w = 1.0E+00) 	Physics Loss: 2.7881E-04 (w = 1.0E-06) 	Loss Gradient: 1.0521E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.667e-03   ⟨|s_xy+g_y|⟩=5.734e-03
+Train Epoch: 11 [9472/10000 (94%)] 	Forcing Loss: 1.0766E-04 (w = 1.0E+00) 	Physics Loss: 2.2523E-04 (w = 1.0E-06) 	Loss Gradient: 1.2776E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.096e-03   ⟨|s_xy+g_y|⟩=5.985e-03
+Train Epoch: 11 [9536/10000 (95%)] 	Forcing Loss: 1.2068E-04 (w = 1.0E+00) 	Physics Loss: 2.7804E-04 (w = 1.0E-06) 	Loss Gradient: 1.7241E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.763e-03   ⟨|s_xy+g_y|⟩=5.527e-03
+Train Epoch: 11 [9600/10000 (96%)] 	Forcing Loss: 1.0848E-04 (w = 1.0E+00) 	Physics Loss: 2.6981E-04 (w = 1.0E-06) 	Loss Gradient: 7.3381E-02 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.836e-03   ⟨|s_xy+g_y|⟩=5.492e-03
+Train Epoch: 11 [9664/10000 (96%)] 	Forcing Loss: 1.0680E-04 (w = 1.0E+00) 	Physics Loss: 2.6436E-04 (w = 1.0E-06) 	Loss Gradient: 1.4365E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.224e-03   ⟨|s_xy+g_y|⟩=5.410e-03
+Train Epoch: 11 [9728/10000 (97%)] 	Forcing Loss: 1.1727E-04 (w = 1.0E+00) 	Physics Loss: 2.2893E-04 (w = 1.0E-06) 	Loss Gradient: 1.4343E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.783e-03   ⟨|s_xy+g_y|⟩=5.917e-03
+Train Epoch: 11 [9792/10000 (97%)] 	Forcing Loss: 1.1967E-04 (w = 1.0E+00) 	Physics Loss: 2.7512E-04 (w = 1.0E-06) 	Loss Gradient: 1.4599E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.774e-03   ⟨|s_xy+g_y|⟩=5.633e-03
+Train Epoch: 11 [9856/10000 (98%)] 	Forcing Loss: 1.0709E-04 (w = 1.0E+00) 	Physics Loss: 2.4176E-04 (w = 1.0E-06) 	Loss Gradient: 1.1013E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=6.051e-03   ⟨|s_xy+g_y|⟩=5.741e-03
+Train Epoch: 11 [9920/10000 (99%)] 	Forcing Loss: 1.1670E-04 (w = 1.0E+00) 	Physics Loss: 2.4853E-04 (w = 1.0E-06) 	Loss Gradient: 1.7695E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.162e-03   ⟨|s_xy+g_y|⟩=5.472e-03
+Train Epoch: 11 [2496/10000 (99%)] 	Forcing Loss: 9.4017E-05 (w = 1.0E+00) 	Physics Loss: 2.6618E-04 (w = 1.0E-06) 	Loss Gradient: 1.2151E-01 	lr: 8.26E-05
+
+⟨|s_xx+g_x|⟩=5.851e-03   ⟨|s_xy+g_y|⟩=5.783e-03
+Train Epoch: 12 [0/10000 (0%)] 	Forcing Loss: 1.1478E-04 (w = 1.0E+00) 	Physics Loss: 2.7582E-04 (w = 1.0E-06) 	Loss Gradient: 1.3015E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.889e-03   ⟨|s_xy+g_y|⟩=5.848e-03
+Train Epoch: 12 [64/10000 (1%)] 	Forcing Loss: 1.1492E-04 (w = 1.0E+00) 	Physics Loss: 2.5287E-04 (w = 1.0E-06) 	Loss Gradient: 1.3815E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.027e-03   ⟨|s_xy+g_y|⟩=6.383e-03
+Train Epoch: 12 [128/10000 (1%)] 	Forcing Loss: 1.3064E-04 (w = 1.0E+00) 	Physics Loss: 2.6141E-04 (w = 1.0E-06) 	Loss Gradient: 1.8991E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.417e-03   ⟨|s_xy+g_y|⟩=5.462e-03
+Train Epoch: 12 [192/10000 (2%)] 	Forcing Loss: 1.0017E-04 (w = 1.0E+00) 	Physics Loss: 2.6221E-04 (w = 1.0E-06) 	Loss Gradient: 1.1762E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.013e-03   ⟨|s_xy+g_y|⟩=5.884e-03
+Train Epoch: 12 [256/10000 (3%)] 	Forcing Loss: 1.1676E-04 (w = 1.0E+00) 	Physics Loss: 2.6479E-04 (w = 1.0E-06) 	Loss Gradient: 1.7367E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.285e-03   ⟨|s_xy+g_y|⟩=5.531e-03
+Train Epoch: 12 [320/10000 (3%)] 	Forcing Loss: 1.0143E-04 (w = 1.0E+00) 	Physics Loss: 2.5090E-04 (w = 1.0E-06) 	Loss Gradient: 1.2761E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.299e-03   ⟨|s_xy+g_y|⟩=6.282e-03
+Train Epoch: 12 [384/10000 (4%)] 	Forcing Loss: 1.3616E-04 (w = 1.0E+00) 	Physics Loss: 2.9474E-04 (w = 1.0E-06) 	Loss Gradient: 1.9777E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.850e-03   ⟨|s_xy+g_y|⟩=5.925e-03
+Train Epoch: 12 [448/10000 (4%)] 	Forcing Loss: 1.2001E-04 (w = 1.0E+00) 	Physics Loss: 2.6622E-04 (w = 1.0E-06) 	Loss Gradient: 1.6533E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.793e-03   ⟨|s_xy+g_y|⟩=5.941e-03
+Train Epoch: 12 [512/10000 (5%)] 	Forcing Loss: 1.1303E-04 (w = 1.0E+00) 	Physics Loss: 2.4757E-04 (w = 1.0E-06) 	Loss Gradient: 1.6643E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.715e-03   ⟨|s_xy+g_y|⟩=5.536e-03
+Train Epoch: 12 [576/10000 (6%)] 	Forcing Loss: 1.1036E-04 (w = 1.0E+00) 	Physics Loss: 2.4718E-04 (w = 1.0E-06) 	Loss Gradient: 1.1082E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.972e-03   ⟨|s_xy+g_y|⟩=5.677e-03
+Train Epoch: 12 [640/10000 (6%)] 	Forcing Loss: 1.1220E-04 (w = 1.0E+00) 	Physics Loss: 2.5619E-04 (w = 1.0E-06) 	Loss Gradient: 1.3737E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.458e-03   ⟨|s_xy+g_y|⟩=6.825e-03
+Train Epoch: 12 [704/10000 (7%)] 	Forcing Loss: 1.3058E-04 (w = 1.0E+00) 	Physics Loss: 2.2841E-04 (w = 1.0E-06) 	Loss Gradient: 1.5254E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.819e-03   ⟨|s_xy+g_y|⟩=5.675e-03
+Train Epoch: 12 [768/10000 (8%)] 	Forcing Loss: 1.1259E-04 (w = 1.0E+00) 	Physics Loss: 2.4577E-04 (w = 1.0E-06) 	Loss Gradient: 1.1944E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.659e-03   ⟨|s_xy+g_y|⟩=5.816e-03
+Train Epoch: 12 [832/10000 (8%)] 	Forcing Loss: 1.1106E-04 (w = 1.0E+00) 	Physics Loss: 2.5128E-04 (w = 1.0E-06) 	Loss Gradient: 1.7698E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.828e-03   ⟨|s_xy+g_y|⟩=5.434e-03
+Train Epoch: 12 [896/10000 (9%)] 	Forcing Loss: 1.0468E-04 (w = 1.0E+00) 	Physics Loss: 2.5397E-04 (w = 1.0E-06) 	Loss Gradient: 1.4653E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.198e-03   ⟨|s_xy+g_y|⟩=5.623e-03
+Train Epoch: 12 [960/10000 (10%)] 	Forcing Loss: 1.1883E-04 (w = 1.0E+00) 	Physics Loss: 2.5349E-04 (w = 1.0E-06) 	Loss Gradient: 1.4539E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.447e-03   ⟨|s_xy+g_y|⟩=5.856e-03
+Train Epoch: 12 [1024/10000 (10%)] 	Forcing Loss: 1.3643E-04 (w = 1.0E+00) 	Physics Loss: 2.6991E-04 (w = 1.0E-06) 	Loss Gradient: 2.0298E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.366e-03   ⟨|s_xy+g_y|⟩=6.086e-03
+Train Epoch: 12 [1088/10000 (11%)] 	Forcing Loss: 1.0716E-04 (w = 1.0E+00) 	Physics Loss: 2.9017E-04 (w = 1.0E-06) 	Loss Gradient: 2.0292E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.270e-03   ⟨|s_xy+g_y|⟩=5.810e-03
+Train Epoch: 12 [1152/10000 (11%)] 	Forcing Loss: 1.1838E-04 (w = 1.0E+00) 	Physics Loss: 2.5087E-04 (w = 1.0E-06) 	Loss Gradient: 2.2272E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.356e-03   ⟨|s_xy+g_y|⟩=6.479e-03
+Train Epoch: 12 [1216/10000 (12%)] 	Forcing Loss: 1.3335E-04 (w = 1.0E+00) 	Physics Loss: 2.5870E-04 (w = 1.0E-06) 	Loss Gradient: 1.7026E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.435e-03   ⟨|s_xy+g_y|⟩=6.406e-03
+Train Epoch: 12 [1280/10000 (13%)] 	Forcing Loss: 1.3411E-04 (w = 1.0E+00) 	Physics Loss: 2.4210E-04 (w = 1.0E-06) 	Loss Gradient: 2.1554E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.490e-03   ⟨|s_xy+g_y|⟩=5.753e-03
+Train Epoch: 12 [1344/10000 (13%)] 	Forcing Loss: 1.1204E-04 (w = 1.0E+00) 	Physics Loss: 2.3314E-04 (w = 1.0E-06) 	Loss Gradient: 2.2746E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.877e-03   ⟨|s_xy+g_y|⟩=5.683e-03
+Train Epoch: 12 [1408/10000 (14%)] 	Forcing Loss: 1.0990E-04 (w = 1.0E+00) 	Physics Loss: 2.5203E-04 (w = 1.0E-06) 	Loss Gradient: 1.4644E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.767e-03   ⟨|s_xy+g_y|⟩=6.307e-03
+Train Epoch: 12 [1472/10000 (15%)] 	Forcing Loss: 1.1933E-04 (w = 1.0E+00) 	Physics Loss: 2.2864E-04 (w = 1.0E-06) 	Loss Gradient: 2.2087E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.756e-03   ⟨|s_xy+g_y|⟩=6.080e-03
+Train Epoch: 12 [1536/10000 (15%)] 	Forcing Loss: 1.2061E-04 (w = 1.0E+00) 	Physics Loss: 2.5521E-04 (w = 1.0E-06) 	Loss Gradient: 2.1721E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.056e-03   ⟨|s_xy+g_y|⟩=6.133e-03
+Train Epoch: 12 [1600/10000 (16%)] 	Forcing Loss: 1.2598E-04 (w = 1.0E+00) 	Physics Loss: 2.6530E-04 (w = 1.0E-06) 	Loss Gradient: 1.2674E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.959e-03   ⟨|s_xy+g_y|⟩=6.434e-03
+Train Epoch: 12 [1664/10000 (17%)] 	Forcing Loss: 1.2623E-04 (w = 1.0E+00) 	Physics Loss: 2.6416E-04 (w = 1.0E-06) 	Loss Gradient: 2.0638E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.197e-03   ⟨|s_xy+g_y|⟩=5.801e-03
+Train Epoch: 12 [1728/10000 (17%)] 	Forcing Loss: 1.1797E-04 (w = 1.0E+00) 	Physics Loss: 2.6847E-04 (w = 1.0E-06) 	Loss Gradient: 2.3132E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.618e-03   ⟨|s_xy+g_y|⟩=5.965e-03
+Train Epoch: 12 [1792/10000 (18%)] 	Forcing Loss: 1.1323E-04 (w = 1.0E+00) 	Physics Loss: 2.5752E-04 (w = 1.0E-06) 	Loss Gradient: 1.5891E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.356e-03   ⟨|s_xy+g_y|⟩=6.368e-03
+Train Epoch: 12 [1856/10000 (18%)] 	Forcing Loss: 1.3777E-04 (w = 1.0E+00) 	Physics Loss: 2.6863E-04 (w = 1.0E-06) 	Loss Gradient: 1.5652E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.918e-03   ⟨|s_xy+g_y|⟩=6.540e-03
+Train Epoch: 12 [1920/10000 (19%)] 	Forcing Loss: 1.2739E-04 (w = 1.0E+00) 	Physics Loss: 2.6208E-04 (w = 1.0E-06) 	Loss Gradient: 2.3418E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.677e-03   ⟨|s_xy+g_y|⟩=6.086e-03
+Train Epoch: 12 [1984/10000 (20%)] 	Forcing Loss: 1.1306E-04 (w = 1.0E+00) 	Physics Loss: 2.3313E-04 (w = 1.0E-06) 	Loss Gradient: 1.4490E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.421e-03   ⟨|s_xy+g_y|⟩=5.471e-03
+Train Epoch: 12 [2048/10000 (20%)] 	Forcing Loss: 1.1996E-04 (w = 1.0E+00) 	Physics Loss: 2.5920E-04 (w = 1.0E-06) 	Loss Gradient: 1.7967E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.152e-03   ⟨|s_xy+g_y|⟩=6.190e-03
+Train Epoch: 12 [2112/10000 (21%)] 	Forcing Loss: 1.2577E-04 (w = 1.0E+00) 	Physics Loss: 2.5414E-04 (w = 1.0E-06) 	Loss Gradient: 2.2752E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.433e-03   ⟨|s_xy+g_y|⟩=6.161e-03
+Train Epoch: 12 [2176/10000 (22%)] 	Forcing Loss: 1.3158E-04 (w = 1.0E+00) 	Physics Loss: 2.7478E-04 (w = 1.0E-06) 	Loss Gradient: 1.7455E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.212e-03   ⟨|s_xy+g_y|⟩=5.916e-03
+Train Epoch: 12 [2240/10000 (22%)] 	Forcing Loss: 1.2439E-04 (w = 1.0E+00) 	Physics Loss: 2.5319E-04 (w = 1.0E-06) 	Loss Gradient: 2.0595E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.102e-03   ⟨|s_xy+g_y|⟩=6.198e-03
+Train Epoch: 12 [2304/10000 (23%)] 	Forcing Loss: 1.3248E-04 (w = 1.0E+00) 	Physics Loss: 2.5456E-04 (w = 1.0E-06) 	Loss Gradient: 2.5496E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.621e-03   ⟨|s_xy+g_y|⟩=6.421e-03
+Train Epoch: 12 [2368/10000 (24%)] 	Forcing Loss: 1.4027E-04 (w = 1.0E+00) 	Physics Loss: 2.5985E-04 (w = 1.0E-06) 	Loss Gradient: 2.0216E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.970e-03   ⟨|s_xy+g_y|⟩=5.820e-03
+Train Epoch: 12 [2432/10000 (24%)] 	Forcing Loss: 1.1730E-04 (w = 1.0E+00) 	Physics Loss: 2.6715E-04 (w = 1.0E-06) 	Loss Gradient: 1.5726E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.366e-03   ⟨|s_xy+g_y|⟩=6.171e-03
+Train Epoch: 12 [2496/10000 (25%)] 	Forcing Loss: 1.2887E-04 (w = 1.0E+00) 	Physics Loss: 2.6796E-04 (w = 1.0E-06) 	Loss Gradient: 2.5934E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.699e-03   ⟨|s_xy+g_y|⟩=6.289e-03
+Train Epoch: 12 [2560/10000 (25%)] 	Forcing Loss: 1.1879E-04 (w = 1.0E+00) 	Physics Loss: 2.5103E-04 (w = 1.0E-06) 	Loss Gradient: 2.0744E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.143e-03   ⟨|s_xy+g_y|⟩=6.045e-03
+Train Epoch: 12 [2624/10000 (26%)] 	Forcing Loss: 1.2271E-04 (w = 1.0E+00) 	Physics Loss: 2.6132E-04 (w = 1.0E-06) 	Loss Gradient: 2.5587E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.164e-03   ⟨|s_xy+g_y|⟩=6.217e-03
+Train Epoch: 12 [2688/10000 (27%)] 	Forcing Loss: 1.2970E-04 (w = 1.0E+00) 	Physics Loss: 2.6369E-04 (w = 1.0E-06) 	Loss Gradient: 2.2675E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.012e-03   ⟨|s_xy+g_y|⟩=6.228e-03
+Train Epoch: 12 [2752/10000 (27%)] 	Forcing Loss: 1.2702E-04 (w = 1.0E+00) 	Physics Loss: 2.4150E-04 (w = 1.0E-06) 	Loss Gradient: 2.3032E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.311e-03   ⟨|s_xy+g_y|⟩=6.237e-03
+Train Epoch: 12 [2816/10000 (28%)] 	Forcing Loss: 1.3260E-04 (w = 1.0E+00) 	Physics Loss: 2.5914E-04 (w = 1.0E-06) 	Loss Gradient: 1.6426E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.459e-03   ⟨|s_xy+g_y|⟩=6.109e-03
+Train Epoch: 12 [2880/10000 (29%)] 	Forcing Loss: 1.3107E-04 (w = 1.0E+00) 	Physics Loss: 2.6098E-04 (w = 1.0E-06) 	Loss Gradient: 1.6461E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.348e-03   ⟨|s_xy+g_y|⟩=6.509e-03
+Train Epoch: 12 [2944/10000 (29%)] 	Forcing Loss: 1.3681E-04 (w = 1.0E+00) 	Physics Loss: 2.9411E-04 (w = 1.0E-06) 	Loss Gradient: 1.8920E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.041e-03   ⟨|s_xy+g_y|⟩=6.159e-03
+Train Epoch: 12 [3008/10000 (30%)] 	Forcing Loss: 1.2341E-04 (w = 1.0E+00) 	Physics Loss: 2.7412E-04 (w = 1.0E-06) 	Loss Gradient: 1.8959E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.578e-03   ⟨|s_xy+g_y|⟩=5.755e-03
+Train Epoch: 12 [3072/10000 (31%)] 	Forcing Loss: 1.0707E-04 (w = 1.0E+00) 	Physics Loss: 2.7507E-04 (w = 1.0E-06) 	Loss Gradient: 1.4633E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.627e-03   ⟨|s_xy+g_y|⟩=5.872e-03
+Train Epoch: 12 [3136/10000 (31%)] 	Forcing Loss: 1.1407E-04 (w = 1.0E+00) 	Physics Loss: 2.5831E-04 (w = 1.0E-06) 	Loss Gradient: 2.1150E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.585e-03   ⟨|s_xy+g_y|⟩=5.967e-03
+Train Epoch: 12 [3200/10000 (32%)] 	Forcing Loss: 1.1293E-04 (w = 1.0E+00) 	Physics Loss: 2.7588E-04 (w = 1.0E-06) 	Loss Gradient: 1.5038E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.610e-03   ⟨|s_xy+g_y|⟩=6.090e-03
+Train Epoch: 12 [3264/10000 (32%)] 	Forcing Loss: 1.1674E-04 (w = 1.0E+00) 	Physics Loss: 2.6897E-04 (w = 1.0E-06) 	Loss Gradient: 1.5126E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.355e-03   ⟨|s_xy+g_y|⟩=6.165e-03
+Train Epoch: 12 [3328/10000 (33%)] 	Forcing Loss: 1.1703E-04 (w = 1.0E+00) 	Physics Loss: 2.3070E-04 (w = 1.0E-06) 	Loss Gradient: 1.6685E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.456e-03   ⟨|s_xy+g_y|⟩=5.840e-03
+Train Epoch: 12 [3392/10000 (34%)] 	Forcing Loss: 1.0746E-04 (w = 1.0E+00) 	Physics Loss: 2.5169E-04 (w = 1.0E-06) 	Loss Gradient: 1.1122E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.717e-03   ⟨|s_xy+g_y|⟩=5.237e-03
+Train Epoch: 12 [3456/10000 (34%)] 	Forcing Loss: 1.0064E-04 (w = 1.0E+00) 	Physics Loss: 2.5725E-04 (w = 1.0E-06) 	Loss Gradient: 1.0279E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.367e-03   ⟨|s_xy+g_y|⟩=5.582e-03
+Train Epoch: 12 [3520/10000 (35%)] 	Forcing Loss: 1.0512E-04 (w = 1.0E+00) 	Physics Loss: 2.2880E-04 (w = 1.0E-06) 	Loss Gradient: 1.4820E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.316e-03   ⟨|s_xy+g_y|⟩=5.637e-03
+Train Epoch: 12 [3584/10000 (36%)] 	Forcing Loss: 1.2268E-04 (w = 1.0E+00) 	Physics Loss: 2.5780E-04 (w = 1.0E-06) 	Loss Gradient: 1.6414E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.975e-03   ⟨|s_xy+g_y|⟩=5.121e-03
+Train Epoch: 12 [3648/10000 (36%)] 	Forcing Loss: 1.0649E-04 (w = 1.0E+00) 	Physics Loss: 2.6925E-04 (w = 1.0E-06) 	Loss Gradient: 1.0894E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.523e-03   ⟨|s_xy+g_y|⟩=6.183e-03
+Train Epoch: 12 [3712/10000 (37%)] 	Forcing Loss: 1.1247E-04 (w = 1.0E+00) 	Physics Loss: 2.3728E-04 (w = 1.0E-06) 	Loss Gradient: 1.6667E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.940e-03   ⟨|s_xy+g_y|⟩=5.745e-03
+Train Epoch: 12 [3776/10000 (38%)] 	Forcing Loss: 1.1428E-04 (w = 1.0E+00) 	Physics Loss: 2.7290E-04 (w = 1.0E-06) 	Loss Gradient: 1.7643E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.707e-03   ⟨|s_xy+g_y|⟩=5.464e-03
+Train Epoch: 12 [3840/10000 (38%)] 	Forcing Loss: 1.0358E-04 (w = 1.0E+00) 	Physics Loss: 2.4824E-04 (w = 1.0E-06) 	Loss Gradient: 1.1399E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.145e-03   ⟨|s_xy+g_y|⟩=6.060e-03
+Train Epoch: 12 [3904/10000 (39%)] 	Forcing Loss: 1.2637E-04 (w = 1.0E+00) 	Physics Loss: 2.4655E-04 (w = 1.0E-06) 	Loss Gradient: 1.8835E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.959e-03   ⟨|s_xy+g_y|⟩=5.796e-03
+Train Epoch: 12 [3968/10000 (39%)] 	Forcing Loss: 1.2008E-04 (w = 1.0E+00) 	Physics Loss: 2.6683E-04 (w = 1.0E-06) 	Loss Gradient: 9.5214E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.952e-03   ⟨|s_xy+g_y|⟩=5.841e-03
+Train Epoch: 12 [4032/10000 (40%)] 	Forcing Loss: 1.1737E-04 (w = 1.0E+00) 	Physics Loss: 2.6967E-04 (w = 1.0E-06) 	Loss Gradient: 1.5428E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.469e-03   ⟨|s_xy+g_y|⟩=5.965e-03
+Train Epoch: 12 [4096/10000 (41%)] 	Forcing Loss: 1.1190E-04 (w = 1.0E+00) 	Physics Loss: 2.6488E-04 (w = 1.0E-06) 	Loss Gradient: 1.2450E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.838e-03   ⟨|s_xy+g_y|⟩=5.164e-03
+Train Epoch: 12 [4160/10000 (41%)] 	Forcing Loss: 1.0323E-04 (w = 1.0E+00) 	Physics Loss: 2.3911E-04 (w = 1.0E-06) 	Loss Gradient: 9.4336E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.792e-03   ⟨|s_xy+g_y|⟩=5.342e-03
+Train Epoch: 12 [4224/10000 (42%)] 	Forcing Loss: 1.0316E-04 (w = 1.0E+00) 	Physics Loss: 2.5942E-04 (w = 1.0E-06) 	Loss Gradient: 1.0510E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.821e-03   ⟨|s_xy+g_y|⟩=5.772e-03
+Train Epoch: 12 [4288/10000 (43%)] 	Forcing Loss: 1.1541E-04 (w = 1.0E+00) 	Physics Loss: 2.4475E-04 (w = 1.0E-06) 	Loss Gradient: 1.2069E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.927e-03   ⟨|s_xy+g_y|⟩=5.508e-03
+Train Epoch: 12 [4352/10000 (43%)] 	Forcing Loss: 1.1495E-04 (w = 1.0E+00) 	Physics Loss: 2.7122E-04 (w = 1.0E-06) 	Loss Gradient: 1.7495E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.474e-03   ⟨|s_xy+g_y|⟩=5.233e-03
+Train Epoch: 12 [4416/10000 (44%)] 	Forcing Loss: 9.7804E-05 (w = 1.0E+00) 	Physics Loss: 2.5033E-04 (w = 1.0E-06) 	Loss Gradient: 7.7159E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.036e-03   ⟨|s_xy+g_y|⟩=5.483e-03
+Train Epoch: 12 [4480/10000 (45%)] 	Forcing Loss: 1.0824E-04 (w = 1.0E+00) 	Physics Loss: 2.6072E-04 (w = 1.0E-06) 	Loss Gradient: 1.2924E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.865e-03   ⟨|s_xy+g_y|⟩=5.912e-03
+Train Epoch: 12 [4544/10000 (45%)] 	Forcing Loss: 1.1531E-04 (w = 1.0E+00) 	Physics Loss: 2.8021E-04 (w = 1.0E-06) 	Loss Gradient: 1.7784E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.885e-03   ⟨|s_xy+g_y|⟩=5.536e-03
+Train Epoch: 12 [4608/10000 (46%)] 	Forcing Loss: 1.1206E-04 (w = 1.0E+00) 	Physics Loss: 2.7470E-04 (w = 1.0E-06) 	Loss Gradient: 1.1735E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.461e-03   ⟨|s_xy+g_y|⟩=5.554e-03
+Train Epoch: 12 [4672/10000 (46%)] 	Forcing Loss: 1.0280E-04 (w = 1.0E+00) 	Physics Loss: 2.5217E-04 (w = 1.0E-06) 	Loss Gradient: 1.0619E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.575e-03   ⟨|s_xy+g_y|⟩=6.635e-03
+Train Epoch: 12 [4736/10000 (47%)] 	Forcing Loss: 1.4522E-04 (w = 1.0E+00) 	Physics Loss: 2.8415E-04 (w = 1.0E-06) 	Loss Gradient: 2.6355E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.013e-03   ⟨|s_xy+g_y|⟩=5.820e-03
+Train Epoch: 12 [4800/10000 (48%)] 	Forcing Loss: 1.1881E-04 (w = 1.0E+00) 	Physics Loss: 2.5079E-04 (w = 1.0E-06) 	Loss Gradient: 1.2256E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.018e-03   ⟨|s_xy+g_y|⟩=5.378e-03
+Train Epoch: 12 [4864/10000 (48%)] 	Forcing Loss: 1.0865E-04 (w = 1.0E+00) 	Physics Loss: 2.4249E-04 (w = 1.0E-06) 	Loss Gradient: 1.4578E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.240e-03   ⟨|s_xy+g_y|⟩=5.355e-03
+Train Epoch: 12 [4928/10000 (49%)] 	Forcing Loss: 1.1063E-04 (w = 1.0E+00) 	Physics Loss: 2.7557E-04 (w = 1.0E-06) 	Loss Gradient: 1.4114E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.532e-03   ⟨|s_xy+g_y|⟩=5.975e-03
+Train Epoch: 12 [4992/10000 (50%)] 	Forcing Loss: 1.1345E-04 (w = 1.0E+00) 	Physics Loss: 2.7423E-04 (w = 1.0E-06) 	Loss Gradient: 1.2440E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.819e-03   ⟨|s_xy+g_y|⟩=5.579e-03
+Train Epoch: 12 [5056/10000 (50%)] 	Forcing Loss: 1.0936E-04 (w = 1.0E+00) 	Physics Loss: 2.5721E-04 (w = 1.0E-06) 	Loss Gradient: 1.1088E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.906e-03   ⟨|s_xy+g_y|⟩=5.524e-03
+Train Epoch: 12 [5120/10000 (51%)] 	Forcing Loss: 1.0890E-04 (w = 1.0E+00) 	Physics Loss: 2.6468E-04 (w = 1.0E-06) 	Loss Gradient: 1.0485E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.684e-03   ⟨|s_xy+g_y|⟩=5.549e-03
+Train Epoch: 12 [5184/10000 (52%)] 	Forcing Loss: 1.0659E-04 (w = 1.0E+00) 	Physics Loss: 2.3443E-04 (w = 1.0E-06) 	Loss Gradient: 1.4663E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.716e-03   ⟨|s_xy+g_y|⟩=5.913e-03
+Train Epoch: 12 [5248/10000 (52%)] 	Forcing Loss: 1.1198E-04 (w = 1.0E+00) 	Physics Loss: 2.5547E-04 (w = 1.0E-06) 	Loss Gradient: 1.2255E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.774e-03   ⟨|s_xy+g_y|⟩=5.363e-03
+Train Epoch: 12 [5312/10000 (53%)] 	Forcing Loss: 1.0176E-04 (w = 1.0E+00) 	Physics Loss: 2.3720E-04 (w = 1.0E-06) 	Loss Gradient: 1.2727E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.989e-03   ⟨|s_xy+g_y|⟩=5.403e-03
+Train Epoch: 12 [5376/10000 (54%)] 	Forcing Loss: 1.1192E-04 (w = 1.0E+00) 	Physics Loss: 2.7181E-04 (w = 1.0E-06) 	Loss Gradient: 1.4315E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.381e-03   ⟨|s_xy+g_y|⟩=5.437e-03
+Train Epoch: 12 [5440/10000 (54%)] 	Forcing Loss: 1.2467E-04 (w = 1.0E+00) 	Physics Loss: 2.5556E-04 (w = 1.0E-06) 	Loss Gradient: 1.1520E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.161e-03   ⟨|s_xy+g_y|⟩=6.063e-03
+Train Epoch: 12 [5504/10000 (55%)] 	Forcing Loss: 1.2264E-04 (w = 1.0E+00) 	Physics Loss: 2.6362E-04 (w = 1.0E-06) 	Loss Gradient: 1.8590E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.297e-03   ⟨|s_xy+g_y|⟩=5.780e-03
+Train Epoch: 12 [5568/10000 (55%)] 	Forcing Loss: 1.0269E-04 (w = 1.0E+00) 	Physics Loss: 2.7786E-04 (w = 1.0E-06) 	Loss Gradient: 7.3920E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.662e-03   ⟨|s_xy+g_y|⟩=5.942e-03
+Train Epoch: 12 [5632/10000 (56%)] 	Forcing Loss: 1.1434E-04 (w = 1.0E+00) 	Physics Loss: 2.8879E-04 (w = 1.0E-06) 	Loss Gradient: 1.1302E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.993e-03   ⟨|s_xy+g_y|⟩=5.593e-03
+Train Epoch: 12 [5696/10000 (57%)] 	Forcing Loss: 1.1470E-04 (w = 1.0E+00) 	Physics Loss: 2.5164E-04 (w = 1.0E-06) 	Loss Gradient: 1.6785E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.575e-03   ⟨|s_xy+g_y|⟩=5.694e-03
+Train Epoch: 12 [5760/10000 (57%)] 	Forcing Loss: 1.0692E-04 (w = 1.0E+00) 	Physics Loss: 2.6894E-04 (w = 1.0E-06) 	Loss Gradient: 1.2108E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.772e-03   ⟨|s_xy+g_y|⟩=5.236e-03
+Train Epoch: 12 [5824/10000 (58%)] 	Forcing Loss: 1.0271E-04 (w = 1.0E+00) 	Physics Loss: 2.6607E-04 (w = 1.0E-06) 	Loss Gradient: 1.3919E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.327e-03   ⟨|s_xy+g_y|⟩=5.718e-03
+Train Epoch: 12 [5888/10000 (59%)] 	Forcing Loss: 1.0133E-04 (w = 1.0E+00) 	Physics Loss: 2.2721E-04 (w = 1.0E-06) 	Loss Gradient: 1.2639E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.608e-03   ⟨|s_xy+g_y|⟩=5.540e-03
+Train Epoch: 12 [5952/10000 (59%)] 	Forcing Loss: 1.0770E-04 (w = 1.0E+00) 	Physics Loss: 2.6173E-04 (w = 1.0E-06) 	Loss Gradient: 1.4236E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.703e-03   ⟨|s_xy+g_y|⟩=5.098e-03
+Train Epoch: 12 [6016/10000 (60%)] 	Forcing Loss: 1.0185E-04 (w = 1.0E+00) 	Physics Loss: 2.7020E-04 (w = 1.0E-06) 	Loss Gradient: 8.5243E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.522e-03   ⟨|s_xy+g_y|⟩=5.168e-03
+Train Epoch: 12 [6080/10000 (61%)] 	Forcing Loss: 9.7800E-05 (w = 1.0E+00) 	Physics Loss: 2.6558E-04 (w = 1.0E-06) 	Loss Gradient: 9.5558E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.595e-03   ⟨|s_xy+g_y|⟩=5.711e-03
+Train Epoch: 12 [6144/10000 (61%)] 	Forcing Loss: 1.0644E-04 (w = 1.0E+00) 	Physics Loss: 2.3597E-04 (w = 1.0E-06) 	Loss Gradient: 1.2128E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.596e-03   ⟨|s_xy+g_y|⟩=6.102e-03
+Train Epoch: 12 [6208/10000 (62%)] 	Forcing Loss: 1.1687E-04 (w = 1.0E+00) 	Physics Loss: 2.2228E-04 (w = 1.0E-06) 	Loss Gradient: 1.1481E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.056e-03   ⟨|s_xy+g_y|⟩=6.082e-03
+Train Epoch: 12 [6272/10000 (62%)] 	Forcing Loss: 1.2375E-04 (w = 1.0E+00) 	Physics Loss: 2.5340E-04 (w = 1.0E-06) 	Loss Gradient: 9.0237E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.709e-03   ⟨|s_xy+g_y|⟩=5.781e-03
+Train Epoch: 12 [6336/10000 (63%)] 	Forcing Loss: 1.1203E-04 (w = 1.0E+00) 	Physics Loss: 2.5255E-04 (w = 1.0E-06) 	Loss Gradient: 1.3630E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.498e-03   ⟨|s_xy+g_y|⟩=6.268e-03
+Train Epoch: 12 [6400/10000 (64%)] 	Forcing Loss: 1.1794E-04 (w = 1.0E+00) 	Physics Loss: 2.8183E-04 (w = 1.0E-06) 	Loss Gradient: 1.1769E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.008e-03   ⟨|s_xy+g_y|⟩=5.890e-03
+Train Epoch: 12 [6464/10000 (64%)] 	Forcing Loss: 1.1874E-04 (w = 1.0E+00) 	Physics Loss: 2.7149E-04 (w = 1.0E-06) 	Loss Gradient: 1.0911E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.577e-03   ⟨|s_xy+g_y|⟩=5.755e-03
+Train Epoch: 12 [6528/10000 (65%)] 	Forcing Loss: 1.0901E-04 (w = 1.0E+00) 	Physics Loss: 2.5594E-04 (w = 1.0E-06) 	Loss Gradient: 1.5208E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.947e-03   ⟨|s_xy+g_y|⟩=5.477e-03
+Train Epoch: 12 [6592/10000 (66%)] 	Forcing Loss: 1.1316E-04 (w = 1.0E+00) 	Physics Loss: 2.5951E-04 (w = 1.0E-06) 	Loss Gradient: 1.2666E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.384e-03   ⟨|s_xy+g_y|⟩=5.461e-03
+Train Epoch: 12 [6656/10000 (66%)] 	Forcing Loss: 9.6260E-05 (w = 1.0E+00) 	Physics Loss: 2.4344E-04 (w = 1.0E-06) 	Loss Gradient: 1.3897E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.251e-03   ⟨|s_xy+g_y|⟩=5.924e-03
+Train Epoch: 12 [6720/10000 (67%)] 	Forcing Loss: 1.0541E-04 (w = 1.0E+00) 	Physics Loss: 2.6280E-04 (w = 1.0E-06) 	Loss Gradient: 8.5867E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.734e-03   ⟨|s_xy+g_y|⟩=5.975e-03
+Train Epoch: 12 [6784/10000 (68%)] 	Forcing Loss: 1.1691E-04 (w = 1.0E+00) 	Physics Loss: 2.4452E-04 (w = 1.0E-06) 	Loss Gradient: 1.6626E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.090e-03   ⟨|s_xy+g_y|⟩=5.468e-03
+Train Epoch: 12 [6848/10000 (68%)] 	Forcing Loss: 1.1333E-04 (w = 1.0E+00) 	Physics Loss: 2.5299E-04 (w = 1.0E-06) 	Loss Gradient: 1.0480E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.319e-03   ⟨|s_xy+g_y|⟩=5.679e-03
+Train Epoch: 12 [6912/10000 (69%)] 	Forcing Loss: 1.0100E-04 (w = 1.0E+00) 	Physics Loss: 2.3334E-04 (w = 1.0E-06) 	Loss Gradient: 7.3318E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.508e-03   ⟨|s_xy+g_y|⟩=5.834e-03
+Train Epoch: 12 [6976/10000 (69%)] 	Forcing Loss: 1.0803E-04 (w = 1.0E+00) 	Physics Loss: 2.4233E-04 (w = 1.0E-06) 	Loss Gradient: 1.3288E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.572e-03   ⟨|s_xy+g_y|⟩=5.746e-03
+Train Epoch: 12 [7040/10000 (70%)] 	Forcing Loss: 1.1077E-04 (w = 1.0E+00) 	Physics Loss: 2.4443E-04 (w = 1.0E-06) 	Loss Gradient: 1.0568E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.678e-03   ⟨|s_xy+g_y|⟩=6.060e-03
+Train Epoch: 12 [7104/10000 (71%)] 	Forcing Loss: 1.1967E-04 (w = 1.0E+00) 	Physics Loss: 2.5939E-04 (w = 1.0E-06) 	Loss Gradient: 9.7995E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.322e-03   ⟨|s_xy+g_y|⟩=5.033e-03
+Train Epoch: 12 [7168/10000 (71%)] 	Forcing Loss: 8.9629E-05 (w = 1.0E+00) 	Physics Loss: 2.5851E-04 (w = 1.0E-06) 	Loss Gradient: 8.1432E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.655e-03   ⟨|s_xy+g_y|⟩=5.420e-03
+Train Epoch: 12 [7232/10000 (72%)] 	Forcing Loss: 1.0483E-04 (w = 1.0E+00) 	Physics Loss: 2.4680E-04 (w = 1.0E-06) 	Loss Gradient: 7.6271E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.288e-03   ⟨|s_xy+g_y|⟩=5.636e-03
+Train Epoch: 12 [7296/10000 (73%)] 	Forcing Loss: 1.0623E-04 (w = 1.0E+00) 	Physics Loss: 2.6233E-04 (w = 1.0E-06) 	Loss Gradient: 8.3568E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.728e-03   ⟨|s_xy+g_y|⟩=5.636e-03
+Train Epoch: 12 [7360/10000 (73%)] 	Forcing Loss: 1.1054E-04 (w = 1.0E+00) 	Physics Loss: 2.3641E-04 (w = 1.0E-06) 	Loss Gradient: 9.6777E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.443e-03   ⟨|s_xy+g_y|⟩=6.030e-03
+Train Epoch: 12 [7424/10000 (74%)] 	Forcing Loss: 1.1129E-04 (w = 1.0E+00) 	Physics Loss: 2.5479E-04 (w = 1.0E-06) 	Loss Gradient: 1.1342E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.642e-03   ⟨|s_xy+g_y|⟩=5.772e-03
+Train Epoch: 12 [7488/10000 (75%)] 	Forcing Loss: 1.1520E-04 (w = 1.0E+00) 	Physics Loss: 2.4283E-04 (w = 1.0E-06) 	Loss Gradient: 1.0306E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.488e-03   ⟨|s_xy+g_y|⟩=5.204e-03
+Train Epoch: 12 [7552/10000 (75%)] 	Forcing Loss: 9.4621E-05 (w = 1.0E+00) 	Physics Loss: 2.5373E-04 (w = 1.0E-06) 	Loss Gradient: 7.5294E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.440e-03   ⟨|s_xy+g_y|⟩=5.647e-03
+Train Epoch: 12 [7616/10000 (76%)] 	Forcing Loss: 1.0171E-04 (w = 1.0E+00) 	Physics Loss: 2.7902E-04 (w = 1.0E-06) 	Loss Gradient: 1.0864E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.174e-03   ⟨|s_xy+g_y|⟩=5.996e-03
+Train Epoch: 12 [7680/10000 (76%)] 	Forcing Loss: 1.0578E-04 (w = 1.0E+00) 	Physics Loss: 2.5758E-04 (w = 1.0E-06) 	Loss Gradient: 8.2592E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.228e-03   ⟨|s_xy+g_y|⟩=5.510e-03
+Train Epoch: 12 [7744/10000 (77%)] 	Forcing Loss: 9.6900E-05 (w = 1.0E+00) 	Physics Loss: 2.3613E-04 (w = 1.0E-06) 	Loss Gradient: 8.8821E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.415e-03   ⟨|s_xy+g_y|⟩=5.870e-03
+Train Epoch: 12 [7808/10000 (78%)] 	Forcing Loss: 1.0936E-04 (w = 1.0E+00) 	Physics Loss: 2.4877E-04 (w = 1.0E-06) 	Loss Gradient: 7.1066E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.532e-03   ⟨|s_xy+g_y|⟩=5.498e-03
+Train Epoch: 12 [7872/10000 (78%)] 	Forcing Loss: 1.0462E-04 (w = 1.0E+00) 	Physics Loss: 2.4000E-04 (w = 1.0E-06) 	Loss Gradient: 1.1067E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.087e-03   ⟨|s_xy+g_y|⟩=5.654e-03
+Train Epoch: 12 [7936/10000 (79%)] 	Forcing Loss: 1.1918E-04 (w = 1.0E+00) 	Physics Loss: 2.4512E-04 (w = 1.0E-06) 	Loss Gradient: 1.1042E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.299e-03   ⟨|s_xy+g_y|⟩=5.398e-03
+Train Epoch: 12 [8000/10000 (80%)] 	Forcing Loss: 9.5522E-05 (w = 1.0E+00) 	Physics Loss: 2.4598E-04 (w = 1.0E-06) 	Loss Gradient: 1.0175E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.519e-03   ⟨|s_xy+g_y|⟩=5.168e-03
+Train Epoch: 12 [8064/10000 (80%)] 	Forcing Loss: 9.5642E-05 (w = 1.0E+00) 	Physics Loss: 2.6815E-04 (w = 1.0E-06) 	Loss Gradient: 9.2299E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.359e-03   ⟨|s_xy+g_y|⟩=5.730e-03
+Train Epoch: 12 [8128/10000 (81%)] 	Forcing Loss: 1.2692E-04 (w = 1.0E+00) 	Physics Loss: 2.5476E-04 (w = 1.0E-06) 	Loss Gradient: 1.7200E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.472e-03   ⟨|s_xy+g_y|⟩=5.551e-03
+Train Epoch: 12 [8192/10000 (82%)] 	Forcing Loss: 1.0232E-04 (w = 1.0E+00) 	Physics Loss: 2.4830E-04 (w = 1.0E-06) 	Loss Gradient: 1.0775E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.502e-03   ⟨|s_xy+g_y|⟩=5.316e-03
+Train Epoch: 12 [8256/10000 (82%)] 	Forcing Loss: 1.0256E-04 (w = 1.0E+00) 	Physics Loss: 2.9135E-04 (w = 1.0E-06) 	Loss Gradient: 8.9904E-02 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.022e-03   ⟨|s_xy+g_y|⟩=5.730e-03
+Train Epoch: 12 [8320/10000 (83%)] 	Forcing Loss: 1.1705E-04 (w = 1.0E+00) 	Physics Loss: 2.5806E-04 (w = 1.0E-06) 	Loss Gradient: 1.6423E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.815e-03   ⟨|s_xy+g_y|⟩=5.514e-03
+Train Epoch: 12 [8384/10000 (83%)] 	Forcing Loss: 1.0960E-04 (w = 1.0E+00) 	Physics Loss: 2.5566E-04 (w = 1.0E-06) 	Loss Gradient: 1.4200E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.326e-03   ⟨|s_xy+g_y|⟩=5.259e-03
+Train Epoch: 12 [8448/10000 (84%)] 	Forcing Loss: 1.1607E-04 (w = 1.0E+00) 	Physics Loss: 2.7551E-04 (w = 1.0E-06) 	Loss Gradient: 1.0025E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.613e-03   ⟨|s_xy+g_y|⟩=5.481e-03
+Train Epoch: 12 [8512/10000 (85%)] 	Forcing Loss: 1.0213E-04 (w = 1.0E+00) 	Physics Loss: 2.6432E-04 (w = 1.0E-06) 	Loss Gradient: 1.2030E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.625e-03   ⟨|s_xy+g_y|⟩=5.652e-03
+Train Epoch: 12 [8576/10000 (85%)] 	Forcing Loss: 1.0673E-04 (w = 1.0E+00) 	Physics Loss: 2.6062E-04 (w = 1.0E-06) 	Loss Gradient: 1.7610E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.843e-03   ⟨|s_xy+g_y|⟩=5.214e-03
+Train Epoch: 12 [8640/10000 (86%)] 	Forcing Loss: 1.0366E-04 (w = 1.0E+00) 	Physics Loss: 2.4535E-04 (w = 1.0E-06) 	Loss Gradient: 1.0318E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.207e-03   ⟨|s_xy+g_y|⟩=5.330e-03
+Train Epoch: 12 [8704/10000 (87%)] 	Forcing Loss: 1.1462E-04 (w = 1.0E+00) 	Physics Loss: 2.5308E-04 (w = 1.0E-06) 	Loss Gradient: 2.0723E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.562e-03   ⟨|s_xy+g_y|⟩=5.425e-03
+Train Epoch: 12 [8768/10000 (87%)] 	Forcing Loss: 1.0016E-04 (w = 1.0E+00) 	Physics Loss: 2.5780E-04 (w = 1.0E-06) 	Loss Gradient: 1.5581E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.590e-03   ⟨|s_xy+g_y|⟩=5.770e-03
+Train Epoch: 12 [8832/10000 (88%)] 	Forcing Loss: 1.0707E-04 (w = 1.0E+00) 	Physics Loss: 2.6188E-04 (w = 1.0E-06) 	Loss Gradient: 1.6751E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=6.061e-03   ⟨|s_xy+g_y|⟩=6.002e-03
+Train Epoch: 12 [8896/10000 (89%)] 	Forcing Loss: 1.2095E-04 (w = 1.0E+00) 	Physics Loss: 2.5101E-04 (w = 1.0E-06) 	Loss Gradient: 1.5924E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.909e-03   ⟨|s_xy+g_y|⟩=5.756e-03
+Train Epoch: 12 [8960/10000 (89%)] 	Forcing Loss: 1.1403E-04 (w = 1.0E+00) 	Physics Loss: 2.5457E-04 (w = 1.0E-06) 	Loss Gradient: 1.5467E-01 	lr: 9.14E-05
+
+⟨|s_xx+g_x|⟩=5.338e-03   ⟨|s_xy+g_y|⟩=6.050e-03

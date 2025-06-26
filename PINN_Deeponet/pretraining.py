@@ -49,7 +49,7 @@ network.to(device)
 
 # Create the Adam optimizer and LR scheduler
 optimizer = optim.Adam(network.parameters(), lr=10**(-2.5), amsgrad=True)
-n_epochs = 250
+n_epochs = 2500
 scheduler = sch.OneCycleLR(optimizer,
                        max_lr=2.e-3,
                        total_steps=n_epochs,
