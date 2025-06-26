@@ -17,6 +17,7 @@ if pt.backends.mps.is_available():
     batch_size = 64
     batch_xy = 512
 elif pt.cuda.device_count() > 0:
+    print('CUDA is available')
     device = pt.device("cuda:0")
     batch_size = 64
     batch_xy = 4096
@@ -47,7 +48,7 @@ kernel_size = 7
 n_branch_nonlinear = 3
 p = 100
 network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_nonlinear, p)
-network.load_state_dict(pt.load(store_directory + 'pretrained_model.pth', weights_only=True))
+network.load_state_dict(pt.load(store_directory + 'pretrained_model.pth', map_location=device, weights_only=True))
 network.to(device)
 
 # Create the Adam optimizer and LR scheduler
