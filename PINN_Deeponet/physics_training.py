@@ -11,14 +11,20 @@ from dataset import DeepONetDataset
 # Just some sanity pytorch settings
 pt.set_grad_enabled(True)
 pt.set_default_dtype(pt.float32)
+dtype = pt.float32
 if pt.backends.mps.is_available():
     device = pt.device("mps")
+    batch_size = 64
+    batch_xy = 512
 elif pt.cuda.device_count() > 0:
     device = pt.device("cuda:0")
+    batch_size = 64
+    batch_xy = 4096
 else:
     print('Using CPU because no GPU is available.')
     device = pt.device("cpu")
-dtype = pt.float32
+    batch_size = 64
+    batch_xy = 512
 
 # Load the data configuration
 config_file = 'DataConfig.json'
@@ -26,11 +32,9 @@ config = json.load(open(config_file))
 store_directory = config['Store Directory']
 
 # Load the data in memory
-batch_size = 64
 forcing_dataset = DeepONetDataset(config, device, dtype)
 forcing_loader = DataLoader(forcing_dataset, batch_size=batch_size, shuffle=True)
 internal_dataset = TensorDataset(forcing_dataset.xy_int)
-batch_xy = 512
 internal_loader = DataLoader(internal_dataset, batch_size=batch_xy, shuffle=True)
 n_chunks = len(internal_loader)
 n_data_points = len(forcing_dataset) * len(internal_dataset)
@@ -67,6 +71,9 @@ xy_empty = pt.empty((0,2), device=device, dtype=pt.float32)
 def train(epoch):
     network.train()
 
+    forcing_sum = 0.0
+    physics_sum = 0.0
+
     clip_level = 5.0 # only optimizing the forcing loss
     for f_batch_idx, f_batch in enumerate(forcing_loader):
         optimizer.zero_grad()
@@ -86,12 +93,14 @@ def train(epoch):
         # Do the boundary losses once
         loss_forcing = loss_fn(network, f_batch, xy_empty, xy_forcing)
         loss_forcing.backward()
+        forcing_sum += loss_forcing.item()
 
         physics_loss : float = 0.0
         for xy_batch_idx, (xy_batch,) in enumerate(internal_loader):
             loss_int = loss_fn.forward(network, f_batch, xy_batch, xy_empty) / n_chunks
             loss_int.backward()
             physics_loss += loss_int.item()
+        physics_sum += physics_loss
 
         # Do an optimizer step
         pt.nn.utils.clip_grad_norm_(network.parameters(), max_norm=clip_level)
@@ -101,7 +110,7 @@ def train(epoch):
         # Some housekeeping
         print('Train Epoch: {} [{}/{} ({:.0f}%)] \tForcing Loss: {:.4E} (w = {:.1E}) \tPhysics Loss: {:.4E} (w = {:.1E}) \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
                         epoch, f_batch_idx * len(f_batch), len(forcing_dataset),
-                        100. * f_batch_idx / len(forcing_loader), loss_forcing.item(), w_forcing, physics_loss, w_int, grad, optimizer.param_groups[0]['lr']))
+                        100. * f_batch_idx / len(forcing_loader), loss_forcing.item(), w_forcing, physics_loss, loss_fn.w_int, grad, optimizer.param_groups[0]['lr']))
         train_losses.append(0.0 + loss_forcing.item() + physics_loss)
         train_grads.append(grad.cpu())
         train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)
@@ -110,47 +119,69 @@ def train(epoch):
     pt.save(network.state_dict(), store_directory + 'physics_model.pth')
     pt.save(optimizer.state_dict(), store_directory + 'physics_optimizer.pth')
 
+    # Return the averaged forcing and physics losses for weight calculations
+    n_batches = len(forcing_loader)
+    return forcing_sum / n_batches, physics_sum / n_batches
+
 # Increase the physics weights first with a constant learning rate.
 print('\nStarting Training Procedure...')
 w_int_0  = 1e-7 # Very small
 w_int_max = 1e-1
-warm_epochs   = 2        # low-LR period just after the switch
+current_w_int = w_int_0
+warm_epochs   = 5        # low-LR period just after the switch
 ramp_step     = 10       # how often to multiply by 10
 base_lr       = 1e-3     # your usual LR
-low_lr_factor = 0.2      # LR multiplier during warm-up
+low_lr_factor = 0.1      # LR multiplier during warm-up
 max_epochs    = 100      # run as long as you like
-def ramp_weight(init, max_, epoch, step):
-    """log-ramp: multiply by 10 every <step> epochs until max is reached"""
-    k = k = max(0, (epoch-1)//step)
-    w = init * (10.0 ** k)
-    return min(w, max_)
 def set_lr(optim, factor):
     for g in optim.param_groups:
         g['lr'] = base_lr * factor
 print("\nStarting curriculum-phase training...")
-try:
-    for epoch in range(1, max_epochs + 1):
 
-        # LR handling
-        if epoch <= warm_epochs:
+epoch  = 0
+ramping_done = False        # turns true once w_int hits target_band
+warm_epochs_after_ramp = 3  # low-LR epochs after each jump
+warm_left = warm_epochs     # remaining epochs in low-LR mode
+target_band = (0.3, 3.0)    # balance band for weighted losses
+try:
+    while not ramping_done:
+        epoch += 1
+
+        # ---- learning-rate handling ---------------------------------
+        if warm_left > 0:
             set_lr(optimizer, low_lr_factor)
+            warm_left -= 1
         else:
             set_lr(optimizer, 1.0)
 
-        # task weights
-        w_int = ramp_weight(w_int_0, w_int_max, epoch, ramp_step)
-        loss_fn.setWeights(w_int = w_int, w_forcing = w_forcing)
-        train(epoch)
+        # Do one epoch with these weights
+        loss_fn.setWeights(w_int = current_w_int, w_forcing = w_forcing)
+        forcing_term, physics_term = train(epoch)
+        weighted_ratio = physics_term / forcing_term
+        print(f"epoch {epoch:3d} | ratio={weighted_ratio:.2f} "
+          f"| w_int={current_w_int:.1e} | LR={optimizer.param_groups[0]['lr']:.1e}")
+        
+        # 4. decide whether to ramp
+        if warm_left == 0 and current_w_int < w_int_max and weighted_ratio < target_band[0]:
+            # ×10 jump
+            current_w_int = min(current_w_int*10.0, w_int_max)
+            warm_left = warm_epochs_after_ramp             # restart cool-down
+            print(f" ↑ increased w_int to {current_w_int:.1e}, "
+                f"low-LR for {warm_left} epochs")
+        elif target_band[0] <= weighted_ratio <= target_band[1]:
+            print(" ✓ losses balanced – stop ramping")
+            ramping_done = True
 except KeyboardInterrupt:
     print('Moving on to post training.')
 
 # Post-training: slowly decrease the learing rate to obtain the optimal fit.
 step = 10
 scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.5)
+last_epoch = epoch
 n_epochs = 10 * step
 try:
     for epoch in range(1, n_epochs + 1):
-        train(max_epochs + epoch)
+        train(last_epoch + epoch)
         scheduler.step()
 except KeyboardInterrupt:
     print('Stopping Post-Trainig. Plotting Training Convergence.')
