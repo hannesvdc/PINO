@@ -49,17 +49,19 @@ network.to(device)
 
 # Create the Adam optimizer and LR scheduler
 optimizer = optim.Adam(network.parameters(), lr=10**(-2.5), amsgrad=True)
-step = 25
-scheduler = sch.StepLR(optimizer, step_size=step, gamma=0.5)
+n_epochs = 2500
+scheduler = sch.OneCycleLR(optimizer,
+                       max_lr=2.e-3,
+                       total_steps=n_epochs,
+                       pct_start=0.3, div_factor=25, final_div_factor=10)
 print('Number of Data Points per Parameter: ', n_data_points / (1.0 * network.getNumberofParameters()))
 
 # Training Routine
 E_train = 1.0 
 nu = 0.3
 w_int = 0.0
-w_dirichlet = 0.0
 w_forcing = 1.0
-loss_fn = PhysicsLoss(E_train, nu, w_int, w_dirichlet, w_forcing)
+loss_fn = PhysicsLoss(E_train, nu, w_int, w_forcing)
 train_losses = []
 train_grads = []
 train_counter = []
@@ -70,7 +72,9 @@ def getGradient():
     grads = pt.cat(grads)
     return pt.norm(grads)
 
+pref = loss_fn.pref
 xy_empty = pt.empty((0,2), device=device, dtype=pt.float32)
+xy_left = pt.stack((pt.zeros(forcing_dataset.grid_points), pt.linspace(0.0, 1.0, forcing_dataset.grid_points)), dim=1).to(device=device, dtype=pt.float32)
 def train(epoch):
     network.train()
 
@@ -82,20 +86,19 @@ def train(epoch):
         with pt.no_grad():
             g_x = f_batch[:, :101]
             g_y = f_batch[:, 101:]
+            u, v = network.forward(f_batch, xy_left)
+            dirichlet_loss = u.square().mean() + v.square().mean()
             J, _ = loss_fn.grads_and_hess(network, f_batch, xy_forcing, needsHessian=False)
             u_x = J[:,:,0,0];  u_y = J[:,:,0,1]
             v_x = J[:,:,1,0];  v_y = J[:,:,1,1]
-            pref = loss_fn.pref          # = E_train/(1-ν²)
             tx = (pref * (u_x + nu * v_y) + g_x).abs().mean().item()
             ty = (pref * ((1-nu)/2)*(u_y+v_x) + g_y).abs().mean().item()
             print(f"\n⟨|s_xx+g_x|⟩={tx:.3e}   ⟨|s_xy+g_y|⟩={ty:.3e}")
-            sig_x = loss_fn.pref * (u_x + nu * v_y)      # (B,101)
-            print("corr(σ_xx, g_x) =", pt.corrcoef(pt.stack((sig_x.flatten(), g_x.flatten())))[0,1].item())
+            sig_x = loss_fn.pref * (u_x + nu * v_y)
+            print("corr(σ_x, g_x) =", pt.corrcoef(pt.stack((sig_x.flatten(), g_x.flatten())))[0,1].item())
 
         # Do the boundary losses once
-        loss_dirichlet = loss_fn(network, f_batch, xy_empty, xy_left, xy_empty)
-        loss_dirichlet.backward()
-        loss_forcing = loss_fn(network, f_batch, xy_empty, xy_empty, xy_forcing)
+        loss_forcing = loss_fn(network, f_batch, xy_empty, xy_forcing)
         loss_forcing.backward()
 
         # Do an optimizer step
@@ -106,7 +109,7 @@ def train(epoch):
         # Some housekeeping
         print('Train Epoch: {} [{}/{} ({:.0f}%)]\tDirichlet Loss: {:.4E} \tForcing Loss: {:.4E} \tPhysics Loss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
                         epoch, f_batch_idx * len(f_batch), len(forcing_dataset),
-                        100. * f_batch_idx / len(forcing_loader), 0.0, loss_forcing.item(), 0.0, grad, optimizer.param_groups[0]['lr']))
+                        100. * f_batch_idx / len(forcing_loader), dirichlet_loss, loss_forcing.item(), 0.0, grad, optimizer.param_groups[0]['lr']))
         train_losses.append(loss_forcing.item())
         train_grads.append(grad.cpu())
         train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)
@@ -117,7 +120,6 @@ def train(epoch):
 
 # Do the actual training
 print('\nStarting Training Procedure...')
-n_epochs = 10 * step # Do a max of 250 epochs pre-training. Should be enough convergence.
 try:
     for epoch in range(1, n_epochs + 1):
         train(epoch)

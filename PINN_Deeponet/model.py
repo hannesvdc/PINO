@@ -68,6 +68,7 @@ class ConvDeepONet(nn.Module):
                        p : int) -> None:
         super(ConvDeepONet, self).__init__()
         self.p = p
+        self.beta = 6.0
         
         self.branch_net = BranchModel(n_branch_conv, n_branch_channels, kernel_size, n_branch_nonlinear, p)
         self.trunk_net = TrunkModel(p)
@@ -93,25 +94,30 @@ class ConvDeepONet(nn.Module):
         t_v = trunk_output[:, self.p:]
 
         # Combine through matrix multiplication
-        u = b_u @ t_u.T
-        v = b_v @ t_v.T
+        u_hat = b_u @ t_u.T
+        v_hat = b_v @ t_v.T
+
+        # Multiply by the ramp to enforce the Dirichlet BCs
+        x = trunk_input[:, 0]            # (Nc,)
+        r = 1.0 - pt.exp(-x / self.beta).unsqueeze(0)
+        u = r * u_hat
+        v = r * v_hat
 
         # The output are two matrices of shape (B, Nc)
         return u, v
     
 class PhysicsLoss(nn.Module):
-    def __init__(self, E_train, nu, w_int=1.0, w_dirichlet=1.0, w_forcing=1.0):
+    def __init__(self, E_train, nu, w_int=1.0, w_forcing=1.0):
         super().__init__()
         self.E, self.nu = E_train, nu
         self.pref = self.E / (1.0 - self.nu**2)
-        self.w_int, self.w_dirichlet, self.w_forcing = w_int, w_dirichlet, w_forcing
+        self.w_int, self.w_forcing = w_int, w_forcing
 
-    def setWeights(self, w_int : float, w_dirichlet : float, w_forcing : float):
+    def setWeights(self, w_int : float, w_forcing : float):
         self.w_int = w_int
-        self.w_dirichlet = w_dirichlet
         self.w_forcing = w_forcing
 
-    def forward(self, model : ConvDeepONet, f_batch : pt.Tensor, xy_int : pt.Tensor, xy_diriclet : pt.Tensor, xy_forcing : pt.Tensor):
+    def forward(self, model : ConvDeepONet, f_batch : pt.Tensor, xy_int : pt.Tensor, xy_forcing : pt.Tensor):
 
         # PDE residual inside the domain
         if xy_int.numel() != 0:
@@ -127,13 +133,6 @@ class PhysicsLoss(nn.Module):
             loss_int = loss_int_u.square().mean() + loss_int_v.square().mean()
         else:
             loss_int = pt.zeros(1, device=f_batch.device, dtype=f_batch.dtype, requires_grad=False).squeeze()
-        
-        # Dirichlet boundary conditions on the left
-        if xy_diriclet.numel() != 0:
-            u_left, v_left = model.forward(f_batch, xy_diriclet)
-            loss_left = u_left.square().mean() + v_left.square().mean()
-        else:
-            loss_left = pt.zeros(1, device=f_batch.device, dtype=f_batch.dtype, requires_grad=False).squeeze()
 
         # Forcing (Neumann) boundary conditions on the right
         if xy_forcing.numel() != 0:
@@ -150,7 +149,7 @@ class PhysicsLoss(nn.Module):
         else:
             loss_forcing = pt.zeros(1, device=f_batch.device, dtype=f_batch.dtype, requires_grad=False).squeeze()
 
-        return self.w_int * loss_int + self.w_dirichlet * loss_left + self.w_forcing * loss_forcing
+        return self.w_int * loss_int + self.w_forcing * loss_forcing
 
     def grads_and_hess(self, model : ConvDeepONet, f_batch : pt.Tensor, xy : pt.Tensor, needsHessian : bool = True) -> Tuple[pt.Tensor, pt.Tensor]:
         """
