@@ -3,7 +3,7 @@ import torch as pt
 import torch.optim as optim
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, TensorDataset
-from torch.optim.lr_scheduler import OneCycleLR
+from torch.optim.lr_scheduler import OneCycleLR, StepLR
 
 from model import ConvDeepONet, PhysicsLoss
 from dataset import DeepONetDataset
@@ -36,27 +36,26 @@ xy_forcing = forcing_dataset.xy_forcing
 n_chunks = len(internal_loader)
 
 # Load model
-network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_nonlinear=3, p=100)
-network.load_state_dict(pt.load(store_directory + 'physics_model.pth', map_location=device, weights_only=True))
+network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_nonlinear=3, n_trunk_nonlinear=5, p=100)
+network.load_state_dict(pt.load(store_directory + 'pretrained_model.pth', map_location=device, weights_only=True))
 network.to(device)
+for p in network.branch_net.parameters():
+    p.requires_grad = False
+last_layer = network.branch_net.layers[-1]
+if isinstance(last_layer, pt.nn.Linear):
+    for p in last_layer.parameters():
+        p.requires_grad = True
 
 # Optimizer
-optimizer = optim.Adam(network.parameters(), lr=1e-5, amsgrad=True)
-n_epochs = 250
-scheduler = OneCycleLR(
-    optimizer,
-    max_lr=1e-3,
-    total_steps=n_epochs,
-    pct_start=0.3,
-    div_factor=25,
-    final_div_factor=10
-)
+optimizer = optim.Adam(filter(lambda p: p.requires_grad, network.parameters()), lr=1e-4, amsgrad=True)
+#scheduler = StepLR(optimizer, step_size=step, gamma=0.5)
 
 # Physics loss
 E_train = 1.0
 nu = 0.3
-final_w_int = 1e-6  # Use your final w_int here
-loss_fn = PhysicsLoss(E_train, nu, w_int=final_w_int, w_forcing=1.0)
+w_int_init = 1e-8 # Start at the physics_training value
+w_int_max  = 1e-2
+loss_fn = PhysicsLoss(E_train, nu, w_int=w_int_init, w_forcing=1.0)
 
 # Tracking
 train_losses = []
@@ -118,9 +117,13 @@ def posttrain(epoch):
     pt.save(optimizer.state_dict(), store_directory + "posttrain_optimizer.pth")
 
 # Main loop
+n_epochs = 500
 for epoch in range(1, n_epochs + 1):
+    # Exponentially ramp w_int from init to max
+    w_int = w_int_init * (w_int_max / w_int_init) ** (epoch / n_epochs)
+    loss_fn.setWeights(w_int=w_int, w_forcing=1.0)
+    print(f"\n>>> Epoch {epoch:3d} | w_int = {w_int:.2e}")
     posttrain(epoch)
-    scheduler.step()
 
 # Plot
 plt.figure()

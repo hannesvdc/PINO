@@ -43,17 +43,17 @@ class TrunkModel(nn.Module):
     """
     The branch network in our DeepONet. The input is a vector of shape (Nc, 2).
     """
-    def __init__(self, p : int):
+    def __init__(self, n_nonlinear : int, p : int):
         super().__init__()
 
         # Define two linear layers with activation
         n_hidden = 256
         layer_list = list()
-        layer_list.append(("linear1", nn.Linear(2, n_hidden)))
-        layer_list.append((f"act1", nn.Tanh()))
-        layer_list.append(("linear2", nn.Linear(n_hidden, n_hidden)))
-        layer_list.append((f"act2", nn.Tanh()))
-        layer_list.append(("linear3", nn.Linear(n_hidden, 2*p)))
+        for i in range(n_nonlinear):
+            in_neurons = 2 if i == 0 else n_hidden
+            layer_list.append((f"linear{i+1}", nn.Linear(in_neurons, n_hidden)))
+            layer_list.append((f"act{i+1}", nn.Tanh()))
+        layer_list.append((f"linear{n_nonlinear+1}", nn.Linear(n_hidden, 2*p)))
 
         self.layers = nn.Sequential(OrderedDict(layer_list))
 
@@ -65,13 +65,14 @@ class ConvDeepONet(nn.Module):
                        n_branch_channels : int, 
                        kernel_size : int, 
                        n_branch_nonlinear : int,
+                       n_trunk_nonlinear : int,
                        p : int) -> None:
         super(ConvDeepONet, self).__init__()
         self.p = p
         self.beta = 6.0
         
         self.branch_net = BranchModel(n_branch_conv, n_branch_channels, kernel_size, n_branch_nonlinear, p)
-        self.trunk_net = TrunkModel(p)
+        self.trunk_net = TrunkModel(n_trunk_nonlinear, p)
 
         print('Number of DeepONet Parameters:', sum(p.numel() for p in self.parameters()))
     
