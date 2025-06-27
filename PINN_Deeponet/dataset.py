@@ -15,10 +15,10 @@ class DeepONetDataset(Dataset):
         print('Loading Data...')
         self.grid_points = 101
         self.branch_input_data = pt.tensor(np.load(directory + branch_filename).transpose(), requires_grad=False, device=device, dtype=dtype) # Transpose to make data row-major
-        trunk_input_data = pt.tensor(np.load(directory + trunk_filename).transpose(), requires_grad=True, device=device, dtype=dtype) # Grads necessary for PINN loss
-        self.xy_left = trunk_input_data[0:self.grid_points, :]
-        self.xy_forcing = trunk_input_data[-self.grid_points:, :]
-        self.xy_int = trunk_input_data[self.grid_points:-self.grid_points, :]
+        self.trunk_input_data = pt.tensor(np.load(directory + trunk_filename).transpose(), requires_grad=True, device=device, dtype=dtype) # Grads necessary for PINN loss
+        self.xy_left = self.trunk_input_data[0:self.grid_points, :]
+        self.xy_forcing = self.trunk_input_data[-self.grid_points:, :]
+        self.xy_int = self.trunk_input_data[self.grid_points:-self.grid_points, :]
         print(self.branch_input_data)
 
         # Print the total memory consumption
