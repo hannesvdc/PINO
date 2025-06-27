@@ -18,9 +18,13 @@ config = json.load(open(config_file))
 store_directory = config['Store Directory']
 
 # Load the data in memory
+index = 1001
 forcing_dataset = DeepONetDataset(config, device, dtype)
-f_sample = pt.unsqueeze(forcing_dataset.branch_input_data[101,:], dim=0) # Take a random forcing from the dataset, doesn't matter
+f_sample = pt.unsqueeze(forcing_dataset.branch_input_data[index,:], dim=0) # Take a random forcing from the dataset, doesn't matter
 xy_all = forcing_dataset.trunk_input_data
+u_reference = np.load(config["Data Directory"] + "output_data_u.npy")[index,:].reshape(101, 101)
+v_reference = np.load(config["Data Directory"] + "output_data_v.npy")[index,:].reshape(101, 101)
+print(u_reference.shape)
 
 # Create and initialize the model
 n_branch_conv = 5
@@ -56,6 +60,19 @@ plt.pcolor(X, Y, v.detach().numpy().T, cmap='jet')
 plt.xlabel(r"$x$")
 plt.ylabel(r"$y$")
 plt.title(r'$y$-displacements $v(x, y)$')
+plt.colorbar()
+
+plt.figure()
+plt.pcolor(X, Y, u_reference.T, cmap='jet')
+plt.xlabel(r"$x$")
+plt.ylabel(r"$y$")
+plt.title(r'$x$-displacements REF $u(x, y)$')
+plt.colorbar()
+plt.figure()
+plt.pcolor(X, Y, v_reference.T, cmap='jet')
+plt.xlabel(r"$x$")
+plt.ylabel(r"$y$")
+plt.title(r'$y$-displacements REF $v(x, y)$')
 plt.colorbar()
 
 # Plot the forcing vector f
