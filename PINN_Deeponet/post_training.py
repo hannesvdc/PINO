@@ -54,7 +54,7 @@ optimizer = optim.Adam(filter(lambda p: p.requires_grad, network.parameters()), 
 E_train = 1.0
 nu = 0.3
 w_int_init = 1e-8 # Start at the physics_training value
-w_int_max  = 1e-2
+w_int_max  = 1.0
 loss_fn = PhysicsLoss(E_train, nu, w_int=w_int_init, w_forcing=1.0)
 
 # Tracking
