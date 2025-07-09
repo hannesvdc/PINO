@@ -21,11 +21,6 @@ epochs = np.linspace(1, n_epochs, n_epochs) * actual_epochs / n_epochs
 unweighted_physics_losses = physics_losses / physics_weights
 total_losses = forcing_losses + physics_losses
 
-# Determine the optimal w_int
-optimal_epoch = np.argmin(unweighted_physics_losses)
-optimal_physics_weight = physics_weights[optimal_epoch]
-print('Optimal Physics Weight: ', optimal_physics_weight, ' at epoch', optimal_epoch * actual_epochs / n_epochs)
-
 # Plot all arrays
 plt.semilogy(epochs, unweighted_physics_losses, label='Unweighted Physics Losses', alpha=0.5)
 plt.semilogy(epochs, physics_losses, label='Weighted Physics Losses', alpha=0.5)

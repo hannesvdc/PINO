@@ -16,9 +16,10 @@ dtype = pt.float32
 config_file = 'DataConfig.json'
 config = json.load(open(config_file))
 store_directory = config['Store Directory']
+data_directory = config['Data Directory']
 
 # Load the data in memory
-index = 1001
+index = 101
 forcing_dataset = DeepONetDataset(config, device, dtype)
 f_sample = pt.unsqueeze(forcing_dataset.branch_input_data[index,:], dim=0) # Take a random forcing from the dataset, doesn't matter
 xy_all = forcing_dataset.trunk_input_data
@@ -27,8 +28,10 @@ v_reference = np.load(config["Data Directory"] + "output_data_v.npy")[index,:].r
 print(u_reference.shape)
 
 # Create and initialize the model
+optimal_posttrain_epoch = 460
+optimal_network_weights = pt.load(data_directory + f'pino_epoch_results/posttrain_model_epoch={optimal_posttrain_epoch}.pth', map_location=device, weights_only=True)
 network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_nonlinear=3, n_trunk_nonlinear=5, p=100)
-network.load_state_dict(pt.load(store_directory + 'posttrain_model.pth', map_location=device, weights_only=True))
+network.load_state_dict(optimal_network_weights)
 network.to(device)
 
 # Push the data through the network
