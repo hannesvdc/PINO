@@ -15,23 +15,24 @@ train_counter = np.load(store_directory + "epochs.npy")
 physics_weights = np.load(store_directory + "physics_weights.npy")
 
 # Compute the weighted/unweighted losses
+actual_epochs = 500
 n_epochs = len(physics_losses)
-epochs = np.linspace(1, n_epochs, n_epochs)
+epochs = np.linspace(1, n_epochs, n_epochs) * actual_epochs / n_epochs
 unweighted_physics_losses = physics_losses / physics_weights
 total_losses = forcing_losses + physics_losses
 
 # Determine the optimal w_int
 optimal_epoch = np.argmin(unweighted_physics_losses)
 optimal_physics_weight = physics_weights[optimal_epoch]
-print('Optimal Physics Weight: ', optimal_physics_weight, ' at epoch', optimal_epoch)
+print('Optimal Physics Weight: ', optimal_physics_weight, ' at epoch', optimal_epoch * actual_epochs / n_epochs)
 
 # Plot all arrays
-plt.semilogy(epochs, unweighted_physics_losses, label='Unweighted Physics Losses')
-plt.semilogy(epochs, physics_losses, label='Weighted Physics Losses')
-plt.semilogy(epochs, forcing_losses, label='Forcing Losses')
-plt.semilogy(epochs, forcing_losses, label='Total Weighted Losses')
-plt.semilogy(epochs, disp_x, label=r'Averaged $x$-Displacements')
-plt.semilogy(epochs, disp_y, label=r'Averaged $y$-Displacements')
+plt.semilogy(epochs, unweighted_physics_losses, label='Unweighted Physics Losses', alpha=0.5)
+plt.semilogy(epochs, physics_losses, label='Weighted Physics Losses', alpha=0.5)
+plt.semilogy(epochs, forcing_losses, label='Forcing Losses', alpha=0.5)
+plt.semilogy(epochs, total_losses, label='Total Weighted Losses', alpha=0.5)
+plt.semilogy(epochs, disp_x, label=r'Averaged $x$-Displacements', alpha=0.5)
+plt.semilogy(epochs, disp_y, label=r'Averaged $y$-Displacements', alpha=0.5)
 plt.xlabel('Epoch')
 plt.ylabel('Log Scale')
 plt.legend()

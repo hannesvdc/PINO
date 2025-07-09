@@ -27,12 +27,7 @@ v_reference = np.load(config["Data Directory"] + "output_data_v.npy")[index,:].r
 print(u_reference.shape)
 
 # Create and initialize the model
-n_branch_conv = 5
-n_branch_channels = 8
-kernel_size = 7
-n_branch_nonlinear = 3
-p = 100
-network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_nonlinear, p)
+network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_nonlinear=3, n_trunk_nonlinear=5, p=100)
 network.load_state_dict(pt.load(store_directory + 'posttrain_model.pth', map_location=device, weights_only=True))
 network.to(device)
 
