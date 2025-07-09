@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=physics
-#SBATCH --output=physics.out
-#SBATCH --error=physics.err
+#SBATCH --job-name=pre
+#SBATCH --output=pre.out
+#SBATCH --error=pre.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=2-00:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --partition=h100
 
@@ -16,4 +16,4 @@ source /home/hvandec1/pycl/bin/activate
 
 # Run the experiment with the array task ID as job_id
 cd /home/hvandec1/PINO/PINN_Deeponet/
-python3 physics_training.py
+python3 pretraining.py
