@@ -7,7 +7,7 @@ from scipy.interpolate import interp1d
 # ==== Load forcing data from file ====
 # Expected format: three columns (y, f1, f2)
 # Example row: 0.35   1.2   -0.5
-index = 1001
+index = 101
 config_file = 'DataConfig.json'
 config = json.load(open(config_file))
 data_directory = config["Data Directory"]

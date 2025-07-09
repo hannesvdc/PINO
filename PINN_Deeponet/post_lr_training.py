@@ -1,4 +1,5 @@
 import json
+import numpy as np
 import torch as pt
 import torch.optim as optim
 import matplotlib.pyplot as plt
@@ -28,6 +29,7 @@ else:
 # Load config and data
 config = json.load(open('DataConfig.json'))
 store_directory = config['Store Directory']
+data_directory = config['Data Directory']
 forcing_dataset = DeepONetDataset(config, device, dtype)
 forcing_loader = DataLoader(forcing_dataset, batch_size=batch_size, shuffle=True)
 internal_dataset = TensorDataset(forcing_dataset.xy_int)
@@ -37,20 +39,23 @@ n_chunks = len(internal_loader)
 grid_size = forcing_dataset.grid_points
 
 # Load model
+optimal_posttrain_epoch = 460
+optimal_network_weights = pt.load(data_directory + f'pino_epoch_results/posttrain_model_epoch={optimal_posttrain_epoch}.pth', map_location=device, weights_only=True)
 network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_nonlinear=3, n_trunk_nonlinear=5, p=100)
-network.load_state_dict(pt.load(store_directory + 'posttrain_model.pth', map_location=device, weights_only=True))
+network.load_state_dict(optimal_network_weights)
 network.to(device)
 
 # Optimizer
 step = 25
 gamma = 0.5
-optimizer = optim.Adam(filter(lambda p: p.requires_grad, network.parameters()), lr=1e-4, amsgrad=True)
+optimizer = optim.Adam(filter(lambda p: p.requires_grad, network.parameters()), lr=2e-4, amsgrad=True)
 scheduler = StepLR(optimizer, step_size=step, gamma=gamma)
 
 # Physics loss
+physics_weights_per_epoch = np.load('Results/physics_weights.npy')
 E_train = 1.0
 nu = 0.3
-w_int = 1.0 # The optimized value. Keeping it constant here.
+w_int = np.load('Results/physics_weights.npy')[int(optimal_posttrain_epoch / 500.0 * len(physics_weights_per_epoch))]
 loss_fn = PhysicsLoss(E_train, nu, w_int=w_int, w_forcing=1.0)
 
 # Tracking
@@ -113,7 +118,7 @@ def train(epoch):
     pt.save(optimizer.state_dict(), store_directory + "posttrain_lr_optimizer.pth")
 
 # Main loop
-n_epochs = 6 * step
+n_epochs = 10 * step
 for epoch in range(1, n_epochs + 1):
     train(epoch)
     scheduler.step()
