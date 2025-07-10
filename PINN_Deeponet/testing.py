@@ -28,10 +28,9 @@ v_reference = np.load(config["Data Directory"] + "output_data_v.npy")[index,:].r
 print(u_reference.shape)
 
 # Create and initialize the model
-optimal_posttrain_epoch = 460
-optimal_network_weights = pt.load(data_directory + f'pino_epoch_results/posttrain_model_epoch={optimal_posttrain_epoch}.pth', map_location=device, weights_only=True)
+network_weights = pt.load('Results/posttrain_lr_model.pth', map_location=device, weights_only=True)
 network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_nonlinear=3, n_trunk_nonlinear=5, p=100)
-network.load_state_dict(optimal_network_weights)
+network.load_state_dict(network_weights)
 network.to(device)
 
 # Push the data through the network

@@ -48,7 +48,7 @@ network.to(device)
 # Optimizer
 step = 25
 gamma = 0.5
-optimizer = optim.Adam(filter(lambda p: p.requires_grad, network.parameters()), lr=2e-4, amsgrad=True)
+optimizer = optim.Adam(filter(lambda p: p.requires_grad, network.parameters()), lr=1e-4, amsgrad=True)
 scheduler = StepLR(optimizer, step_size=step, gamma=gamma)
 
 # Physics loss
