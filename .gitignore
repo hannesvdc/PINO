@@ -4,6 +4,8 @@
 *$py.class
 **/DataConfig.json
 **/.DS_Store
+**/*.err
+**/*.out
 
 # C extensions
 *.so
