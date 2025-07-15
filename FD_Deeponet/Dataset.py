@@ -37,7 +37,7 @@ class DeepONetDataset(Dataset):
 	
     def __getitem__(self, idx):
         return self.branch_input_data[idx,:], self.output_data_u[idx,:], self.output_data_v[idx,:]
-    
+
 if __name__ == '__main__':
     config_file = 'DataConfig.json'
     config = json.load(open(config_file))

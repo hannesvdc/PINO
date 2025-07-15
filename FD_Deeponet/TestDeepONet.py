@@ -81,31 +81,48 @@ u_max = max(np.max(u), np.max(u_nn))
 v_min = min(np.min(v), np.min(v_nn))
 v_max = max(np.max(v), np.max(v_nn))
 
-plt.pcolormesh(X, Y, u, shading='auto', cmap='jet', vmin=u_min, vmax=u_max)
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title(r'Reference Displacement $u(x,y)$')
-plt.colorbar()
 
-plt.figure()
-plt.pcolormesh(X, Y, u_nn, shading='auto', cmap='jet', vmin=u_min, vmax=u_max)
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title(r'DeepONet Displacement $u(x,y)$')
-plt.colorbar()
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), constrained_layout=True, sharex=True, sharey=True)
+fig.set_constrained_layout_pads(wspace=0.05)
+m1 = ax1.pcolormesh(X, Y, u, shading='auto', cmap='jet', vmin=u_min, vmax=u_max)
+ax1.set_xlabel(r'$x$')
+ax1.set_ylabel(r'$y$')
+ax1.set_title(r'FEM Displacement $u(x,y)$')
 
-plt.figure()
-plt.pcolormesh(X, Y, v, shading='auto', cmap='jet', vmin=v_min, vmax=v_max)
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title(r'Reference Displacement $v(x,y)$')
-plt.colorbar()
+m2 = ax2.pcolormesh(X, Y, u_nn, shading='auto', cmap='jet', vmin=u_min, vmax=u_max)
+ax2.set_xlabel(r'$x$')
+ax2.set_ylabel(r'$y$')
+ax2.set_title(r'DeepONet Displacement $u(x,y)$')
 
-plt.figure()
-plt.pcolormesh(X, Y, v_nn, shading='auto', cmap='jet', vmin=v_min, vmax=v_max)
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title(r'DeepONet Displacement $v(x,y)$')
-plt.colorbar()
+for ax in (ax1, ax2):
+    ax.set_aspect('equal', adjustable='box')  # lock aspect, resize box if needed
+    ax.set_xlim(X.min(), X.max())
+    ax.set_ylim(Y.min(), Y.max())
+fig.colorbar(m2, ax=[ax1, ax2], 
+                    location='right', 
+                    shrink=0.75, 
+                    pad=0.02)
+plt.savefig('./Results/u_displacement.png', transparent=True)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), constrained_layout=True, sharex=True, sharey=True)
+fig.set_constrained_layout_pads(wspace=0.05)
+m1 = ax1.pcolormesh(X, Y, v, shading='auto', cmap='jet', vmin=u_min, vmax=u_max)
+ax1.set_xlabel(r'$x$')
+ax1.set_ylabel(r'$y$')
+ax1.set_title(r'FEM Displacement $v(x,y)$')
+
+m2 = ax2.pcolormesh(X, Y, v_nn, shading='auto', cmap='jet', vmin=u_min, vmax=u_max)
+ax2.set_xlabel(r'$x$')
+ax2.set_ylabel(r'$y$')
+ax2.set_title(r'DeepONet Displacement $v(x,y)$')
+
+for ax in (ax1, ax2):
+    ax.set_aspect('equal', adjustable='box')  # lock aspect, resize box if needed
+    ax.set_xlim(X.min(), X.max())
+    ax.set_ylim(Y.min(), Y.max())
+fig.colorbar(m2, ax=[ax1, ax2], 
+                    location='right', 
+                    shrink=0.75, 
+                    pad=0.02)
 
 plt.show()
