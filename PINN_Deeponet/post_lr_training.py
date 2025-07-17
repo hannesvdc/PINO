@@ -39,7 +39,7 @@ n_chunks = len(internal_loader)
 grid_size = forcing_dataset.grid_points
 
 # Load model
-optimal_posttrain_epoch = 460
+optimal_posttrain_epoch = 475
 optimal_network_weights = pt.load(data_directory + f'pino_epoch_results/posttrain_model_epoch={optimal_posttrain_epoch}.pth', map_location=device, weights_only=True)
 network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_nonlinear=3, n_trunk_nonlinear=5, p=100)
 network.load_state_dict(optimal_network_weights)
@@ -48,7 +48,7 @@ network.to(device)
 # Optimizer
 step = 25
 gamma = 0.5
-optimizer = optim.Adam(filter(lambda p: p.requires_grad, network.parameters()), lr=1e-4, amsgrad=True)
+optimizer = optim.Adam(network.parameters(), lr=1e-4, amsgrad=True)
 scheduler = StepLR(optimizer, step_size=step, gamma=gamma)
 
 # Physics loss
@@ -57,6 +57,7 @@ E_train = 1.0
 nu = 0.3
 w_int = np.load('Results/physics_weights.npy')[int(optimal_posttrain_epoch / 500.0 * len(physics_weights_per_epoch))]
 loss_fn = PhysicsLoss(E_train, nu, w_int=w_int, w_forcing=1.0)
+pref = loss_fn.pref
 
 # Tracking
 train_losses = []
@@ -65,10 +66,7 @@ train_counter = []
 xy_empty = pt.empty((0, 2), device=device, dtype=pt.float32)
 
 def getGradient():
-    grads = [p.grad.view(-1) for p in network.parameters() if p.grad is not None]
-    return pt.norm(pt.cat(grads))
-
-pref = loss_fn.pref
+    return pt.norm(pt.cat([p.grad.view(-1) for p in network.parameters() if p.grad is not None]))
 def train(epoch):
     network.train()
     clip_level = 5.0
