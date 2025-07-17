@@ -57,6 +57,7 @@ nu = 0.3
 w_int_init = 1e-8 # Start at the physics_training value
 w_int_max  = 1.0
 loss_fn = PhysicsLoss(E_train, nu, w_int=w_int_init, w_forcing=1.0)
+pref = loss_fn.pref
 
 # Tracking
 train_losses = []
@@ -67,13 +68,10 @@ physics_weights = []
 forcing_losses = []
 disp_x = []
 disp_y = []
-xy_empty = pt.empty((0, 2), device=device, dtype=pt.float32)
+xy_empty = pt.empty((0, 2), device=device, dtype=dtype)
 
 def getGradient():
-    grads = [p.grad.view(-1) for p in network.parameters() if p.grad is not None]
-    return pt.norm(pt.cat(grads))
-
-pref = loss_fn.pref
+    return pt.norm(pt.cat([p.grad.view(-1) for p in network.parameters() if p.grad is not None]))
 def posttrain(epoch):
     network.train()
     clip_level = 5.0
