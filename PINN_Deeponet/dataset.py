@@ -15,7 +15,7 @@ class DeepONetDataset(Dataset):
         branch_filename = 'branch_data.npy'
         trunk_filename = 'trunk_data.npy'
 
-        self.N = 100_000
+        self.N = 10_000
         self.lam = 2.0
 
         print('Loading Data...')
