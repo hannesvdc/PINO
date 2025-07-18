@@ -19,7 +19,7 @@ store_directory = config['Store Directory']
 data_directory = config['Data Directory']
 
 # Load the data in memory
-index = 52
+index = 101
 forcing_dataset = DeepONetDataset(config, device, dtype)
 f_sample = pt.unsqueeze(forcing_dataset.branch_input_data[index,:], dim=0) # Take a random forcing from the dataset, doesn't matter
 xy_all = forcing_dataset.trunk_input_data

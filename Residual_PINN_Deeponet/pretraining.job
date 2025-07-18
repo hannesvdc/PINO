@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH --job-name=pre
+#SBATCH --output=pre.out
+#SBATCH --error=pre.err
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=1-00:00:00
+#SBATCH --gres=gpu:1
+#SBATCH --partition=h100
+
+# Load environment modules if needed
+source /apps/Lmod
+
+# Activate your virtual environment
+source /home/hvandec1/pycl/bin/activate
+
+# Run the experiment with the array task ID as job_id
+cd /home/hvandec1/PINO/Residual_PINN_Deeponet/
+python3 pretraining.py

@@ -7,7 +7,7 @@ from typing import Tuple
 
 class BranchModel(nn.Module):
     """
-    The branch network in our DeepONet. The input is a vector of shape (B, 2, 101).
+    The branch network in our DeepONet. The input is a vector of shape (B, 3, 101).
     """
     def __init__(self, n_conv : int, 
                        n_channels : int, 
