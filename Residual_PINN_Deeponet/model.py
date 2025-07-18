@@ -66,21 +66,28 @@ class TrunkModel(nn.Module):
     """
     The branch network in our DeepONet. The input is a vector of shape (Nc, 2).
     """
-    def __init__(self, n_nonlinear : int, p : int):
+    def __init__(self, n_residual : int, p : int):
         super().__init__()
 
         # Define two linear layers with activation
         n_hidden = 256
-        layer_list = list()
-        for i in range(n_nonlinear):
-            in_neurons = 2 if i == 0 else n_hidden
-            layer_list.append((f"linear{i+1}", nn.Linear(in_neurons, n_hidden)))
-            layer_list.append((f"act{i+1}", nn.Tanh()))
-        layer_list.append((f"linear{n_nonlinear+1}", nn.Linear(n_hidden, 2*p)))
 
-        self.layers = nn.Sequential(OrderedDict(layer_list))
+        layers = OrderedDict()
 
-    def forward(self, x : pt.Tensor):
+        # 1) Plain input layer   + activation
+        layers["linear_in"] = nn.Linear(2, n_hidden)
+        layers["act_in"]    = nn.Tanh()
+
+        # 2) Stack of residual blocks, each keeps dimension n_hidden
+        for i in range(n_residual):
+            layers[f"res{i+1}"] = ResidualFC(n_hidden)
+
+        # 3) Final projection  (n_hidden → 2p), no activation here
+        layers["linear_out"] = nn.Linear(n_hidden, 2 * p)
+
+        self.layers = nn.Sequential(layers)
+
+    def forward(self, x : pt.Tensor) -> pt.Tensor:
         return self.layers(x)
     
 class ConvDeepONet(nn.Module):
@@ -88,14 +95,14 @@ class ConvDeepONet(nn.Module):
                        n_branch_channels : int, 
                        kernel_size : int, 
                        n_branch_residual : int,
-                       n_trunk_nonlinear : int,
+                       n_trunk_residual : int,
                        p : int) -> None:
         super(ConvDeepONet, self).__init__()
         self.p = p
         self.beta = 6.0
         
         self.branch_net = BranchModel(n_branch_conv, n_branch_channels, kernel_size, n_branch_residual, p)
-        self.trunk_net = TrunkModel(n_trunk_nonlinear, p)
+        self.trunk_net = TrunkModel(n_trunk_residual, p)
 
         print('Number of DeepONet Parameters:', sum(p.numel() for p in self.parameters()))
     

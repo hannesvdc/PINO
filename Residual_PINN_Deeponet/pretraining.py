@@ -43,9 +43,9 @@ n_branch_conv = 5
 n_branch_channels = 8
 kernel_size = 7
 n_branch_residual = 3
-n_trunk_nonlinear = 5
+n_trunk_residual = 4
 p = 100
-network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_residual, n_trunk_nonlinear, p)
+network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_residual, n_trunk_residual, p)
 network.to(device)
 
 # Create the Adam optimizer and LR scheduler
