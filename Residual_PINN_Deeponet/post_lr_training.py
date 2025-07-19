@@ -39,9 +39,15 @@ n_chunks = len(internal_loader)
 grid_size = forcing_dataset.grid_points
 
 # Load model
+n_branch_conv = 5
+n_branch_channels = 8
+kernel_size = 7
+n_branch_residual = 3
+n_trunk_residual = 4
+p = 100
 optimal_posttrain_epoch = 475
 optimal_network_weights = pt.load(data_directory + f'residual_pino_epoch_results/posttrain_model_epoch={optimal_posttrain_epoch}.pth', map_location=device, weights_only=True)
-network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_residual=3, n_trunk_residual=4, p=100)
+network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_residual, n_trunk_residual, p)
 network.load_state_dict(optimal_network_weights)
 network.to(device)
 
