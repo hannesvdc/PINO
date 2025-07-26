@@ -132,7 +132,7 @@ def posttrain(epoch):
     pt.save(optimizer.state_dict(), data_directory + f"residual_pino_epoch_results/posttrain_optimizer_epoch={epoch}.pth")
 
 # Main loop
-n_epochs = 500
+n_epochs = 300
 for epoch in range(1, n_epochs + 1):
     # Exponentially ramp w_int from init to max
     w_int = w_int_init * (w_int_max / w_int_init) ** (epoch / n_epochs)
