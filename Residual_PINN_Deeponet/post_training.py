@@ -178,14 +178,6 @@ for epoch in range(start_epoch+1, n_epochs + 1):
     print(f"\n>>> Epoch {epoch:3d} | w_int = {w_int:.2e}")
     posttrain(epoch)
 
-# Save all loss and mean-displacement arrays
-np.save(store_directory + "physics_losses.npy", np.array(physics_losses))
-np.save(store_directory + "forcing_losses.npy", np.array(forcing_losses))
-np.save(store_directory + "disp_x.npy", np.array(disp_x))
-np.save(store_directory + "disp_y.npy", np.array(disp_y))
-np.save(store_directory + "epochs.npy", np.array(train_counter))
-np.save(store_directory + "physics_weights.npy", np.array(physics_weights))
-
 # Plot
 plt.figure()
 plt.semilogy(train_counter, train_losses, label="Loss", alpha=0.6)
