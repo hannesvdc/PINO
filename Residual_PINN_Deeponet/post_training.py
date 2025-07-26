@@ -4,6 +4,7 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
+import argparse
 
 from model import ConvDeepONet, PhysicsLoss
 from dataset import DeepONetDataset
@@ -25,6 +26,11 @@ else:
     batch_size = 64
     batch_xy = 512
 
+# Read the commandline arguments for beginning or restarting
+parser = argparse.ArgumentParser(description="Train or resume model")
+parser.add_argument('--resume', action='store_true')
+args = parser.parse_args()
+
 # Load config and data
 config = json.load(open('DataConfig.json'))
 data_directory = config['Data Directory']
@@ -38,14 +44,14 @@ n_chunks = len(internal_loader)
 grid_size = forcing_dataset.grid_points
 
 # Load model
-n_branch_conv = 5
-n_branch_channels = 8
-kernel_size = 7
-n_branch_residual = 3
-n_trunk_residual = 4
-p = 100
-network = ConvDeepONet(n_branch_conv, n_branch_channels, kernel_size, n_branch_residual, n_trunk_residual, p)
-network.load_state_dict(pt.load(store_directory + 'pretrained_model.pth', map_location=device, weights_only=True))
+network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_residual=3, n_trunk_residual=4, p=100)
+if args.resume:
+    checkpoint = pt.load(data_directory + 'posttraining/last_checkpoint.pth', map_location=device)
+    start_epoch = checkpoint['epoch']
+    network.load_state_dict(checkpoint['model_state_dict'])
+else: # Start training
+    start_epoch = 0
+    network.load_state_dict(pt.load(store_directory + 'pretrained_model.pth', map_location=device, weights_only=True))
 network.to(device)
 for p in network.branch_net.parameters():
     p.requires_grad = False
@@ -56,6 +62,8 @@ if isinstance(last_layer, pt.nn.Linear):
 
 # Optimizer
 optimizer = optim.Adam(filter(lambda p: p.requires_grad, network.parameters()), lr=1e-4, amsgrad=True)
+if args.resume:
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
 # Physics loss
 E_train = 1.0
@@ -128,12 +136,23 @@ def posttrain(epoch):
         train_grads.append(grad.cpu().item())
         train_counter.append(epoch + f_batch_idx / len(forcing_loader))
 
-    pt.save(network.state_dict(), data_directory + f"residual_pino_epoch_results/posttrain_model_epoch={epoch}.pth")
-    pt.save(optimizer.state_dict(), data_directory + f"residual_pino_epoch_results/posttrain_optimizer_epoch={epoch}.pth")
+    # Store this epoch
+    checkpoint = {
+        'epoch': epoch,
+        'model_state_dict': network.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'physics_loss': physics_loss,
+        'forcing_loss': loss_forcing.item(),
+        'total_loss': total,
+        'w_forcing': loss_fn.w_forcing,
+        'w_int': loss_fn.w_int,
+    }
+    pt.save(checkpoint, data_directory + f'posttraining/checkpoint_{epoch}.pth')
+    pt.save(checkpoint, data_directory + f'posttraining/last_checkpoint.pth')
 
 # Main loop
 n_epochs = 300
-for epoch in range(1, n_epochs + 1):
+for epoch in range(start_epoch+1, n_epochs + 1):
     # Exponentially ramp w_int from init to max
     w_int = w_int_init * (w_int_max / w_int_init) ** (epoch / n_epochs)
     loss_fn.setWeights(w_int=w_int, w_forcing=1.0)
