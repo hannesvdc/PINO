@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
 import argparse
+import os
 
 from model import ConvDeepONet, PhysicsLoss
 from dataset import DeepONetDataset
@@ -48,6 +49,8 @@ network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_br
 if args.resume:
     checkpoint = pt.load(data_directory + 'posttraining/last_checkpoint.pth', map_location=device)
     start_epoch = checkpoint['epoch']
+
+    print('Resuming from epoch', start_epoch)
     network.load_state_dict(checkpoint['model_state_dict'])
 else: # Start training
     start_epoch = 0
@@ -136,7 +139,7 @@ def posttrain(epoch):
         train_grads.append(grad.cpu().item())
         train_counter.append(epoch + f_batch_idx / len(forcing_loader))
 
-    # Store this epoch
+    # Store the network and optimizer states 
     checkpoint = {
         'epoch': epoch,
         'model_state_dict': network.state_dict(),
@@ -150,8 +153,24 @@ def posttrain(epoch):
     pt.save(checkpoint, data_directory + f'posttraining/checkpoint_{epoch}.pth')
     pt.save(checkpoint, data_directory + f'posttraining/last_checkpoint.pth')
 
+    # Append all weights and losses
+    new_loss_and_weights_data = np.zeros((6, len(physics_losses)))
+    new_loss_and_weights_data[0,:] = physics_losses
+    new_loss_and_weights_data[1,:] = forcing_losses
+    new_loss_and_weights_data[2,:] = disp_x
+    new_loss_and_weights_data[3,:] = disp_y
+    new_loss_and_weights_data[4,:] = train_counter
+    new_loss_and_weights_data[5,:] = physics_weights
+    path = store_directory + 'losses_and_weights.npy'
+    if os.path.exists(path):
+        losses_and_weights = np.load(path) # (6,n_epochs) array
+        losses_and_weights = np.concatenate((losses_and_weights, new_loss_and_weights_data), axis=1)
+    else:
+        losses_and_weights = new_loss_and_weights_data
+    np.save(path, losses_and_weights)
+
 # Main loop
-n_epochs = 500
+n_epochs = 300
 for epoch in range(start_epoch+1, n_epochs + 1):
     # Exponentially ramp w_int from init to max
     w_int = w_int_init * (w_int_max / w_int_init) ** (epoch / n_epochs)
