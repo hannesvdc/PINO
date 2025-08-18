@@ -39,10 +39,10 @@ n_chunks = len(internal_loader)
 grid_size = forcing_dataset.grid_points
 
 # Load model
-optimal_posttrain_epoch = 475
-optimal_network_weights = pt.load(data_directory + f'residual_pino_epoch_results/posttrain_model_epoch={optimal_posttrain_epoch}.pth', map_location=device, weights_only=True)
+optimal_posttrain_epoch = 220
+optimal_checkpoint = pt.load(data_directory + f'posttraining/checkpoint_{optimal_posttrain_epoch}.pth', map_location=device)
 network = ConvDeepONet(n_branch_conv=5, n_branch_channels=8, kernel_size=7, n_branch_residual=3, n_trunk_residual=4, p=100)
-network.load_state_dict(optimal_network_weights)
+network.load_state_dict(optimal_checkpoint['model_state_dict'])
 network.to(device)
 
 # Optimizer
@@ -52,10 +52,9 @@ optimizer = optim.Adam(network.parameters(), lr=1e-4, amsgrad=True)
 scheduler = StepLR(optimizer, step_size=step, gamma=gamma)
 
 # Physics loss
-physics_weights_per_epoch = np.load('Results/physics_weights.npy')
 E_train = 1.0
 nu = 0.3
-w_int = np.load('Results/physics_weights.npy')[int(optimal_posttrain_epoch / 500.0 * len(physics_weights_per_epoch))]
+w_int = optimal_checkpoint['w_int']
 loss_fn = PhysicsLoss(E_train, nu, w_int=w_int, w_forcing=1.0)
 pref = loss_fn.pref
 
