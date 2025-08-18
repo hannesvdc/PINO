@@ -16,4 +16,4 @@ source /home/hvandec1/pycl/bin/activate
 
 # Run the experiment with the array task ID as job_id
 cd /home/hvandec1/PINO/Residual_PINN_Deeponet/
-python3 post_training.py
+python3 post_training.py --resume
