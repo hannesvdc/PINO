@@ -4,7 +4,7 @@
 #SBATCH --error=post_lr.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=1-00:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --partition=a100
 
@@ -15,5 +15,5 @@ source /apps/Lmod
 source /home/hvandec1/pycl/bin/activate
 
 # Run the experiment with the array task ID as job_id
-cd /home/hvandec1/PINO/PINN_Deeponet/
+cd /home/hvandec1/PINO/Residual_PINN_Deeponet/
 python3 post_lr_training.py

@@ -1,5 +1,4 @@
 import json
-import numpy as np
 import torch as pt
 import torch.optim as optim
 import matplotlib.pyplot as plt
