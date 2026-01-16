@@ -48,14 +48,14 @@ network.load_state_dict(pretrained_state)
 print('Number of Trainable Parameters: ', network.getNumberOfParameters())
 
 # Optimizer
-lr = 1e-4
+lr = 1e-3
 optimizer = optim.Adam(network.parameters(), lr=lr, amsgrad=True)
 
 # Physics loss
 E_train = 1.0
 nu = 0.3
-w_int_init = 1e-4
-w_int_max  = 1.0
+w_int_init = 1e-3
+w_int_max  = 5.0
 loss_fn = PhysicsLoss(E_train, nu, w_int=w_int_init, w_forcing=1.0)
 pref = loss_fn.pref
 
@@ -116,17 +116,22 @@ def posttrain(epoch):
 
 # Main loop
 n_epochs = 300
-for epoch in range(1, n_epochs + 1):
-    # Exponentially ramp w_int from init to max
-    w_int = w_int_init * (w_int_max / w_int_init) ** (epoch / n_epochs)
-    loss_fn.setWeights(w_int=w_int, w_forcing=1.0)
-    print(f"\n>>> Epoch {epoch:3d} | w_int = {w_int:.2e}")
-    posttrain(epoch)
+try:
+    for epoch in range(1, n_epochs + 1):
+        # Exponentially ramp w_int from init to max
+        w_int = w_int_init * (w_int_max / w_int_init) ** (epoch / n_epochs)
+        loss_fn.setWeights(w_int=w_int, w_forcing=1.0)
+        print(f"\n>>> Epoch {epoch:3d} | w_int = {w_int:.2e}")
+        posttrain(epoch)
+except KeyboardInterrupt:
+    print('Aborting Training. Plotting Training Convergence.')
 
 # Plot
 plt.figure()
-plt.semilogy(train_counter, train_losses, label="Loss", alpha=0.6)
-plt.semilogy(train_counter, train_grads, label="Gradient Norm", alpha=0.6)
+plt.semilogy(train_counter, forcing_losses, label="Forcing Loss", alpha=0.6)
+plt.semilogy(train_counter, physics_losses, label="Weighted Physics Loss", alpha=0.6)
+plt.semilogy(train_counter, train_losses, label="Combined Loss", alpha=0.6)
+plt.semilogy(train_counter, train_grads, label="Weighted Gradient Norm", alpha=0.6)
 plt.xlabel("Epoch")
 plt.ylabel("Loss / Gradient")
 plt.legend()
