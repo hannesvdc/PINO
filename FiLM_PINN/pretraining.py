@@ -29,7 +29,7 @@ store_directory = config['Store Directory']
 batch_size = 128
 forcing_dataset = ElasticityDataset(config, device, dtype)
 forcing_loader = DataLoader(forcing_dataset, batch_size=batch_size, shuffle=True)
-xy_forcing = forcing_dataset.xy_forcing
+xy_forcing_data = forcing_dataset.xy_forcing
 
 # Create and initialize the model
 m_boundary = 101
@@ -41,9 +41,9 @@ network.to(device)
 print('Number of Trainable Parameters: ', network.getNumberOfParameters())
 
 # Create the Adam optimizer and LR scheduler
-lr = 1e-4
+lr = 1e-3
 optimizer = optim.Adam(network.parameters(), lr=lr, amsgrad=True)
-n_epochs = 2500
+n_epochs = 100
 
 # Training Routine
 E_train = 1.0 
@@ -51,16 +51,18 @@ nu = 0.3
 w_int = 0.0
 w_forcing = 1.0
 loss_fn = PhysicsLoss(E_train, nu, w_int, w_forcing)
-train_losses = []
-train_grads = []
-train_counter = []
+pref = loss_fn.pref
+
+# Store training results
 def getGradient():
     grads = [p.grad.view(-1) for p in network.parameters() if p.grad is not None]
     return pt.norm(pt.cat(grads))
+train_losses = []
+train_grads = []
+train_counter = []
 
-pref = loss_fn.pref
+# Fixed xy points for evaluating the solution
 xy_empty = pt.empty((0,2), device=device, dtype=pt.float32)
-xy_left = pt.stack((pt.zeros(forcing_dataset.grid_points), pt.linspace(0.0, 1.0, forcing_dataset.grid_points)), dim=1).to(device=device, dtype=pt.float32)
 def train(epoch):
     network.train()
 
@@ -70,14 +72,11 @@ def train(epoch):
 
         # Reshape the forcing inputs
         gx = f_batch[:, :m_boundary]
-        gy = f_batch[:, m_boundary:2*m_boundary]
+        gy = f_batch[:, m_boundary:]
         g_batch = pt.stack([gx, gy], dim=1)
 
         # Print some diagnostics
-        with pt.no_grad():
-            uv = network.forward(g_batch, xy_left)
-            dirichlet_loss = uv[...,0].square().mean() + uv[...,1].square().mean()
-        J, _ = loss_fn.grads_and_hess(network, g_batch, xy_forcing, needsHessian=False)
+        J, _ = loss_fn.grads_and_hess(network, g_batch, xy_forcing_data, needsHessian=False)
         u_x = J[:,:,0,0];  u_y = J[:,:,0,1]
         v_x = J[:,:,1,0];  v_y = J[:,:,1,1]
         tx = (pref * (u_x + nu * v_y) + gx).abs().mean().item()
@@ -85,7 +84,7 @@ def train(epoch):
         print(f"\n⟨|s_xx+g_x|⟩={tx:.3e}   ⟨|s_xy+g_y|⟩={ty:.3e}")
 
         # Do the boundary losses once
-        loss_forcing = loss_fn(network, g_batch, xy_empty, xy_forcing)
+        loss_forcing = loss_fn(network, g_batch, xy_empty, xy_forcing_data)
         loss_forcing.backward()
 
         # Do an optimizer step
@@ -94,9 +93,9 @@ def train(epoch):
         optimizer.step()
 
         # Some housekeeping
-        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tDirichlet Loss: {:.4E} \tForcing Loss: {:.4E} \tPhysics Loss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
+        print('Train Epoch: {} [{}/{} ({:.0f}%)] \tForcing Loss: {:.4E} \tPhysics Loss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
                         epoch, f_batch_idx * len(g_batch), len(forcing_dataset),
-                        100. * f_batch_idx / len(forcing_loader), dirichlet_loss, loss_forcing.item(), 0.0, grad.item(), optimizer.param_groups[0]['lr']))
+                        100. * f_batch_idx / len(forcing_loader), loss_forcing.item(), 0.0, grad.item(), optimizer.param_groups[0]['lr']))
         train_losses.append(loss_forcing.item())
         train_grads.append(grad.cpu())
         train_counter.append((1.0*f_batch_idx)/len(forcing_loader) + epoch-1)

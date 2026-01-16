@@ -100,7 +100,7 @@ class PhysicsLoss(nn.Module):
         # Pointwise function for jacrev: inputs are single sample g, single point xy
         def uv_vec(g_single: pt.Tensor, xy_single: pt.Tensor) -> pt.Tensor:
             # g_single: (2, m), xy_single: (2,)
-            uv = model(g_single.unsqueeze(0), xy_single.unsqueeze(0))
+            uv = model(xy_single.unsqueeze(0), g_single.unsqueeze(0))
             # Expect model output shape either (1,1,2) or (1,2).
             if uv.ndim == 3:
                 return uv[0, 0]   # (2,)

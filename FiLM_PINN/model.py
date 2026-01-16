@@ -185,6 +185,9 @@ class ElasticityFiLMPINN(nn.Module):
         self.trunk = FiLMTrunkMLP(n_features=n_features,
                                   hidden=trunk_hidden,
                                   depth=trunk_depth)
+        
+    def getNumberOfParameters(self):
+        return sum([p.numel() for p in self.parameters() if p.requires_grad])
 
     def forward( self,
                  xy: pt.Tensor,         # (B, 2)
