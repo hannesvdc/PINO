@@ -43,6 +43,7 @@ n_features = 64
 trunk_hidden = 128
 trunk_depth = 8
 network = ElasticityFiLMPINN(m_boundary, n_features, trunk_hidden, trunk_depth)
+network.compile()
 network.to(device)
 pretrained_state = pt.load(store_directory + 'pretrained_model.pth', map_location=device, weights_only=True)
 network.load_state_dict(pretrained_state)
@@ -141,7 +142,7 @@ except KeyboardInterrupt:
 plt.figure()
 plt.semilogy(train_counter, forcing_losses, label="Forcing Loss", alpha=0.6)
 plt.semilogy(train_counter, physics_losses, label="Weighted Physics Loss", alpha=0.6)
-plt.semilogy(train_counter, np.array(physics_losses) / np.array(physics_weights), label="Weighted Physics Loss", alpha=0.6)
+plt.semilogy(train_counter, np.array(physics_losses) / np.array(physics_weights), label="Physics Loss", alpha=0.6)
 plt.semilogy(train_counter, train_losses, label="Combined Loss", alpha=0.6)
 plt.semilogy(train_counter, train_grads, label="Weighted Gradient Norm", alpha=0.6)
 plt.xlabel("Epoch")
