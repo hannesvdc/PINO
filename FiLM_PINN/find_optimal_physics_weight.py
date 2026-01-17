@@ -1,5 +1,6 @@
 import json
 import torch as pt
+import numpy as np
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
@@ -66,13 +67,21 @@ train_counter = []
 physics_losses = []
 physics_weights = []
 forcing_losses = []
-disp_x = []
-disp_y = []
 xy_empty = pt.empty((0, 2), device=device, dtype=dtype)
 
 def getGradient():
     return pt.norm(pt.cat([p.grad.view(-1) for p in network.parameters() if p.grad is not None]))
-
+def save_checkpoint(epoch, w_int, forcing_loss, physics_loss, total_loss):
+    ckpt = {
+        "epoch": int(epoch),
+        "w_int": float(w_int),
+        "forcing_loss" : forcing_loss,
+        "physics_loss" : physics_loss,
+        "total_loss" : total_loss,
+        "model_state_dict": network.state_dict(),
+    }
+    filename = f'physics_training/epoch_{epoch:04d}.pth'
+    pt.save(ckpt, store_directory + filename)
 def posttrain(epoch):
     network.train()
     clip_level = 5.0
@@ -89,11 +98,9 @@ def posttrain(epoch):
 
         # Forcing loss
         loss_forcing = loss_fn(network, g_batch, xy_empty, xy_forcing_data)
-        forcing_losses.append(loss_forcing.item())
 
         # Interior Loss
         loss_int = loss_fn(network, g_batch, xy_batch, xy_empty)
-        physics_losses.append(loss_int.item())
 
         # Compute the combined loss and backprop
         total = loss_forcing + loss_int
@@ -105,14 +112,18 @@ def posttrain(epoch):
         optimizer.step()
 
         # Some housekeeping
-        physics_weights.append(loss_fn.w_int)
         print('Train Epoch: {} [{}/{} ({:.0f}%)] \tForcing Loss: {:.4E} (w = {:.1E}) \tPhysics Loss: {:.4E} (w = {:.1E}) \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
                         epoch, f_batch_idx * len(f_batch), len(forcing_dataset),
                         100. * f_batch_idx / len(forcing_loader), loss_forcing.item(), loss_fn.w_forcing, loss_int.item(), loss_fn.w_int, grad, optimizer.param_groups[0]['lr']))
-
+        forcing_losses.append(loss_forcing.item())
+        physics_losses.append(loss_int.item())
+        physics_weights.append(loss_fn.w_int)
         train_losses.append(total.item())
         train_grads.append(grad.cpu().item())
         train_counter.append(epoch + f_batch_idx / len(forcing_loader))
+
+    # Store the current checkpoint
+    save_checkpoint(epoch, loss_fn.w_int, loss_forcing.item(), loss_int.item(), total.item())
 
 # Main loop
 n_epochs = 300
@@ -130,6 +141,7 @@ except KeyboardInterrupt:
 plt.figure()
 plt.semilogy(train_counter, forcing_losses, label="Forcing Loss", alpha=0.6)
 plt.semilogy(train_counter, physics_losses, label="Weighted Physics Loss", alpha=0.6)
+plt.semilogy(train_counter, np.array(physics_losses) / np.array(physics_weights), label="Weighted Physics Loss", alpha=0.6)
 plt.semilogy(train_counter, train_losses, label="Combined Loss", alpha=0.6)
 plt.semilogy(train_counter, train_grads, label="Weighted Gradient Norm", alpha=0.6)
 plt.xlabel("Epoch")
