@@ -46,23 +46,18 @@ network = ElasticityFiLMPINN(m_boundary, n_features, trunk_hidden, trunk_depth)
 network.to(device)
 print('Number of Trainable Parameters: ', network.getNumberOfParameters())
 
-# Load the network state corresponding to this optimal physics weight.
-optimal_epoch = 244
-optimal_weight_state = pt.load( store_directory + f"physics_training/epoch_{optimal_epoch:04d}.pth", map_location=device, weights_only=True)
-w_int = optimal_weight_state["w_int"]
-network.load_state_dict(optimal_weight_state["model_state_dict"])
-
 # Optimizer
-lr = 1e-4
+lr = 1e-3
 n_epochs = 100
 optimizer = optim.Adam(network.parameters(), lr=lr, amsgrad=True)
-scheduler = pt.optim.lr_scheduler.CosineAnnealingLR( optimizer, T_max=n_epochs, eta_min=1e-6)
-#scheduler = pt.optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", factor=0.1, patience=10, min_lr=1e-6)
+scheduler = pt.optim.lr_scheduler.StepLR(optimizer, 100, 0.1)
 
 # Physics loss
+w_int = 1.0
+w_forcing = 1.0
 E_train = 1.0
 nu = 0.3
-loss_fn = PhysicsLoss(E_train, nu, w_int=w_int, w_forcing=1.0)
+loss_fn = PhysicsLoss(E_train, nu, w_int=w_int, w_forcing=w_forcing)
 pref = loss_fn.pref
 
 # Tracking
@@ -85,7 +80,7 @@ def save_checkpoint(epoch, forcing_loss, physics_loss, total_loss):
         "total_loss" : total_loss,
         "model_state_dict": network.state_dict(),
     }
-    filename = f'post_training/epoch_{epoch:04d}.pth'
+    filename = f'vanilla/epoch_{epoch:04d}.pth'
     pt.save(ckpt, store_directory + filename)
 def posttrain(epoch):
     network.train()
@@ -117,7 +112,6 @@ def posttrain(epoch):
 
         # Compute the combined loss and backprop
         total = loss_forcing + loss_int
-#        total.backward()
 
         # Step optimizer and scheduler
         pt.nn.utils.clip_grad_norm_(network.parameters(), max_norm=clip_level)
@@ -163,6 +157,6 @@ plt.semilogy(train_counter, train_grads, label="Gradient Norm", alpha=0.6)
 plt.xlabel("Epoch")
 plt.ylabel("Loss / Gradient")
 plt.legend()
-plt.title("Post Training with Adam")
+plt.title("Vanilla Training with Adam")
 plt.tight_layout()
 plt.show()
