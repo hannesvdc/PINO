@@ -145,12 +145,11 @@ def posttrain(epoch):
     return epoch_loss / n_batches
 
 # Main loop
-n_epochs = 300
 try:
     for epoch in range(1, n_epochs + 1):
         print(f"\n>>> Epoch {epoch:3d} | w_int = {w_int:.2e}")
         avg_loss_val = posttrain(epoch)
-        scheduler.step()
+        scheduler.step(epoch)
 except KeyboardInterrupt:
     print('Aborting Training. Plotting Training Convergence.')
 
