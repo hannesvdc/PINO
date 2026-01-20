@@ -115,16 +115,13 @@ def posttrain(epoch):
         loss_total_grad = getGradient()
         loss_int_grad = loss_total_grad - loss_forcing_grad
 
-        # Compute the combined loss and backprop
-        total = loss_forcing + loss_int
-#        total.backward()
-
         # Step optimizer and scheduler
         pt.nn.utils.clip_grad_norm_(network.parameters(), max_norm=clip_level)
         grad = getGradient()
         optimizer.step()
 
         # To feed back to the scheduler
+        total = loss_forcing + loss_int
         epoch_loss += total.item()
         n_batches += 1
 
