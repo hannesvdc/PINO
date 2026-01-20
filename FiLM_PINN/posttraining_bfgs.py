@@ -9,8 +9,6 @@ from model import ElasticityFiLMPINN
 from loss import PhysicsLoss
 from dataset import ElasticityDataset
 
-from itertools import cycle
-
 # Just some sanity pytorch settings
 pt.set_grad_enabled(True)
 pt.set_default_dtype(pt.float32)
@@ -31,8 +29,8 @@ store_directory = config['Store Directory']
 # Load the data in memory
 batch_size = 128
 m_boundary = 101
-forcing_dataset = ElasticityDataset(config, device, dtype)
-forcing_loader = DataLoader(forcing_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+forcing_dataset = ElasticityDataset(config, device, dtype, reduce=True)
+forcing_loader = DataLoader(forcing_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
 fixed_forcing_sample = next(iter(forcing_loader))
 gx = fixed_forcing_sample[:, :m_boundary]
 gy = fixed_forcing_sample[:, m_boundary:]
@@ -85,21 +83,26 @@ def save_checkpoint(epoch, total_loss):
     filename = f'post_bfgs_training/epoch_{epoch:04d}.pth'
     pt.save(ckpt, store_directory + filename)
 def closure():
+    print('Model Evaluation...')
+
     network.train()
     optimizer.zero_grad()
 
     # Forcing loss
     loss_forcing = loss_fn(network, g_batch, xy_empty, xy_forcing_data)
-    epoch_loss = loss_forcing
+    loss_forcing.backward()
+    epoch_loss = float(loss_forcing.detach())
 
     # Interior Loss
     for _, (xy_batch,) in enumerate(internal_loader):
         loss_int = loss_fn(network, g_batch, xy_batch, xy_empty) / n_chunks
-        epoch_loss += loss_int
+        loss_int.backward()
+        epoch_loss += float(loss_int.detach())
     
-    epoch_loss.backward()
-
-    return epoch_loss
+    # LBFGS only needs a scalar loss value back.
+    # It does NOT need the returned tensor to carry a graph, since grads are already in .grad.
+    print('...Done')
+    return pt.tensor(epoch_loss, device=device, dtype=dtype)
 
 # Main loop
 try:

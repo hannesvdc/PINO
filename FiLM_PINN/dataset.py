@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 import numpy as np
 
 class ElasticityDataset(Dataset):
-    def __init__(self, config, device, dtype):
+    def __init__(self, config, device, dtype, reduce=False):
         super().__init__()
         self.device = device
         self.dtype = dtype
@@ -15,7 +15,10 @@ class ElasticityDataset(Dataset):
         branch_filename = 'branch_data.npy'
         trunk_filename = 'trunk_data.npy'
 
-        self.N = 100_000
+        if reduce:
+            self.N = 5_000
+        else:
+            self.N = 100_000
         self.lam = 2.0
 
         print('Loading Data...')
