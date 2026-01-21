@@ -55,7 +55,7 @@ network.load_state_dict(optimal_weight_state["model_state_dict"])
 
 # Optimizer
 max_iter = 20
-n_epochs = 10
+n_epochs = 50
 optimizer = optim.LBFGS(network.parameters(), lr=1.0, max_iter=max_iter, line_search_fn="strong_wolfe")
 
 # Physics loss
