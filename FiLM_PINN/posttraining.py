@@ -57,7 +57,6 @@ lr = 1e-4
 n_epochs = 100
 optimizer = optim.Adam(network.parameters(), lr=lr, amsgrad=True)
 scheduler = pt.optim.lr_scheduler.CosineAnnealingLR( optimizer, T_max=n_epochs, eta_min=1e-6)
-#scheduler = pt.optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", factor=0.1, patience=10, min_lr=1e-6)
 
 # Physics loss
 E_train = 1.0
