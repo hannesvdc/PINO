@@ -41,7 +41,7 @@ print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.paramet
 lr = 1.0
 max_iter = 50
 n_epochs = 100
-optimizer = LBFGS( model.parameters(), lr, max_iter=max_iter )
+optimizer = LBFGS( model.parameters(), lr, max_iter=max_iter, line_search_fn="strong_wolfe", history_size=100 )
 def getGradientNorm():
     grads = [p.grad.view(-1) for p in model.parameters() if p.grad is not None]
     return pt.norm(pt.cat(grads))
@@ -63,7 +63,6 @@ def closure():
     # It does NOT need the returned tensor to carry a graph, since grads are already in .grad.
     return pt.tensor(epoch_loss, device=device, dtype=dtype)
 def validate():
-    print('Model Validation...')
     model.eval()
 
     # Just the one validation batch
@@ -79,11 +78,13 @@ def validate():
 print('\nStarting Training...')
 train_counter = []
 train_losses = []
+train_grads = []
 validation_counter = []
 validation_losses = []
 for epoch in range( n_epochs ):
     training_loss = optimizer.step( closure )
-    print('Train Epoch: {} \tLoss: {:.4E}'.format( epoch, training_loss ))
+    grad_norm = getGradientNorm()
+    print('\nTrain Epoch: {} \tLoss: {:.4E} \tLoss Gradient: {:.4E}'.format( epoch, training_loss, grad_norm ))
     
     validation_loss = validate()
     print('Validation Epoch: {} \tLoss: {:.4E}'.format( epoch, validation_loss ))
@@ -93,11 +94,13 @@ for epoch in range( n_epochs ):
     pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs.pth')
 
     train_counter.append( epoch )
-    train_losses.append( training_loss )
+    train_losses.append( training_loss.item() )
+    train_grads.append( grad_norm.cpu() )
     validation_losses.append( validation_loss )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)
+plt.semilogy(train_counter, train_grads, label='Loss Gradient', alpha=0.5)
 plt.semilogy(validation_counter, validation_losses, label='Validation Loss', alpha=0.5)
 plt.legend()
 plt.xlabel('Epoch')
