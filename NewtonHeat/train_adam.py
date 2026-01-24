@@ -33,9 +33,11 @@ print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.paramet
 
 # Create the adam optimizer with learning rate scheduler
 lr = 1e-3
-n_epochs = 500
-optimizer = Adam( model.parameters(), lr)
-scheduler = StepLR( optimizer, step_size=100, gamma=0.1 )
+n_steps = 5
+step_size = 150
+n_epochs = n_steps * step_size
+optimizer = Adam( model.parameters(), lr, amsgrad=True )
+scheduler = StepLR( optimizer, step_size=step_size, gamma=0.1 )
 def getGradientNorm():
     grads = [p.grad.view(-1) for p in model.parameters() if p.grad is not None]
     return pt.norm(pt.cat(grads))
@@ -51,7 +53,7 @@ store_directory = './Results/'
 # Train Function
 def train( epoch ):
     model.train()
-    clip_level = 5.0
+    clip_level = 1.0
 
     for batch_idx, (t, p) in enumerate( train_loader ):
         optimizer.zero_grad()
