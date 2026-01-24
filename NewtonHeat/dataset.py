@@ -22,8 +22,8 @@ class NewtonDataset(Dataset):
         self.T_inf = pt.empty((N,1), device=device, dtype=dtype).uniform_( -T_max, T_max, generator=gen )
 
         # Also sample the time-points
-        tau = pt.rand(N, 1, device=device, dtype=dtype, generator=gen) * tau_max
-        self.t = pt.exp( self.logk ) * tau
+        tau = tau_max * pt.rand(N, 1, device=device, dtype=dtype, generator=gen)
+        self.t = tau / pt.exp( self.logk )
 
     def __len__( self ):
         return len( self.logk )
