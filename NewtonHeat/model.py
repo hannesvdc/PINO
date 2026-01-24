@@ -40,8 +40,10 @@ class PINO( nn.Module ):
     """
     def __init__( self, 
                   n_hidden_layers : int, 
-                  z : int ):
+                  z : int, 
+                  T_max : float):
         super().__init__()
+        self.T_max = T_max
 
         # Different FiLM module per layer
         self.FiLM_layers = nn.ModuleList( FiLMLayer(z) for _ in range(n_hidden_layers) )
@@ -64,10 +66,10 @@ class PINO( nn.Module ):
         assert p.shape[1] == 3, "This model expects three parameters (T0, k, T_inf)" 
         
         # Preprocess the parameters
-        T0 = p[:,0:1]
+        T0_hat = p[:,0:1] / self.T_max
         k = p[:,1:2].clamp_min(1e-12)
-        T_inf = p[:,2:]
-        p_film = pt.cat( ( T0 - T_inf, pt.log(k), T_inf ), dim=1 )
+        T_hat_inf = p[:,2:3] / self.T_max
+        p_film = pt.cat( ( T0_hat - T_hat_inf, pt.log(k), T_hat_inf ), dim=1 )
 
         # Pass through the hidden layers
         x = t * k
@@ -77,12 +79,14 @@ class PINO( nn.Module ):
             x = self.act( x )
 
         # Calculate the final output and enforce the Dirichlet boundary conditions.
-        x = self.output_layer( x ) # (B,)
-        return t * x + (T0 - T_inf)
+        x = self.output_layer( x ) # (B,) learns the temperature delta (in T_max units)
+        T_hat = (T0_hat - T_hat_inf) + t * x + T_hat_inf
+        return T_hat * self.T_max
 
 class PINOLoss( nn.Module ):
-    def __init__( self ):
+    def __init__( self, eps=1e-12 ):
         super().__init__()
+        self.eps = eps
 
     def forward(self,
                 model : PINO,
@@ -99,9 +103,8 @@ class PINOLoss( nn.Module ):
         dT_t = pt.autograd.grad( outputs=T_t, 
                                  inputs=t, 
                                  grad_outputs=pt.ones_like(T_t),
-                                 create_graph=True,
-                                 retain_graph=True )[0]
-        eq = dT_t + k * (T_t - T_inf)
+                                 create_graph=True )[0]
+        eq = dT_t / (k + self.eps) + (T_t - T_inf)
         loss = pt.mean( eq**2 )
 
         return loss

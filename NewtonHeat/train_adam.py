@@ -27,7 +27,7 @@ validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shu
 # Create the PINO
 n_hidden_layers = 2
 z = 64
-model = PINO( n_hidden_layers, z ).to( device=device )
+model = PINO( n_hidden_layers, z, T_max ).to( device=device )
 loss_fn = PINOLoss()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
@@ -51,6 +51,7 @@ store_directory = './Results/'
 # Train Function
 def train( epoch ):
     model.train()
+    clip_level = 5.0
 
     for batch_idx, (t, p) in enumerate( train_loader ):
         optimizer.zero_grad()
@@ -58,6 +59,7 @@ def train( epoch ):
         # Compute the loss and its gradient
         loss = loss_fn( model, t, p )
         loss.backward()
+        pt.nn.utils.clip_grad_norm_( model.parameters(), max_norm=clip_level )
         grad = getGradientNorm()
 
         # Update the weights
