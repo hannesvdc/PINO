@@ -16,13 +16,18 @@ pt.set_grad_enabled(True)
 # Create the training and validation datasets
 T_max = 10.0
 tau_max = 4.0
-N_train = 100_000
+N_train = 10_000
 N_validation = 5_000
 train_dataset = NewtonDataset( N_train, T_max, tau_max, device, dtype )
 validation_dataset = NewtonDataset( N_validation, T_max, tau_max, device, dtype )
 B = 128
 train_loader = DataLoader( train_dataset, batch_size=B, shuffle=True )
 validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shuffle=False )
+
+# Also store the dataset for later use
+store_directory = './Results/'
+pt.save( train_dataset.all().cpu(), store_directory + 'train_data.pth' )
+pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data.pth' )
 
 # Create the PINO
 n_hidden_layers = 2
@@ -48,19 +53,21 @@ train_losses = []
 train_grads = []
 validation_counter = []
 validation_losses = []
-store_directory = './Results/'
 
 # Train Function
 def train( epoch ):
     model.train()
-    clip_level = 1.0
+    clip_level = 100.0
 
+    epoch_loss = float( 0.0 )
     for batch_idx, (t, p) in enumerate( train_loader ):
-        optimizer.zero_grad()
+        optimizer.zero_grad( set_to_none=True )
 
         # Compute the loss and its gradient
         loss = loss_fn( model, t, p )
         loss.backward()
+        epoch_loss += float( loss.item() )
+        pre_grad = getGradientNorm()
         pt.nn.utils.clip_grad_norm_( model.parameters(), max_norm=clip_level )
         grad = getGradientNorm()
 
@@ -72,10 +79,10 @@ def train( epoch ):
         train_losses.append( loss.item())
         train_grads.append( grad.cpu() )
 
-        # Update
-        print('Train Epoch: {} [{}/{} ({:.0f}%)] \tLoss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
-                        epoch, batch_idx , len( train_loader ), 100. * batch_idx / len( train_loader ), 
-                        loss.item(), grad.item(), optimizer.param_groups[0]['lr']))
+    # Update
+    epoch_loss /= len( train_loader )
+    print('Train Epoch: {} \tLoss: {:.4E} \tPre-Clip Loss Gradient: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
+            epoch, epoch_loss, pre_grad.item(), grad.item(), optimizer.param_groups[0]['lr']))
     
     # Store the pretrained state
     pt.save( model.state_dict(), store_directory + 'model_adam.pth')
@@ -95,8 +102,7 @@ def validate( epoch ):
         validation_losses.append( loss.item())
 
         # Update
-        print('Validation Epoch: {} [{}/{} ({:.0f}%)] \tLoss: {:.4E}'.format(
-                        epoch, batch_idx , len( validation_loader ), 100. * batch_idx / len( validation_loader ), loss.item()))
+        print( 'Validation Epoch: {} \tLoss: {:.4E}'.format( epoch, loss.item() ) )
 
 # Actual training and validation    
 for epoch in range( n_epochs ):
