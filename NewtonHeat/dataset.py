@@ -17,19 +17,19 @@ class NewtonDataset(Dataset):
 
         # Sample T0, T_inf and log_k unformly
         gen = pt.Generator( device=device )
-        self.T0 = pt.empty((N,1)).uniform_( -T_max, T_max, generator=gen )
-        self.logk = pt.empty((N,1)).uniform_( math.log(1e-2), math.log(1e2), generator=gen )
-        self.T_inf = pt.empty((N,1)).uniform_( -T_max, T_max, generator=gen )
+        self.T0 = pt.empty((N,1), device=device, dtype=dtype).uniform_( -T_max, T_max, generator=gen )
+        self.logk = pt.empty((N,1), device=device, dtype=dtype).uniform_( math.log(1e-2), math.log(1e2), generator=gen )
+        self.T_inf = pt.empty((N,1), device=device, dtype=dtype).uniform_( -T_max, T_max, generator=gen )
 
         # Also sample the time-points
-        tau = pt.rand(N, 1, generator=gen) * tau_max
+        tau = pt.rand(N, 1, device=device, dtype=dtype, generator=gen) * tau_max
         self.t = pt.exp( self.logk ) * tau
 
     def __len__( self ):
         return len( self.logk )
     
-    def __getitem__(self, idx : int) -> Tuple[int, pt.Tensor]:
-        return idx, pt.Tensor([self.T0[idx], self.logk[idx], self.T_inf[idx], self.t[idx]])
+    def __getitem__(self, idx : int) -> Tuple[pt.Tensor, pt.Tensor]:
+        return self.t[idx], pt.cat((self.T0[idx], self.logk[idx], self.T_inf[idx]), dim=0)
     
 if __name__ == '__main__':
     N = 100_000
