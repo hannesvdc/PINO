@@ -20,7 +20,7 @@ train_dataset = NewtonDataset( N_test, T_max, tau_max, device, dtype )
 n_hidden_layers = 2
 z = 64
 model = PINO( n_hidden_layers, z, T_max )
-model.load_state_dict( pt.load('./Results/model_adam.pth', weights_only=True) )
+model.load_state_dict( pt.load( './Results/model_lbfgs.pth', weights_only=True, map_location=device )  )
 
 # Compare PINO with the exact solution of the ODE
 idx = 25
