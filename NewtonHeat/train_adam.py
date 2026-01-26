@@ -31,17 +31,17 @@ pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data.pth'
 
 # Create the PINO
 n_hidden_layers = 2
-z = 64
+z = 32
 model = PINO( n_hidden_layers, z, T_max ).to( device=device )
 loss_fn = PINOLoss()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
 # Create the adam optimizer with learning rate scheduler
 lr = 1e-3
-n_steps = 5
-step_size = 150
+n_steps = 4
+step_size = 1000
 n_epochs = n_steps * step_size
-optimizer = Adam( model.parameters(), lr, amsgrad=True )
+optimizer = Adam( model.parameters(), lr )
 scheduler = StepLR( optimizer, step_size=step_size, gamma=0.1 )
 def getGradientNorm():
     grads = [p.grad.view(-1) for p in model.parameters() if p.grad is not None]
@@ -57,7 +57,7 @@ validation_losses = []
 # Train Function
 def train( epoch ):
     model.train()
-    clip_level = 100.0
+    clip_level = 5e2
 
     epoch_loss = float( 0.0 )
     for batch_idx, (t, p) in enumerate( train_loader ):
@@ -81,7 +81,7 @@ def train( epoch ):
 
     # Update
     epoch_loss /= len( train_loader )
-    print('Train Epoch: {} \tLoss: {:.4E} \tPre-Clip Loss Gradient: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
+    print('\nTrain Epoch: {} \tLoss: {:.4E} \tPre-Clip Loss Gradient: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
             epoch, epoch_loss, pre_grad.item(), grad.item(), optimizer.param_groups[0]['lr']))
     
     # Store the pretrained state
@@ -104,11 +104,14 @@ def validate( epoch ):
         # Update
         print( 'Validation Epoch: {} \tLoss: {:.4E}'.format( epoch, loss.item() ) )
 
-# Actual training and validation    
-for epoch in range( n_epochs ):
-    train( epoch )
-    validate( epoch )
-    scheduler.step( )
+# Actual training and validation
+try:
+    for epoch in range( n_epochs ):
+        train( epoch )
+        validate( epoch )
+        scheduler.step( )
+except KeyboardInterrupt:
+    pass
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)

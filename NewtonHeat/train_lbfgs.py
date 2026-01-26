@@ -1,10 +1,18 @@
 import torch as pt
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import TensorDataset
 from torch.optim import LBFGS
 import matplotlib.pyplot as plt
 
-from dataset import NewtonDataset
 from model import PINO, PINOLoss
+
+# Load commandline arguments
+import argparse
+def parseArguments( ):
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--restart', dest='restart', action='store_true')
+    arg_parser.add_argument('--no-restart', dest='restart', action='store_false')
+    return arg_parser.parse_args( )
+args = parseArguments()
 
 # Train on the GPU
 device = pt.device("cpu")
@@ -21,28 +29,29 @@ t_validation = validation_data[:,0:1]
 p_validation = validation_data[:,1:]
 
 # Create the training and validation datasets
-B = 128
 N_validation = validation_data.shape[0]
 train_dataset = TensorDataset( t_train, p_train )
-train_loader = DataLoader( train_dataset, batch_size=B, shuffle=False, drop_last=True )
 validation_dataset = TensorDataset( t_validation, p_validation )
-validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shuffle=False, drop_last=True )
 
 # Create the PINO model and loss
 n_hidden_layers = 2
-z = 64
+z = 32
 T_max = 10.0
 model = PINO( n_hidden_layers, z, T_max ).to( dtype=dtype )
-model.load_state_dict( pt.load( store_directory + 'model_adam.pth', weights_only=True, map_location=device ) )
+if args.restart:
+    model.load_state_dict( pt.load( store_directory + 'model_lbfgs.pth', weights_only=True, map_location=device ) )
+else:
+    model.load_state_dict( pt.load( store_directory + 'model_adam.pth', weights_only=True, map_location=device ) )
 loss_fn = PINOLoss()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ])) 
 
 # Create the adam optimizer with learning rate scheduler
 lr = 1.0
-max_iter = 100
-n_epochs = 250
+max_iter = 50
 history_size = 50
 optimizer = LBFGS( model.parameters(), lr, max_iter=max_iter, line_search_fn="strong_wolfe", history_size=history_size )
+if args.restart:
+    optimizer.load_state_dict( pt.load( store_directory + 'optimizer_lbfgs.pth' ) )
 def getGradientNorm():
     grads = [p.grad.view(-1) for p in model.parameters() if p.grad is not None]
     return pt.norm(pt.cat(grads))
@@ -84,18 +93,23 @@ train_losses = []
 train_grads = []
 validation_counter = []
 validation_losses = []
+
+epoch = 1
 n_stuck = 0
 last_loss = pt.inf
+step_norm = pt.inf
+decreased_lr = True
 try:
-    for epoch in range( n_epochs ):
+    while step_norm > 1e-8 or decreased_lr:
         w0 = pt.cat([p.detach().flatten() for p in model.parameters()])
         training_loss = optimizer.step( closure )
         w1 = pt.cat([p.detach().flatten() for p in model.parameters()])
         step_norm = (w1 - w0).norm().item()
-        print('\nTrain Epoch: {} \tLoss: {:.4E} \tLoss Gradient: {:.4E} \tStep Norm: {:.4E}'.format( epoch, last_state["loss"], last_state["grad_norm"], step_norm ))
+        print('\nTrain Epoch: {} \tLoss: {:.10E} \tLoss Gradient: {:.10E} \tStep Norm: {:.10E} \t Lr: {:.4E}'.format( 
+            epoch, last_state["loss"], last_state["grad_norm"], step_norm, optimizer.param_groups[0]["lr"] ))
         
         validation_loss = validate()
-        print('Validation Epoch: {} \tLoss: {:.4E}'.format( epoch, validation_loss.item() ))
+        print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))
         
         # Store the pretrained state
         pt.save( model.state_dict(), store_directory + 'model_lbfgs.pth')
@@ -104,15 +118,23 @@ try:
         train_counter.append( epoch )
         train_losses.append( last_state["loss"] )
         train_grads.append( last_state["grad_norm"] )
+        validation_counter.append( epoch )
         validation_losses.append( validation_loss.item() )
 
-        stuck = abs(training_loss - last_loss) < 1e-10 and step_norm < 1e-8
+        stuck = step_norm < 1e-8
         n_stuck += stuck
-        if n_stuck >= 5:
-            print('Lowering L-BFGS Learning Rate.')
+        if stuck:
+            print('Lowering L-BFGS Learning Rate to', 0.3 * lr)
+            lr = 0.3 * lr
+            for g in optimizer.param_groups:
+                g["lr"] = lr
             n_stuck = 0
-            lr = 0.1 * lr
-            optimizer = LBFGS( model.parameters(), lr, max_iter=max_iter, line_search_fn="strong_wolfe", history_size=history_size )
+            decreased_lr = True
+        else:
+            decreased_lr = False
+        
+        # Update to the next epoch.
+        epoch += 1
         last_loss = float( training_loss )
 except KeyboardInterrupt:
     pass
@@ -134,5 +156,4 @@ plt.legend()
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.title('L-BFGS: Detailed Information')
-plt.show()
 plt.show()
