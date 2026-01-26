@@ -9,14 +9,20 @@ class NewtonDataset(Dataset):
                       T_max : float,
                       tau_max : float,
                       device=pt.device('cpu'), 
-                      dtype=pt.float32):
+                      dtype=pt.float32,
+                      test=False):
         super().__init__()
 
         self.device = device
         self.dtype = dtype
 
         # Sample T0, T_inf and log_k unformly
-        gen = pt.Generator( device=device )
+        if test:
+            import time
+            gen = pt.Generator( device=device )
+            gen.manual_seed( int(time.time()) )
+        else:
+            gen = pt.Generator( device=device )
         self.T0 = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( -T_max, T_max, generator=gen )
         logk = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( math.log(1e-2), math.log(1e2), generator=gen )
         self.k = pt.exp( logk )
