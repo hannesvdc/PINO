@@ -11,11 +11,11 @@ from model import PINO, PINOLoss
 device = pt.device("mps")
 dtype = pt.float32
 pt.set_default_dtype( dtype )
-pt.set_grad_enabled(True)
+pt.set_grad_enabled( True )
 
 # Create the training and validation datasets
 T_max = 10.0
-tau_max = 4.0
+tau_max = 10.0 # train to exp( -10 )
 N_train = 10_000
 N_validation = 5_000
 train_dataset = NewtonDataset( N_train, T_max, tau_max, device, dtype )
@@ -32,7 +32,7 @@ pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data.pth'
 # Create the PINO
 n_hidden_layers = 2
 z = 32
-model = PINO( n_hidden_layers, z, T_max ).to( device=device )
+model = PINO( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_min, train_dataset.logk_max ).to( device=device )
 loss_fn = PINOLoss()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
@@ -85,8 +85,8 @@ def train( epoch ):
             epoch, epoch_loss, pre_grad.item(), grad.item(), optimizer.param_groups[0]['lr']))
     
     # Store the pretrained state
-    pt.save( model.state_dict(), store_directory + 'model_adam.pth')
-    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam.pth')
+    pt.save( model.state_dict(), store_directory + 'model_adam_improved.pth')
+    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam_improved.pth')
 
 # Validation Function 
 def validate( epoch ):

@@ -13,8 +13,10 @@ class NewtonDataset(Dataset):
                       test=False):
         super().__init__()
 
-        self.device = device
-        self.dtype = dtype
+        self.T_max = T_max
+        self.tau_max = tau_max
+        self.logk_min = math.log(1e-2)
+        self.logk_max = math.log(1e2)
 
         # Sample T0, T_inf and log_k unformly
         if test:
@@ -23,10 +25,10 @@ class NewtonDataset(Dataset):
             gen.manual_seed( int(time.time()) )
         else:
             gen = pt.Generator( device=device )
-        self.T0 = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( -T_max, T_max, generator=gen )
-        logk = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( math.log(1e-2), math.log(1e2), generator=gen )
+        self.T0 = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( -self.T_max, self.T_max, generator=gen )
+        logk = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( self.logk_min, self.logk_max, generator=gen )
         self.k = pt.exp( logk )
-        self.T_inf = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( -T_max, T_max, generator=gen )
+        self.T_inf = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( -self.T_max, self.T_max, generator=gen )
 
         # Also sample the time-points
         tau = tau_max * pt.rand( (N,1), device=device, dtype=dtype, requires_grad=False, generator=gen)
@@ -43,7 +45,7 @@ class NewtonDataset(Dataset):
     
 if __name__ == '__main__':
     N = 100_000
-    T_max = 1.0
+    T_max = 10.0
     tau_max = 4.0
     dataset = NewtonDataset( N, T_max, tau_max )
     print(dataset[3], len(dataset))

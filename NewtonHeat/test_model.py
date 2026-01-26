@@ -12,14 +12,14 @@ pt.set_grad_enabled(True)
 
 # Create the test
 T_max = 10.0
-tau_max = 4.0
+tau_max = 10.0
 N_test = 100
 test_dataset = NewtonDataset( N_test, T_max, tau_max, device, dtype, test=True )
 
 # Load the model
 n_hidden_layers = 2
 z = 32
-model = PINO( n_hidden_layers, z, T_max )
+model = PINO( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_min, test_dataset.logk_max )
 model.load_state_dict( pt.load( './Results/model_lbfgs.pth', weights_only=True, map_location=device )  )
 
 # Evaluate the model for every parameter combination in the dataset. I know for-loops are inefficient but IDC
@@ -60,9 +60,22 @@ plt.legend()
 
 # Plot the master curve
 plt.figure()
-plt.plot( tau_grid.numpy(), pt.mean(T_evaluations, dim=1).detach().numpy(), color='tab:blue')
-plt.plot( tau_grid.numpy(), pt.exp(-tau_grid).detach().numpy(), color='tab:orange')
+plt.plot( tau_grid.numpy(), pt.mean(T_evaluations, dim=1).detach().numpy(), color='tab:blue', label='Averaged PINO Master Curve')
+plt.plot( tau_grid.numpy(), pt.exp(-tau_grid).detach().numpy(), color='tab:orange', label=r"$\exp(-kt)$")
 plt.xlabel(r"$k t$")
-plt.ylabel(r"$\frac{T(t)-T_{\text{\infty}}}{T_0 - T_{\text{\infty}}}$")
+plt.ylabel(r"$\frac{T(t)-T_{\infty}}{T_0 - T_{\infty}}$", rotation=0)
+plt.legend()
+
+# Plot realizations of the master curve
+plt.figure()
+for n in range( 10 ):
+    _, p = test_dataset[n]
+    T0 = p[0]
+    T_inf = p[2]
+    T_diff = float(T0 - T_inf)
+    plt.plot( tau_grid.numpy(), T_evaluations[:,n].detach().numpy(), label=r"$T_0-T_{\infty} =$"  + str(round(T_diff,2)))
+plt.plot( tau_grid.numpy(), pt.exp(-tau_grid).detach().numpy(), color='tab:orange', label=r"$\exp(-kt)$")
+plt.xlabel(r"$k t$")
+plt.ylabel(r"$\frac{T(t)-T_{\infty}}{T_0 - T_{\infty}}$", rotation=0)
 plt.legend()
 plt.show()

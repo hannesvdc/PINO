@@ -41,9 +41,15 @@ class PINO( nn.Module ):
     def __init__( self, 
                   n_hidden_layers : int, 
                   z : int, 
-                  T_max : float):
+                  T_max : float,
+                  tau_max : float,
+                  logk_min : float,
+                  logk_max : float ):
         super().__init__()
         self.T_max = T_max
+        self.tau_max = tau_max
+        self.logk_min = logk_min
+        self.logk_max = logk_max
 
         # Different FiLM module per layer
         self.FiLM_layers = nn.ModuleList( FiLMLayer(z) for _ in range(n_hidden_layers) )
@@ -67,12 +73,14 @@ class PINO( nn.Module ):
         
         # Preprocess the parameters
         T0_hat = p[:,0:1] / self.T_max
-        k = p[:,1:2].clamp_min(1e-12)
         T_hat_inf = p[:,2:3] / self.T_max
-        p_film = pt.cat( ( T0_hat - T_hat_inf, pt.log(k), T_hat_inf ), dim=1 )
+        k = p[:,1:2].clamp_min(1e-12)
+        logk_hat = (pt.log(k) - self.logk_min) / (self.logk_max - self.logk_min)
+        p_film = pt.cat( ( T0_hat - T_hat_inf, logk_hat, T_hat_inf ), dim=1 )
 
         # Pass through the hidden layers
-        x = t * k
+        tau = t * k
+        x = tau / self.tau_max
         for n in range( self.n_hidden_layers ):
             gamma, beta = self.FiLM_layers[n]( p_film )
             x = gamma * self.layers[n](x) + beta

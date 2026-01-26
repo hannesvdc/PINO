@@ -1,3 +1,4 @@
+import math
 import torch as pt
 from torch.utils.data import TensorDataset
 from torch.optim import LBFGS
@@ -37,11 +38,14 @@ validation_dataset = TensorDataset( t_validation, p_validation )
 n_hidden_layers = 2
 z = 32
 T_max = 10.0
-model = PINO( n_hidden_layers, z, T_max ).to( dtype=dtype )
+tau_max = 10.0
+logk_min = math.log( 1e-2 )
+logk_max = math.log( 1e2 )
+model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( dtype=dtype )
 if args.restart:
-    model.load_state_dict( pt.load( store_directory + 'model_lbfgs.pth', weights_only=True, map_location=device ) )
+    model.load_state_dict( pt.load( store_directory + 'model_lbfgs_improved.pth', weights_only=True, map_location=device ) )
 else:
-    model.load_state_dict( pt.load( store_directory + 'model_adam.pth', weights_only=True, map_location=device ) )
+    model.load_state_dict( pt.load( store_directory + 'model_adam_improved.pth', weights_only=True, map_location=device ) )
 loss_fn = PINOLoss()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ])) 
 
@@ -51,7 +55,7 @@ max_iter = 50
 history_size = 50
 optimizer = LBFGS( model.parameters(), lr, max_iter=max_iter, line_search_fn="strong_wolfe", history_size=history_size )
 if args.restart:
-    optimizer.load_state_dict( pt.load( store_directory + 'optimizer_lbfgs.pth' ) )
+    optimizer.load_state_dict( pt.load( store_directory + 'optimizer_lbfgs_improved.pth' ) )
 def getGradientNorm():
     grads = [p.grad.view(-1) for p in model.parameters() if p.grad is not None]
     return pt.norm(pt.cat(grads))
@@ -95,12 +99,8 @@ validation_counter = []
 validation_losses = []
 
 epoch = 1
-n_stuck = 0
-last_loss = pt.inf
-step_norm = pt.inf
-decreased_lr = True
 try:
-    while step_norm > 1e-8 or decreased_lr:
+    while lr > 1.e-6:
         w0 = pt.cat([p.detach().flatten() for p in model.parameters()])
         training_loss = optimizer.step( closure )
         w1 = pt.cat([p.detach().flatten() for p in model.parameters()])
@@ -112,8 +112,8 @@ try:
         print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))
         
         # Store the pretrained state
-        pt.save( model.state_dict(), store_directory + 'model_lbfgs.pth')
-        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs.pth')
+        pt.save( model.state_dict(), store_directory + 'model_lbfgs_improved.pth')
+        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs_improved.pth')
 
         train_counter.append( epoch )
         train_losses.append( last_state["loss"] )
@@ -121,21 +121,14 @@ try:
         validation_counter.append( epoch )
         validation_losses.append( validation_loss.item() )
 
-        stuck = step_norm < 1e-8
-        n_stuck += stuck
-        if stuck:
+        if step_norm < 1e-8:
             print('Lowering L-BFGS Learning Rate to', 0.3 * lr)
             lr = 0.3 * lr
             for g in optimizer.param_groups:
                 g["lr"] = lr
-            n_stuck = 0
-            decreased_lr = True
-        else:
-            decreased_lr = False
         
         # Update to the next epoch.
         epoch += 1
-        last_loss = float( training_loss )
 except KeyboardInterrupt:
     pass
 
