@@ -1,7 +1,6 @@
 import torch as pt
 import torch.nn as nn
 
-from collections import OrderedDict
 from typing import Tuple
 
 class FiLMLayer( nn.Module ):

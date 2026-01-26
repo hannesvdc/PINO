@@ -43,9 +43,9 @@ logk_min = math.log( 1e-2 )
 logk_max = math.log( 1e2 )
 model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( dtype=dtype )
 if args.restart:
-    model.load_state_dict( pt.load( store_directory + 'model_lbfgs_improved.pth', weights_only=True, map_location=device ) )
+    model.load_state_dict( pt.load( store_directory + 'model_lbfgs.pth', weights_only=True, map_location=device ) )
 else:
-    model.load_state_dict( pt.load( store_directory + 'model_adam_improved.pth', weights_only=True, map_location=device ) )
+    model.load_state_dict( pt.load( store_directory + 'model_adam.pth', weights_only=True, map_location=device ) )
 loss_fn = PINOLoss()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ])) 
 
@@ -55,7 +55,7 @@ max_iter = 50
 history_size = 50
 optimizer = LBFGS( model.parameters(), lr, max_iter=max_iter, line_search_fn="strong_wolfe", history_size=history_size )
 if args.restart:
-    optimizer.load_state_dict( pt.load( store_directory + 'optimizer_lbfgs_improved.pth' ) )
+    optimizer.load_state_dict( pt.load( store_directory + 'optimizer_lbfgs.pth' ) )
 def getGradientNorm():
     grads = [p.grad.view(-1) for p in model.parameters() if p.grad is not None]
     return pt.norm(pt.cat(grads))
@@ -92,6 +92,7 @@ def validate():
 
 # Actual training and validation
 print('\nStarting Training...')
+learning_rates = []
 train_counter = []
 train_losses = []
 train_grads = []
@@ -112,14 +113,15 @@ try:
         print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))
         
         # Store the pretrained state
-        pt.save( model.state_dict(), store_directory + 'model_lbfgs_improved.pth')
-        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs_improved.pth')
+        pt.save( model.state_dict(), store_directory + 'model_lbfgs.pth')
+        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs.pth')
 
         train_counter.append( epoch )
         train_losses.append( last_state["loss"] )
         train_grads.append( last_state["grad_norm"] )
         validation_counter.append( epoch )
         validation_losses.append( validation_loss.item() )
+        learning_rates.append( optimizer.param_groups[0]["lr"] )
 
         if step_norm < 1e-8:
             print('Lowering L-BFGS Learning Rate to', 0.3 * lr)
@@ -131,6 +133,11 @@ try:
         epoch += 1
 except KeyboardInterrupt:
     pass
+
+# Store the per-epoch convergence results
+import numpy as np
+np.save( store_directory + 'LBFGS_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory + 'LBFGS_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses, learning_rates) ) )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)

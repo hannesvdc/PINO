@@ -15,7 +15,7 @@ pt.set_grad_enabled( True )
 
 # Create the training and validation datasets
 T_max = 10.0
-tau_max = 10.0 # train to exp( -10 )
+tau_max = 8.0 # train to exp( -tau_max )
 N_train = 10_000
 N_validation = 5_000
 train_dataset = NewtonDataset( N_train, T_max, tau_max, device, dtype )
@@ -85,8 +85,8 @@ def train( epoch ):
             epoch, epoch_loss, pre_grad.item(), grad.item(), optimizer.param_groups[0]['lr']))
     
     # Store the pretrained state
-    pt.save( model.state_dict(), store_directory + 'model_adam_improved.pth')
-    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam_improved.pth')
+    pt.save( model.state_dict(), store_directory + 'model_adam.pth')
+    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam.pth')
 
 # Validation Function 
 def validate( epoch ):
@@ -113,6 +113,11 @@ try:
 except KeyboardInterrupt:
     pass
 
+# Store the per-epoch convergence results
+import numpy as np
+np.save( store_directory + 'Adam_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory + 'Adam_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses) ) )
+
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)
 plt.semilogy(train_counter, train_grads, label='Loss Gradient', alpha=0.5)
@@ -120,4 +125,5 @@ plt.semilogy(validation_counter, validation_losses, label='Validation Loss', alp
 plt.legend()
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
+plt.title('Adam')
 plt.show()

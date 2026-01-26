@@ -39,31 +39,12 @@ for n in range( N_test ):
     T_t = evaluatePINO( t_grid[:,None], p )
     T_evaluations[:,n] = (T_t[:,0] - T_inf) / (T0 - T_inf)
 
-# Compare PINO with the exact solution of the ODE
-idx = 25
-_, p = test_dataset[idx]
-T0 = p[0]
-k = p[1]
-T_inf = p[2]
-t_grid = pt.linspace(0.0, tau_max, 100) / k
-T_t = evaluatePINO( t_grid[:,None], p )
-
-# Compare to the analytical solution
-T_t_analytic = T_inf + (T0 - T_inf) * pt.exp( -k * t_grid )
-
-# Plot both
-plt.plot( t_grid.numpy(), T_t.detach().numpy(), label="PINO" )
-plt.plot( t_grid.numpy(), T_t_analytic.detach().numpy(), label="Analytic Solution")
-plt.xlabel(r"$t$")
-plt.ylabel(r"$T(t)$")
-plt.legend()
-
 # Plot the master curve
 plt.figure()
 plt.plot( tau_grid.numpy(), pt.mean(T_evaluations, dim=1).detach().numpy(), color='tab:blue', label='Averaged PINO Master Curve')
 plt.plot( tau_grid.numpy(), pt.exp(-tau_grid).detach().numpy(), color='tab:orange', label=r"$\exp(-kt)$")
 plt.xlabel(r"$k t$")
-plt.ylabel(r"$\frac{T(t)-T_{\infty}}{T_0 - T_{\infty}}$", rotation=0)
+plt.ylabel(r"$\frac{T(kt)-T_{\infty}}{T_0 - T_{\infty}}$", rotation=0)
 plt.legend()
 
 # Plot realizations of the master curve
@@ -76,6 +57,6 @@ for n in range( 10 ):
     plt.plot( tau_grid.numpy(), T_evaluations[:,n].detach().numpy(), label=r"$T_0-T_{\infty} =$"  + str(round(T_diff,2)))
 plt.plot( tau_grid.numpy(), pt.exp(-tau_grid).detach().numpy(), color='tab:orange', label=r"$\exp(-kt)$")
 plt.xlabel(r"$k t$")
-plt.ylabel(r"$\frac{T(t)-T_{\infty}}{T_0 - T_{\infty}}$", rotation=0)
+plt.ylabel(r"$\frac{T(kt)-T_{\infty}}{T_0 - T_{\infty}}$", rotation=0)
 plt.legend()
 plt.show()
