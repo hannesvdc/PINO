@@ -5,7 +5,15 @@ from torch.optim.lr_scheduler import StepLR
 import matplotlib.pyplot as plt
 
 from dataset import NewtonDataset
-from model import PINO, PINOLoss
+from model import PINO, AdvanedPhysicsPINO
+from loss import PINOLoss
+
+import argparse
+def parseArguments( ):
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--model_type', dest='model_type')
+    return arg_parser.parse_args( )
+args = parseArguments()
 
 # Train on the GPU
 device = pt.device("mps")
@@ -30,16 +38,28 @@ pt.save( train_dataset.all().cpu(), store_directory + 'train_data.pth' )
 pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data.pth' )
 
 # Create the PINO
-n_hidden_layers = 2
 z = 32
-model = PINO( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_min, train_dataset.logk_max ).to( device=device )
-loss_fn = PINOLoss()
+if args.model_type == 'advanced':
+    n_hidden_layers = 1
+    model = AdvanedPhysicsPINO( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_min, train_dataset.logk_max ).to( device=device )
+    step_size = 100
+elif args.model_type == 'initial':
+    n_hidden_layers = 2
+    model = PINO( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_min, train_dataset.logk_max ).to( device=device )
+    step_size = 1000
+elif args.model_type == "simple":
+    n_hidden_layers = 1
+    model = PINO( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_min, train_dataset.logk_max ).to( device=device )
+    step_size = 1000
+else:
+    print('This model type is not supported.')
+    exit()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
+loss_fn = PINOLoss()
 
 # Create the adam optimizer with learning rate scheduler
 lr = 1e-3
 n_steps = 4
-step_size = 1000
 n_epochs = n_steps * step_size
 optimizer = Adam( model.parameters(), lr )
 scheduler = StepLR( optimizer, step_size=step_size, gamma=0.1 )
@@ -85,8 +105,8 @@ def train( epoch ):
             epoch, epoch_loss, pre_grad.item(), grad.item(), optimizer.param_groups[0]['lr']))
     
     # Store the pretrained state
-    pt.save( model.state_dict(), store_directory + 'model_adam.pth')
-    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam.pth')
+    pt.save( model.state_dict(), store_directory + args.model_type + '_model_adam.pth')
+    pt.save( optimizer.state_dict(), store_directory + args.model_type + '_optimizer_adam.pth')
 
 # Validation Function 
 def validate( epoch ):
@@ -115,8 +135,8 @@ except KeyboardInterrupt:
 
 # Store the per-epoch convergence results
 import numpy as np
-np.save( store_directory + 'Adam_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
-np.save( store_directory + 'Adam_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses) ) )
+np.save( store_directory + args.model_type + '_Adam_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory + args.model_type + '_Adam_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses) ) )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)

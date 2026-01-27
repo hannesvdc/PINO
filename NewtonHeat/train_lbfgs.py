@@ -4,7 +4,8 @@ from torch.utils.data import TensorDataset
 from torch.optim import LBFGS
 import matplotlib.pyplot as plt
 
-from model import PINO, PINOLoss
+from model import PINO, AdvanedPhysicsPINO
+from loss import PINOLoss
 
 # Load commandline arguments
 import argparse
@@ -12,6 +13,7 @@ def parseArguments( ):
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--restart', dest='restart', action='store_true')
     arg_parser.add_argument('--no-restart', dest='restart', action='store_false')
+    arg_parser.add_argument('--model_type', dest='model_type')
     return arg_parser.parse_args( )
 args = parseArguments()
 
@@ -35,17 +37,31 @@ train_dataset = TensorDataset( t_train, p_train )
 validation_dataset = TensorDataset( t_validation, p_validation )
 
 # Create the PINO model and loss
-n_hidden_layers = 2
-z = 32
 T_max = 10.0
 tau_max = 10.0
 logk_min = math.log( 1e-2 )
 logk_max = math.log( 1e2 )
-model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( dtype=dtype )
-if args.restart:
-    model.load_state_dict( pt.load( store_directory + 'model_lbfgs.pth', weights_only=True, map_location=device ) )
+z = 32
+if args.model_type == 'advanced':
+    n_hidden_layers = 1
+    model = AdvanedPhysicsPINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( device=device )
+    step_size = 100
+elif args.model_type == 'initial':
+    n_hidden_layers = 2
+    model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( device=device )
+    step_size = 1000
+elif args.model_type == "simple":
+    n_hidden_layers = 1
+    model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( device=device )
+    step_size = 1000
 else:
-    model.load_state_dict( pt.load( store_directory + 'model_adam.pth', weights_only=True, map_location=device ) )
+    print('This model type is not supported.')
+    exit()
+
+if args.restart:
+    model.load_state_dict( pt.load( store_directory + args.model_type + '_model_lbfgs.pth', weights_only=True, map_location=device ) )
+else:
+    model.load_state_dict( pt.load( store_directory + args.model_type + '_model_adam.pth', weights_only=True, map_location=device ) )
 loss_fn = PINOLoss()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ])) 
 
@@ -55,7 +71,7 @@ max_iter = 50
 history_size = 50
 optimizer = LBFGS( model.parameters(), lr, max_iter=max_iter, line_search_fn="strong_wolfe", history_size=history_size )
 if args.restart:
-    optimizer.load_state_dict( pt.load( store_directory + 'optimizer_lbfgs.pth' ) )
+    optimizer.load_state_dict( pt.load( store_directory + args.model_type + '_optimizer_lbfgs.pth' ) )
 def getGradientNorm():
     grads = [p.grad.view(-1) for p in model.parameters() if p.grad is not None]
     return pt.norm(pt.cat(grads))
@@ -113,8 +129,8 @@ try:
         print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))
         
         # Store the pretrained state
-        pt.save( model.state_dict(), store_directory + 'model_lbfgs.pth')
-        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs.pth')
+        pt.save( model.state_dict(), store_directory + args.model_type + '_model_lbfgs.pth')
+        pt.save( optimizer.state_dict(), store_directory + args.model_type + '_optimizer_lbfgs.pth')
 
         train_counter.append( epoch )
         train_losses.append( last_state["loss"] )
@@ -136,8 +152,8 @@ except KeyboardInterrupt:
 
 # Store the per-epoch convergence results
 import numpy as np
-np.save( store_directory + 'LBFGS_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
-np.save( store_directory + 'LBFGS_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses, learning_rates) ) )
+np.save( store_directory + args.model_type + '_LBFGS_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory + args.model_type + '_LBFGS_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses, learning_rates) ) )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)

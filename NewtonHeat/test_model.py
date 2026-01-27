@@ -1,8 +1,15 @@
 import torch as pt
 import matplotlib.pyplot as plt
 
-from model import PINO
+from model import PINO, AdvanedPhysicsPINO
 from dataset import NewtonDataset
+
+import argparse
+def parseArguments( ):
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--model_type', dest='model_type')
+    return arg_parser.parse_args( )
+args = parseArguments()
 
 # Test on the CPU
 device = pt.device("cpu")
@@ -17,10 +24,24 @@ N_test = 100
 test_dataset = NewtonDataset( N_test, T_max, tau_max, device, dtype, test=True )
 
 # Load the model
-n_hidden_layers = 2
 z = 32
-model = PINO( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_min, test_dataset.logk_max )
-model.load_state_dict( pt.load( './Results/model_lbfgs.pth', weights_only=True, map_location=device )  )
+if args.model_type == 'advanced':
+    n_hidden_layers = 1
+    model = AdvanedPhysicsPINO( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_min, test_dataset.logk_max ).to( device=device )
+    step_size = 100
+elif args.model_type == 'initial':
+    n_hidden_layers = 2
+    model = PINO( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_min, test_dataset.logk_max ).to( device=device )
+    step_size = 1000
+elif args.model_type == "simple":
+    n_hidden_layers = 1
+    model = PINO( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_min, test_dataset.logk_max ).to( device=device )
+    step_size = 1000
+else:
+    print('This model type is not supported.')
+    exit()
+store_directory = './Results/'
+model.load_state_dict( pt.load( store_directory + args.model_type + '_model_lbfgs.pth', weights_only=True, map_location=device ) )
 
 # Evaluate the model for every parameter combination in the dataset. I know for-loops are inefficient but IDC
 N_t_grid = 100
