@@ -4,7 +4,8 @@ from torch.utils.data import TensorDataset
 from torch.optim import LBFGS
 import matplotlib.pyplot as plt
 
-from model import PINO, AdvanedPhysicsPINO
+from simple_model import PINO
+from advanced_model import AdvanedPhysicsPINO
 from loss import PINOLoss
 
 # Load commandline arguments

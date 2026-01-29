@@ -5,7 +5,8 @@ from torch.optim.lr_scheduler import StepLR
 import matplotlib.pyplot as plt
 
 from dataset import NewtonDataset
-from model import PINO, AdvanedPhysicsPINO
+from simple_model import PINO
+from advanced_model import AdvanedPhysicsPINO
 from loss import PINOLoss
 
 import argparse

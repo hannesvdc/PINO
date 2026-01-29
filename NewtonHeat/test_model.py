@@ -1,7 +1,8 @@
 import torch as pt
 import matplotlib.pyplot as plt
 
-from model import PINO, AdvanedPhysicsPINO
+from simple_model import PINO
+from advanced_model import AdvanedPhysicsPINO
 from dataset import NewtonDataset
 
 import argparse
