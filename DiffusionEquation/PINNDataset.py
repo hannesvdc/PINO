@@ -14,7 +14,6 @@ class PINNDataset(Dataset):
 
         self.T_max = T_max
         self.tau_max = tau_max
-        self.logk_min = math.log(1e-2)
         self.logk_max = math.log(1e2)
 
         # Sample log_k and T_s uniformly
@@ -22,14 +21,20 @@ class PINNDataset(Dataset):
         if test:
             import time
             gen.manual_seed( int(time.time()) )
-        logk = pt.empty((N,1), dtype=dtype, requires_grad=False).uniform_( self.logk_min, self.logk_max, generator=gen )
+        logk = pt.empty((N,1), dtype=dtype, requires_grad=False).uniform_( -self.logk_max, self.logk_max, generator=gen )
         self.k = pt.exp( logk )
         self.T_s = pt.empty((N,1), dtype=dtype, requires_grad=False).uniform_( -self.T_max, self.T_max, generator=gen )
 
         # Also sample space and time
         self.x = pt.rand( (N,1), dtype=dtype, requires_grad=False, generator=gen)
-        tau = tau_max * pt.rand( (N,1), dtype=dtype, requires_grad=False, generator=gen)
-        tau = tau.clip(min=1e-2)
+
+        # Put most tau closer to 0
+        tau_min = 1e-2
+        gamma = 2.0  # 1 = log-uniform, >1 biases small tau
+        u = pt.rand((N,1), dtype=dtype, generator=gen)
+        log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
+        tau = pt.exp(log_tau)
+        print(pt.mean(tau))
         self.t = tau / self.k
 
     def __len__( self ):

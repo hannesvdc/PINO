@@ -9,7 +9,6 @@ from FixedInitialPINN import FixedInitialPINN
 from Loss import HeatLoss
 from sampleInitialGP import gp
 
-# Train on the GPU
 dtype = pt.float64
 pt.set_grad_enabled( True )
 pt.set_default_dtype( dtype )
@@ -40,11 +39,12 @@ validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shu
 store_directory = './Results/pinn/'
 pt.save( train_dataset.all().cpu(), store_directory + 'train_data.pth' )
 pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data.pth' )
+pt.save( u0, store_directory + 'initial.pth')
 
 # Create the PINO
 z = 64
 n_hidden_layers = 2
-model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, u0, x_grid, l )
+model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_max, u0, x_grid, l )
 plot_grid = pt.linspace(0.0, 1.0, 1001)
 u0_int = model.evaluate_u0( plot_grid[:,None] )
 plt.plot( x_grid.cpu().numpy(), u0.cpu().numpy(), label="Exact Initial Condition")
@@ -103,6 +103,7 @@ def train( epoch ):
         pre_grad = getGradientNorm()
         pt.nn.utils.clip_grad_norm_( model.parameters(), max_norm=clip_level )
         grad = getGradientNorm()
+        rel_rms = rms / (T_t_rms.item() + T_xx_rms.item() + 1e-12)
 
         # Update the weights
         optimizer.step()
@@ -120,7 +121,7 @@ def train( epoch ):
     print('\nTrain Epoch: {} \tLoss: {:.4E} \tPre-Clip Loss Gradient: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
             epoch, epoch_loss, pre_grad.item(), grad.item(), optimizer.param_groups[0]['lr']))
     print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tTotal RMS: {:.4E} \tLoss Relative RMS: {:.4E}'.format(
-        T_t_rms, T_xx_rms, rms, rms / (T_t_rms + T_xx_rms + 1e-12) ))
+        T_t_rms, T_xx_rms, rms, rel_rms ))
     
     # Store the pretrained state
     pt.save( model.state_dict(), store_directory + 'model_adam.pth')
@@ -136,7 +137,7 @@ def validate( epoch ):
         p = p.to(device=device, dtype=dtype)
 
         # Compute the loss and its gradient
-        loss, rms, T_t_rms, T_xx_rms = loss_fn( model, x, t, p )
+        loss, _, _, _ = loss_fn( model, x, t, p )
 
         # Bookkeeping
         validation_counter.append( (1.0*batch_idx) / len(validation_loader) + epoch)

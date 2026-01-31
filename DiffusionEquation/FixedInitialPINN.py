@@ -21,12 +21,14 @@ class FixedInitialPINN( nn.Module ):
                   z : int, 
                   T_max : float,
                   tau_max : float,
+                  logk_max : float,
                   u0 : pt.Tensor,
                   x_grid : pt.Tensor, 
                   l : float):
         super().__init__()
         self.T_max = T_max
         self.tau_max = tau_max
+        self.logk_max = logk_max
 
         # Store the initial condition and grid as non-autograd parameters
         n_grid_points = pt.numel( u0 )
@@ -40,7 +42,7 @@ class FixedInitialPINN( nn.Module ):
         hidden_layers = []
         self.act = nn.Tanh()
         for n in range(n_hidden_layers):
-            n_inputs = 2 if n == 0 else z # (x, tau)
+            n_inputs = 4 if n == 0 else z # (x, tau, log k, u0_at_x)
             hidden_layers.append( nn.Linear(n_inputs, z, bias=True) )
         self.layers = nn.ModuleList( hidden_layers )
 
@@ -79,6 +81,7 @@ class FixedInitialPINN( nn.Module ):
         # Pre-process the parameters and input
         T_s = p[:,1:2]
         k = p[:,0:1]
+        logk_hat = pt.log(k) / self.logk_max # scale between -1 and 1
         tau = t * k
         tau_hat = tau / self.tau_max
         
@@ -86,7 +89,7 @@ class FixedInitialPINN( nn.Module ):
         u0_at_x = self.evaluate_u0( x )
 
         # Push through the network
-        y = pt.cat((x, tau_hat), dim=1)
+        y = pt.cat((x, tau_hat, logk_hat, u0_at_x), dim=1)
         for n in range( self.n_hidden_layers ):
             y = self.act( self.layers[n](y) )
 
