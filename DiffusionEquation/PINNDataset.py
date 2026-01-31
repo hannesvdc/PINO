@@ -38,10 +38,10 @@ class PINNDataset(Dataset):
         return len( self.k )
     
     def __getitem__(self, idx : int) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
-        return self.t[idx], self.x[idx], pt.cat((self.k[idx], self.T_s[idx]), dim=0)
+        return self.x[idx], self.t[idx], pt.cat((self.k[idx], self.T_s[idx]), dim=0)
     
     def all( self ) -> pt.Tensor:
-        return pt.cat( (self.t, self.x, self.k, self.T_s), dim=1 )
+        return pt.cat( (self.x, self.t, self.k, self.T_s), dim=1 )
     
 if __name__ == '__main__':
     N = 10_000
