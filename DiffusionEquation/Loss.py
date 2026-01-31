@@ -32,7 +32,7 @@ class HeatLoss( nn.Module ):
                                  inputs=x,
                                  grad_outputs=pt.ones_like(dT_x),
                                  create_graph=True)[0]
-        eq = dT_t - k * dT_xx # Not sure if this is the best formulation, perhaps we need to divide by k to regularize
+        eq = dT_t / (k + 1e-8) -  dT_xx # Not sure if this is the best formulation, perhaps we need to divide by k to regularize
         loss = pt.mean( eq**2 )
 
         return loss

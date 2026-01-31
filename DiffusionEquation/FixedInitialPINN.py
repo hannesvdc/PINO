@@ -1,6 +1,5 @@
 import torch as pt
 import torch.nn as nn
-import math
     
 class FixedInitialPINN( nn.Module ):
     """
@@ -8,12 +7,12 @@ class FixedInitialPINN( nn.Module ):
     in accordance to the heat eqauation. The equation is
 
     .. math::
-        T_t(x, t) = \kappa T_{xx}(x, t)
+        T_t(x, t) = \\kappa T_{xx}(x, t)
     
     subject to a fixed initial temperature profile :math:`T(x, 0) = T_0(x)` and Dirichlet boundary conditions 
     :math:`T(0,t) = T(1,t) = T_s` where :math:`T_s` is the temperature of the surrounding heat bath.
 
-    This PINO adds in a lot of physics into the model. Given input parameters :math:`(\kappa, T_s)`,
+    This PINO adds in a lot of physics into the model. Given input parameters :math:`(\\kappa, T_s)`,
     the output is :math:`(T(x,t) - T_s) / T_max  =  u_0(x) + t * k * x * (1-x) * NN(t*k, x)` with
     :math:`u_0(x) = (T_0(x) - T_s) / T_max`.
     """
@@ -54,11 +53,12 @@ class FixedInitialPINN( nn.Module ):
 
         kernel = lambda y, yp: pt.exp(-0.5 * (y - yp)**2 / self.l**2) # Covariance kernel
         grid_1, grid_2 = pt.meshgrid( grid, grid, indexing="ij" )
-        K = kernel(grid_1, grid_2) + 1e-8 * pt.eye( N_grid, device=grid.device, dtype=grid.dtype ) 
+        K = kernel(grid_1, grid_2) + 1e-4 * pt.eye( N_grid, device=grid.device, dtype=grid.dtype ) 
 
-        u0 = pt.flatten( self.u0 )
-        alpha = pt.linalg.solve( K, u0 ) # shape (N_grid,)
-        self.register_buffer("alpha", alpha[:,None]) # shape (N_grid,1)
+        u0 = pt.transpose( self.u0, 0, 1 )
+        L = pt.linalg.cholesky( K )
+        alpha = pt.cholesky_solve( u0, L ) # shape (N_grid,)
+        self.register_buffer("alpha", alpha) # shape (N_grid,1)
 
     # Need to make sure the PINN output is fully differentiable w.r.t. x and t.
     # This means evaluating u0 through interpolation, even if we only actually

@@ -10,10 +10,9 @@ from Loss import HeatLoss
 from sampleInitialGP import gp
 
 # Train on the GPU
-device = pt.device("mps")
-dtype = pt.float32
-pt.set_default_dtype( dtype )
+dtype = pt.float64
 pt.set_grad_enabled( True )
+pt.set_default_dtype( dtype )
 
 # Create the initial condition. We want T_max to be ~95th percentile, so std=T_max/1.96
 T_max = 10.0
@@ -43,10 +42,22 @@ pt.save( train_dataset.all().cpu(), store_directory + 'train_data.pth' )
 pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data.pth' )
 
 # Create the PINO
-z = 32
+z = 64
 n_hidden_layers = 2
-model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, u0, x_grid, l ).to( device=device )
-step_size = 1000
+model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, u0, x_grid, l )
+plot_grid = pt.linspace(0.0, 1.0, 1001)
+u0_int = model.evaluate_u0( plot_grid[:,None] )
+plt.plot( x_grid.cpu().numpy(), u0.cpu().numpy(), label="Exact Initial Condition")
+plt.plot(plot_grid.cpu().numpy(), u0_int.cpu().numpy(), linestyle='--', label="RBF Interpolation")
+plt.legend()
+plt.xlabel(r"$x$")
+plt.ylabel(r"$u_0(x)$")
+plt.show( )
+
+# Move the model to the GPU (and single precision dtype )
+device = pt.device("mps")
+dtype = pt.float32
+model = model.to( device=device, dtype=dtype )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
 # Create the Loss function
@@ -55,6 +66,7 @@ loss_fn = HeatLoss()
 # Create the adam optimizer with learning rate scheduler
 lr = 1e-3
 n_steps = 4
+step_size = 1000
 n_epochs = n_steps * step_size
 optimizer = Adam( model.parameters(), lr )
 scheduler = StepLR( optimizer, step_size=step_size, gamma=0.1 )
@@ -72,14 +84,14 @@ validation_losses = []
 # Train Function
 def train( epoch ):
     model.train()
-    clip_level = 5e2
+    clip_level = 5e4
 
     epoch_loss = float( 0.0 )
     for batch_idx, (x, t, p) in enumerate( train_loader ):
         optimizer.zero_grad( set_to_none=True )
-        x = x.to(device=device)
-        t = t.to(device=device)
-        p = p.to(device=device)
+        x = x.to(device=device, dtype=dtype)
+        t = t.to(device=device, dtype=dtype)
+        p = p.to(device=device, dtype=dtype)
 
         # Compute the loss and its gradient
         loss = loss_fn( model, x, t, p )
@@ -111,9 +123,9 @@ def validate( epoch ):
     model.eval()
 
     for batch_idx, (x, t, p) in enumerate( validation_loader ):
-        x = x.to(device=device)
-        t = t.to(device=device)
-        p = p.to(device=device)
+        x = x.to(device=device, dtype=dtype)
+        t = t.to(device=device, dtype=dtype)
+        p = p.to(device=device, dtype=dtype)
 
         # Compute the loss and its gradient
         loss = loss_fn( model, x, t, p )
