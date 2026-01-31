@@ -30,8 +30,8 @@ T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
 N_train = 10_000
 N_validation = 5_000
-train_dataset = PINNDataset( x_grid, N_train, T_max, tau_max, dtype, test=False)
-validation_dataset = PINNDataset( x_grid, N_validation, T_max, tau_max, dtype, test=False)
+train_dataset = PINNDataset( N_train, T_max, tau_max, dtype, test=False)
+validation_dataset = PINNDataset( N_validation, T_max, tau_max, dtype, test=False)
 B = 128
 train_loader = DataLoader( train_dataset, batch_size=B, shuffle=True )
 validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shuffle=False )
@@ -64,8 +64,8 @@ print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.paramet
 loss_fn = HeatLoss()
 
 # Create the adam optimizer with learning rate scheduler
-lr = 1e-3
-n_steps = 4
+lr = 1e-2
+n_steps = 5
 step_size = 1000
 n_epochs = n_steps * step_size
 optimizer = Adam( model.parameters(), lr )
@@ -80,6 +80,9 @@ train_losses = []
 train_grads = []
 validation_counter = []
 validation_losses = []
+T_t_rmss = []
+T_xx_rmss = []
+rel_rmss = []
 
 # Train Function
 def train( epoch ):
@@ -94,7 +97,7 @@ def train( epoch ):
         p = p.to(device=device, dtype=dtype)
 
         # Compute the loss and its gradient
-        loss = loss_fn( model, x, t, p )
+        loss, rms, T_t_rms, T_xx_rms = loss_fn( model, x, t, p )
         loss.backward()
         epoch_loss += float( loss.item() )
         pre_grad = getGradientNorm()
@@ -108,11 +111,16 @@ def train( epoch ):
         train_counter.append( (1.0*batch_idx) / len(train_loader) + epoch)
         train_losses.append( loss.item())
         train_grads.append( grad.cpu() )
+        T_t_rmss.append( T_t_rms.item() )
+        T_xx_rmss.append( T_xx_rms.item() )
+        rel_rmss.append( rms.item() / (T_t_rms.item() + T_xx_rms.item() + 1e-12) )
 
     # Update
     epoch_loss /= len( train_loader )
     print('\nTrain Epoch: {} \tLoss: {:.4E} \tPre-Clip Loss Gradient: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
             epoch, epoch_loss, pre_grad.item(), grad.item(), optimizer.param_groups[0]['lr']))
+    print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tTotal RMS: {:.4E} \tLoss Relative RMS: {:.4E}'.format(
+        T_t_rms, T_xx_rms, rms, rms / (T_t_rms + T_xx_rms + 1e-12) ))
     
     # Store the pretrained state
     pt.save( model.state_dict(), store_directory + 'model_adam.pth')
@@ -128,7 +136,7 @@ def validate( epoch ):
         p = p.to(device=device, dtype=dtype)
 
         # Compute the loss and its gradient
-        loss = loss_fn( model, x, t, p )
+        loss, rms, T_t_rms, T_xx_rms = loss_fn( model, x, t, p )
 
         # Bookkeeping
         validation_counter.append( (1.0*batch_idx) / len(validation_loader) + epoch)
@@ -155,6 +163,9 @@ np.save( store_directory + 'Adam_Validation_Convergence.npy', np.hstack( (valida
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)
 plt.semilogy(train_counter, train_grads, label='Loss Gradient', alpha=0.5)
 plt.semilogy(validation_counter, validation_losses, label='Validation Loss', alpha=0.5)
+plt.semilogy(train_counter, T_t_rmss, label=r'RMS $T_t$')
+plt.semilogy(train_counter, T_xx_rmss, label=r'RMS $T_{xx}$')
+plt.semilogy(train_counter, rel_rmss, label='Relative Loss RMS')
 plt.legend()
 plt.xlabel('Epoch')
 plt.ylabel('Loss')

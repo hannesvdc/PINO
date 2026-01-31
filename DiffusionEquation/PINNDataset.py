@@ -5,8 +5,7 @@ from torch.utils.data import Dataset
 from typing import Tuple
 
 class PINNDataset(Dataset):
-    def __init__(self, x_grid : pt.Tensor,
-                       N : int,
+    def __init__(self, N : int,
                        T_max : float,
                        tau_max : float,
                        dtype = pt.float64,
@@ -28,10 +27,9 @@ class PINNDataset(Dataset):
         self.T_s = pt.empty((N,1), dtype=dtype, requires_grad=False).uniform_( -self.T_max, self.T_max, generator=gen )
 
         # Also sample space and time
-        N_grid_points = pt.numel(x_grid)
-        indices = pt.randint(low=0, high=N_grid_points, size=(N,), generator=gen)
-        self.x = (pt.flatten(x_grid)[indices])[:,None]
+        self.x = pt.rand( (N,1), dtype=dtype, requires_grad=False, generator=gen)
         tau = tau_max * pt.rand( (N,1), dtype=dtype, requires_grad=False, generator=gen)
+        tau = tau.clip(min=1e-2)
         self.t = tau / self.k
 
     def __len__( self ):
@@ -47,7 +45,6 @@ if __name__ == '__main__':
     N = 10_000
     T_max = 10.0
     tau_max = 10.0
-    x_grid = pt.linspace( 0.0, 1.0, 51 )
-    dataset = PINNDataset( x_grid, N, T_max, tau_max )
+    dataset = PINNDataset( N, T_max, tau_max )
     print(dataset[3], len(dataset))
     print(dataset.all())
