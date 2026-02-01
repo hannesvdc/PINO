@@ -1,18 +1,16 @@
 import math
 import torch as pt
-from torch.utils.data import DataLoader
 from torch.optim import LBFGS
-from torch.optim.lr_scheduler import StepLR
 import matplotlib.pyplot as plt
 
-from PINNDataset import PINNDataset
 from FixedInitialPINN import FixedInitialPINN
 from Loss import HeatLoss
-from sampleInitialGP import gp
 
 dtype = pt.float64
+device = pt.device("cpu")
 pt.set_grad_enabled( True )
 pt.set_default_dtype( dtype )
+pt.set_default_device( device )
 
 # Create the initial condition. We want T_max to be ~95th percentile, so std=T_max/1.96
 T_max = 10.0
@@ -23,13 +21,13 @@ x_grid = pt.linspace(0.0, 1.0, N_grid_points)
 l = 0.12 # GP correlation length
 
 # Create the training and validation datasets
-store_directory = './Results/'
+store_directory = './Results/pinn/'
 u0 = pt.load(store_directory + 'initial.pth', weights_only=True)
-train_data = pt.load( store_directory + 'train_data.pth' ).to( dtype=dtype )
+train_data = pt.load( store_directory + 'train_data.pth', weights_only=True ).to( dtype=dtype )
 x_train = train_data[:,0:1]
 t_train = train_data[:,1:2]
 p_train = train_data[:,2:]
-validation_data = pt.load( store_directory + 'validation_data.pth' ).to( dtype=dtype )
+validation_data = pt.load( store_directory + 'validation_data.pth', weights_only=True ).to( dtype=dtype )
 x_validation = validation_data[:,0:1]
 t_validation = validation_data[:,1:2]
 p_validation = validation_data[:,2:]
@@ -38,6 +36,9 @@ p_validation = validation_data[:,2:]
 z = 64
 n_hidden_layers = 2
 model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, logk_max, u0, x_grid, l )
+model.load_state_dict( pt.load(store_directory + '/model_adam.pth', weights_only=True, map_location=device) )
+model = model.to( device=device, dtype=dtype )
+
 plot_grid = pt.linspace(0.0, 1.0, 1001)
 u0_int = model.evaluate_u0( plot_grid[:,None] )
 plt.plot( x_grid.cpu().numpy(), u0.cpu().numpy(), label="Exact Initial Condition")
@@ -46,11 +47,6 @@ plt.legend()
 plt.xlabel(r"$x$")
 plt.ylabel(r"$u_0(x)$")
 plt.show( )
-
-# Move the model to the GPU (and single precision dtype )
-device = pt.device("mps")
-dtype = pt.float32
-model = model.to( device=device, dtype=dtype )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
 # Create the Loss function
@@ -64,7 +60,7 @@ def getGradientNorm():
     return pt.norm(pt.cat(grads))
 
 # The L-BFGS closure
-last_state = {"loss" : None, "grad_norm" : None}
+last_state = {"loss" : None, "grad_norm" : None, "rel_rms" : None}
 all_loss_evalutaions = []
 all_grad_evaluations = []
 def closure():
@@ -72,13 +68,17 @@ def closure():
     optimizer.zero_grad( set_to_none=True )
 
     # Batched but Deterministic Loss for memory constraints
-    epoch_loss = loss_fn( model, x_train, t_train, p_train )
+    epoch_loss, rms, T_t_rms, T_xx_rms = loss_fn( model, x_train, t_train, p_train )
     epoch_loss.backward( )
 
     # Store some diagnostic information
     last_gradnorm = getGradientNorm().item()
+    rel_rms = rms / (T_t_rms.item() + T_xx_rms.item() + 1e-12)
     last_state["loss"] = epoch_loss.item()
     last_state["grad_norm"] = last_gradnorm # type: ignore
+    last_state["rel_rms"] = rel_rms
+    last_state["T_t rms"] = T_t_rms.item()
+    last_state["T_xx rms"] = T_xx_rms.item()
     all_loss_evalutaions.append( epoch_loss.item() )
     all_grad_evaluations.append( last_gradnorm )
 
@@ -89,7 +89,7 @@ def validate():
     model.eval()
 
     # Just the one validation batch
-    epoch_loss = loss_fn( model, t_validation, p_validation )
+    epoch_loss, _, _, _ = loss_fn( model, x_validation, t_validation, p_validation )
     
     return epoch_loss
 
@@ -111,6 +111,8 @@ try:
         step_norm = (w1 - w0).norm().item()
         print('\nTrain Epoch: {} \tLoss: {:.10E} \tLoss Gradient: {:.10E} \tStep Norm: {:.10E} \t Lr: {:.4E}'.format( 
             epoch, last_state["loss"], last_state["grad_norm"], step_norm, optimizer.param_groups[0]["lr"] ))
+        print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tLoss Relative RMS: {:.4E}'.format(
+            last_state["T_t rms"], last_state["T_xx rms"], last_state["rel_rms"] ))
         
         validation_loss = validate()
         print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))

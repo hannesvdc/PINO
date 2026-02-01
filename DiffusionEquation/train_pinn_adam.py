@@ -164,8 +164,6 @@ np.save( store_directory + 'Adam_Validation_Convergence.npy', np.hstack( (valida
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)
 plt.semilogy(train_counter, train_grads, label='Loss Gradient', alpha=0.5)
 plt.semilogy(validation_counter, validation_losses, label='Validation Loss', alpha=0.5)
-plt.semilogy(train_counter, T_t_rmss, label=r'RMS $T_t$')
-plt.semilogy(train_counter, T_xx_rmss, label=r'RMS $T_{xx}$')
 plt.semilogy(train_counter, rel_rmss, label='Relative Loss RMS')
 plt.legend()
 plt.xlabel('Epoch')
