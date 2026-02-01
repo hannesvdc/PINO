@@ -79,11 +79,11 @@ class FixedInitialPINN( nn.Module ):
         assert p.shape[1] == 2, "This model expects two parameters (k, T_s)"
 
         # Pre-process the parameters and input
-        T_s = p[:,1:2]
         k = p[:,0:1]
         logk_hat = pt.log(k) / self.logk_max # scale between -1 and 1
         tau = t * k
         tau_hat = tau / self.tau_max
+        T_s = p[:,1:2]
         
         # Pre-process the parameters and input
         u0_at_x = self.evaluate_u0( x )
