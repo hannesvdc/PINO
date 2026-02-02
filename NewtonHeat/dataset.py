@@ -1,7 +1,7 @@
 import torch as pt
 import math
 from torch.utils.data import Dataset
-
+import matplotlib.pyplot as plt
 from typing import Tuple
 
 class NewtonDataset(Dataset):
@@ -33,11 +33,16 @@ class NewtonDataset(Dataset):
 
         # Also sample the time-points
         if biased_tau:
-            tau_min = 1e-2
-            gamma = 2.0  # 1 = log-uniform, >1 biases small tau
-            u = pt.rand((N,1), device=device, dtype=dtype, generator=gen)
-            log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
-            tau = pt.exp(log_tau)
+            log_tau = pt.randn( (N,1), device=device, dtype=dtype, generator=gen)
+            log_tau = math.log(2.0) + 0.5*log_tau
+
+            #tau_min = 1e-2
+            #gamma = 2.0  # 1 = log-uniform, >1 biases small tau
+            #u = pt.rand((N,1), device=device, dtype=dtype, generator=gen)
+            #log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
+            tau = pt.exp(log_tau).clamp_max( tau_max )
+            plt.hist(tau.cpu().numpy(), bins=100, density=True)
+            plt.show()
         else:
             tau = tau_max * pt.rand( (N,1), device=device, dtype=dtype, requires_grad=False, generator=gen)
         self.t = tau / self.k

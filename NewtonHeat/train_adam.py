@@ -5,14 +5,14 @@ from torch.optim.lr_scheduler import StepLR
 import matplotlib.pyplot as plt
 
 from dataset import NewtonDataset
-from simple_model import PINO
-from advanced_model import AdvanedPhysicsPINO
+from model import PINO
 from loss import PINOLoss
 
 import argparse
 def parseArguments( ):
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--model_type', dest='model_type')
+    arg_parser.add_argument('--tau', dest='tau', default="unbiased")
+    arg_parser.add_argument('--time_factor', dest='time_factor', default="linear")
     return arg_parser.parse_args( )
 args = parseArguments()
 
@@ -27,31 +27,23 @@ T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
 N_train = 10_000
 N_validation = 5_000
-if args.model_type == 'simple':
-    train_dataset = NewtonDataset( N_train, T_max, tau_max, device, dtype )
-    validation_dataset = NewtonDataset( N_validation, T_max, tau_max, device, dtype )
-else:
-    train_dataset = NewtonDataset( N_train, T_max, tau_max, device, dtype, biased_tau=True )
-    validation_dataset = NewtonDataset( N_validation, T_max, tau_max, device, dtype, biased_tau=True )
+biased_tau = (args.tau == "biased")
+print(biased_tau)
+train_dataset = NewtonDataset( N_train, T_max, tau_max, device, dtype, biased_tau=biased_tau )
+validation_dataset = NewtonDataset( N_validation, T_max, tau_max, device, dtype, biased_tau=biased_tau )
 B = 128
 train_loader = DataLoader( train_dataset, batch_size=B, shuffle=True )
 validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shuffle=False )
 
 # Also store the dataset for later use
 store_directory = './Results/'
-pt.save( train_dataset.all().cpu(), store_directory + 'train_data_' + args.model_type + '.pth' )
-pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data_' + args.model_type + '.pth' )
+pt.save( train_dataset.all().cpu(), store_directory + 'train_data_' + args.time_factor + '_' + args.tau + '.pth' )
+pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data_' + args.time_factor + '_' + args.tau + '.pth' )
 
 # Create the PINO
 z = 32
 n_hidden_layers = 2
-if args.model_type == 'advanced':
-    model = AdvanedPhysicsPINO( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_min, train_dataset.logk_max ).to( device=device )
-elif args.model_type == "biased" or args.model_type == "simple":
-    model = PINO( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_min, train_dataset.logk_max ).to( device=device )
-else:
-    print('This model type is not supported.')
-    exit()
+model = PINO( n_hidden_layers, z, T_max, tau_max, train_dataset.logk_min, train_dataset.logk_max, time_factor=args.time_factor ).to( device=device )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 loss_fn = PINOLoss()
 
@@ -110,8 +102,8 @@ def train( epoch ):
     print('Total RMS: {:.4E} \tLoss Relative RMS: {:.4E}'.format( total_rms, rel_rms ))
     
     # Store the pretrained state
-    pt.save( model.state_dict(), store_directory + args.model_type + '_model_adam.pth')
-    pt.save( optimizer.state_dict(), store_directory + args.model_type + '_optimizer_adam.pth')
+    pt.save( model.state_dict(), store_directory + args.time_factor + '_' + args.tau + '_model_adam.pth')
+    pt.save( optimizer.state_dict(), store_directory + args.time_factor + '_' + args.tau + '_optimizer_adam.pth')
 
 # Validation Function 
 def validate( epoch ):
@@ -140,8 +132,8 @@ except KeyboardInterrupt:
 
 # Store the per-epoch convergence results
 import numpy as np
-np.save( store_directory + args.model_type + '_Adam_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
-np.save( store_directory + args.model_type + '_Adam_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses) ) )
+np.save( store_directory +  args.time_factor + '_' + args.tau + '_Adam_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory +  args.time_factor + '_' + args.tau + '_Adam_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses) ) )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)

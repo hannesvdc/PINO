@@ -1,14 +1,14 @@
 import torch as pt
 import matplotlib.pyplot as plt
 
-from simple_model import PINO
-from advanced_model import AdvanedPhysicsPINO
+from model import PINO
 from dataset import NewtonDataset
 
 import argparse
 def parseArguments( ):
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--model_type', dest='model_type')
+    arg_parser.add_argument('--tau', dest='tau', default="unbiased")
+    arg_parser.add_argument('--time_factor', dest='time_factor', default="linear")
     return arg_parser.parse_args( )
 args = parseArguments()
 
@@ -20,22 +20,17 @@ pt.set_grad_enabled(True)
 
 # Create the test
 T_max = 10.0
-tau_max = 10.0
-N_test = 100
+tau_max = 8.0
+N_test = 10000
 test_dataset = NewtonDataset( N_test, T_max, tau_max, device, dtype, test=True )
 
 # Load the model
 z = 32
 n_hidden_layers = 2
-if args.model_type == 'advanced':
-    model = AdvanedPhysicsPINO( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_min, test_dataset.logk_max ).to( device=device )
-elif args.model_type == "biased" or args.model_type == "simple":
-    model = PINO( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_min, test_dataset.logk_max ).to( device=device )
-else:
-    print('This model type is not supported.')
-    exit()
+model = PINO( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_min, test_dataset.logk_max, time_factor=args.time_factor ).to( device=device )
 store_directory = './Results/'
-model.load_state_dict( pt.load( store_directory + args.model_type + '_model_adam.pth', weights_only=True, map_location=device ) )
+# model.load_state_dict( pt.load( store_directory + args.time_factor + '_' + args.tau + '_model_adam.pth', weights_only=True, map_location=device ) )
+model.load_state_dict( pt.load( store_directory + 'model_lbfgs.pth', weights_only=True, map_location=device ) )
 
 # Evaluate the model for every parameter combination in the dataset. I know for-loops are inefficient but IDC
 N_t_grid = 100
@@ -63,7 +58,7 @@ for n in range( N_test ):
 
 # Plot the master curve
 plt.figure()
-plt.plot( tau_grid.numpy(), pt.mean(T_evaluations, dim=1).detach().numpy(), color='tab:blue', label='Averaged PINO Master Curve')
+plt.plot( tau_grid.numpy(), pt.mean(T_evaluations, dim=1).detach().numpy(), color='tab:blue', label='PINO Master Curve')
 plt.plot( tau_grid.numpy(), pt.exp(-tau_grid).detach().numpy(), color='tab:orange', label=r"$\exp(-kt)$")
 plt.xlabel(r"$k t$")
 plt.ylabel(r"$\frac{T(kt)-T_{\infty}}{T_0 - T_{\infty}}$", rotation=0)
@@ -88,12 +83,12 @@ _, p = test_dataset[idx]
 T0 = p[0]
 k = p[1]
 T_inf = p[2]
-print(p)
 t_grid = tau_grid / k
-T_t = evaluatePINO( t_grid, p, verbose=True)
+T_t = evaluatePINO( t_grid, p )
 plt.figure()
 plt.plot(t_grid.detach().numpy(), T_t.detach().numpy(), label="PINO Evolution")
 plt.plot(t_grid.detach().numpy(), T_inf + (T0 - T_inf)*pt.exp(-k*t_grid.detach().numpy()), label="Analytic Solution")
 plt.xlabel(r"$t$")
+plt.title(rf"$T_0 = {round(float(T0),1)}, \ k = {round(float(k),1)}, \ T_s = {round(float(T_inf),1)}$")
 plt.legend()
 plt.show()

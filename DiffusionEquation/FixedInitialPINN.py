@@ -95,6 +95,6 @@ class FixedInitialPINN( nn.Module ):
 
         # Form the output 
         g = self.output_layer( y )
-        time_factor = 1.0 - pt.exp(-tau)
+        time_factor = tau / (1.0 + tau)
         u_hat = u0_at_x + time_factor * x * (1.0 - x) * g
         return T_s + u_hat * self.T_max

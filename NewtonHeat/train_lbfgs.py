@@ -4,17 +4,15 @@ from torch.utils.data import TensorDataset
 from torch.optim import LBFGS
 import matplotlib.pyplot as plt
 
-from simple_model import PINO
-from advanced_model import AdvanedPhysicsPINO
+from model import PINO
 from loss import PINOLoss
 
 # Load commandline arguments
 import argparse
 def parseArguments( ):
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--restart', dest='restart', action='store_true')
-    arg_parser.add_argument('--no-restart', dest='restart', action='store_false')
-    arg_parser.add_argument('--model_type', dest='model_type')
+    arg_parser.add_argument('--tau', dest='tau', default="unbiased")
+    arg_parser.add_argument('--time_factor', dest='time_factor', default="linear")
     return arg_parser.parse_args( )
 args = parseArguments()
 
@@ -25,10 +23,10 @@ pt.set_default_dtype( dtype )
 pt.set_grad_enabled(True)
 
 store_directory = './Results/' 
-train_data = pt.load( store_directory + 'train_data_' + args.model_type + '.pth' , map_location=device ).to( dtype=dtype )
+train_data = pt.load( store_directory + 'train_data_' + args.time_factor + '_' + args.tau + '.pth' , map_location=device ).to( dtype=dtype )
 t_train = train_data[:,0:1]
 p_train = train_data[:,1:]
-validation_data = pt.load( store_directory + 'validation_data_' + args.model_type + '.pth' , map_location=device ).to( dtype=dtype )
+validation_data = pt.load( store_directory + 'validation_data_' + args.time_factor + '_' + args.tau + '.pth' , map_location=device ).to( dtype=dtype )
 t_validation = validation_data[:,0:1]
 p_validation = validation_data[:,1:]
 
@@ -39,24 +37,14 @@ validation_dataset = TensorDataset( t_validation, p_validation )
 
 # Create the PINO model and loss
 T_max = 10.0
-tau_max = 10.0
+tau_max = 8.0
 logk_min = math.log( 1e-2 )
 logk_max = math.log( 1e2 )
 z = 32
-if args.model_type == 'advanced':
-    n_hidden_layers = 2
-    model = AdvanedPhysicsPINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( device=device )
-elif args.model_type == "biased" or args.model_type == "simple":
-    n_hidden_layers = 2
-    model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( device=device )
-else:
-    print('This model type is not supported.')
-    exit()
+n_hidden_layers = 2
+model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max, time_factor=args.time_factor ).to( device=device )
+model.load_state_dict( pt.load( store_directory + args.time_factor + '_' + args.tau + '_model_adam.pth', weights_only=True, map_location=device ) )
 
-if args.restart:
-    model.load_state_dict( pt.load( store_directory + args.model_type + '_model_lbfgs.pth', weights_only=True, map_location=device ) )
-else:
-    model.load_state_dict( pt.load( store_directory + args.model_type + '_model_adam.pth', weights_only=True, map_location=device ) )
 loss_fn = PINOLoss()
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ])) 
 
@@ -65,8 +53,6 @@ lr = 1.0
 max_iter = 50
 history_size = 50
 optimizer = LBFGS( model.parameters(), lr, max_iter=max_iter, line_search_fn="strong_wolfe", history_size=history_size )
-if args.restart:
-    optimizer.load_state_dict( pt.load( store_directory + args.model_type + '_optimizer_lbfgs.pth' ) )
 def getGradientNorm():
     grads = [p.grad.view(-1) for p in model.parameters() if p.grad is not None]
     return pt.norm(pt.cat(grads))
@@ -124,8 +110,8 @@ try:
         print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))
         
         # Store the pretrained state
-        pt.save( model.state_dict(), store_directory + args.model_type + '_model_lbfgs.pth')
-        pt.save( optimizer.state_dict(), store_directory + args.model_type + '_optimizer_lbfgs.pth')
+        pt.save( model.state_dict(), store_directory + 'model_lbfgs.pth')
+        pt.save( optimizer.state_dict(), store_directory +'optimizer_lbfgs.pth')
 
         train_counter.append( epoch )
         train_losses.append( last_state["loss"] )
@@ -147,8 +133,8 @@ except KeyboardInterrupt:
 
 # Store the per-epoch convergence results
 import numpy as np
-np.save( store_directory + args.model_type + '_LBFGS_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
-np.save( store_directory + args.model_type + '_LBFGS_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses, learning_rates) ) )
+np.save( store_directory + 'LBFGS_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory + 'LBFGS_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses, learning_rates) ) )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)
