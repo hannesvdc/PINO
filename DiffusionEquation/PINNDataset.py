@@ -34,7 +34,6 @@ class PINNDataset(Dataset):
         u = pt.rand((N,1), dtype=dtype, generator=gen)
         log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
         tau = pt.exp(log_tau)
-        print(pt.mean(tau))
         self.t = tau / self.k
 
     def __len__( self ):

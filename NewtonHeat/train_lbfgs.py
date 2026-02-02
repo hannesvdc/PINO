@@ -25,10 +25,10 @@ pt.set_default_dtype( dtype )
 pt.set_grad_enabled(True)
 
 store_directory = './Results/' 
-train_data = pt.load( store_directory + 'train_data.pth', map_location=device ).to( dtype=dtype )
+train_data = pt.load( store_directory + 'train_data_' + args.model_type + '.pth' , map_location=device ).to( dtype=dtype )
 t_train = train_data[:,0:1]
 p_train = train_data[:,1:]
-validation_data = pt.load( store_directory + 'validation_data.pth', map_location=device ).to( dtype=dtype )
+validation_data = pt.load( store_directory + 'validation_data_' + args.model_type + '.pth' , map_location=device ).to( dtype=dtype )
 t_validation = validation_data[:,0:1]
 p_validation = validation_data[:,1:]
 
@@ -44,17 +44,11 @@ logk_min = math.log( 1e-2 )
 logk_max = math.log( 1e2 )
 z = 32
 if args.model_type == 'advanced':
-    n_hidden_layers = 1
+    n_hidden_layers = 2
     model = AdvanedPhysicsPINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( device=device )
-    step_size = 100
-elif args.model_type == 'initial':
+elif args.model_type == "biased" or args.model_type == "simple":
     n_hidden_layers = 2
     model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( device=device )
-    step_size = 1000
-elif args.model_type == "simple":
-    n_hidden_layers = 1
-    model = PINO( n_hidden_layers, z, T_max, tau_max, logk_min, logk_max ).to( device=device )
-    step_size = 1000
 else:
     print('This model type is not supported.')
     exit()
@@ -86,7 +80,7 @@ def closure():
     optimizer.zero_grad( set_to_none=True )
 
     # Batched but Deterministic Loss for memory constraints
-    epoch_loss = loss_fn( model, t_train, p_train )
+    epoch_loss, _, _ = loss_fn( model, t_train, p_train )
     epoch_loss.backward( )
 
     # Store some diagnostic information
@@ -103,7 +97,7 @@ def validate():
     model.eval()
 
     # Just the one validation batch
-    epoch_loss = loss_fn( model, t_validation, p_validation )
+    epoch_loss, _, _ = loss_fn( model, t_validation, p_validation )
     
     return epoch_loss
 

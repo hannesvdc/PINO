@@ -1,7 +1,5 @@
 import torch as pt
 import torch.nn as nn
-
-from FiLM import FiLMLayer
     
 class PINO( nn.Module ):
     """
@@ -31,15 +29,12 @@ class PINO( nn.Module ):
         self.logk_min = logk_min
         self.logk_max = logk_max
 
-        # Different FiLM module per layer
-        self.FiLM_layers = nn.ModuleList( FiLMLayer(z) for _ in range(n_hidden_layers) )
-
         # Hidden layers with differentiable activation function
         self.n_hidden_layers = n_hidden_layers
         hidden_layers = []
         self.act = nn.Tanh()
         for n in range(n_hidden_layers):
-            n_inputs = 1 if n == 0 else z
+            n_inputs = 4 if n == 0 else z # (tau, log k, T0_hat, T_s_hat)
             hidden_layers.append( nn.Linear(n_inputs, z, bias=True) )
         self.layers = nn.ModuleList( hidden_layers )
 
@@ -53,20 +48,20 @@ class PINO( nn.Module ):
         
         # Preprocess the parameters
         T0_hat = p[:,0:1] / self.T_max
-        T_hat_inf = p[:,2:3] / self.T_max
+        T_s_hat = p[:,2:3] / self.T_max
         k = p[:,1:2].clamp_min(1e-12)
         logk_hat = (pt.log(k) - self.logk_min) / (self.logk_max - self.logk_min)
-        p_film = pt.cat( ( T0_hat - T_hat_inf, logk_hat, T_hat_inf ), dim=1 )
 
         # Pass through the hidden layers
         tau = t * k
-        x = tau / self.tau_max
+        tau_hat = tau / self.tau_max
+        x = pt.cat( (tau_hat, logk_hat, T0_hat, T_s_hat), dim=1 )
         for n in range( self.n_hidden_layers ):
-            gamma, beta = self.FiLM_layers[n]( p_film )
-            x = gamma * self.layers[n](x) + beta
+            x = self.layers[n](x)
             x = self.act( x )
 
         # Calculate the final output and enforce the Dirichlet boundary conditions.
         x = self.output_layer( x ) # (B,) learns the temperature delta (in T_max units)
-        T_hat = T0_hat + t * x
+        time_factor = 1.0 - pt.exp(-tau)
+        T_hat = T0_hat + time_factor * x
         return T_hat * self.T_max

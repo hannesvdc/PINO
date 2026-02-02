@@ -1,6 +1,8 @@
 import torch as pt
 import torch.nn as nn
 
+from typing import Tuple
+
 class PINOLoss( nn.Module ):
     def __init__( self, eps=1e-12 ):
         super().__init__()
@@ -9,7 +11,7 @@ class PINOLoss( nn.Module ):
     def forward(self,
                 model : nn.Module,
                 t : pt.Tensor,
-                p : pt.Tensor) -> pt.Tensor:
+                p : pt.Tensor) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
         k = p[:,1:2]
         T_inf = p[:,2:]
 
@@ -24,5 +26,7 @@ class PINOLoss( nn.Module ):
                                  create_graph=True )[0]
         eq = dT_t / (k + self.eps) + (T_t - T_inf)
         loss = pt.mean( eq**2 )
+        loss_rms = loss.sqrt()
+        total_rms = pt.mean( (dT_t / (k + self.eps))**2 ).sqrt() + pt.mean( (T_t - T_inf)**2 ).sqrt()
 
-        return loss
+        return loss, loss_rms, total_rms

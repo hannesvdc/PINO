@@ -10,6 +10,7 @@ class NewtonDataset(Dataset):
                       tau_max : float,
                       device=pt.device('cpu'), 
                       dtype=pt.float32,
+                      biased_tau=False,
                       test=False):
         super().__init__()
 
@@ -31,7 +32,14 @@ class NewtonDataset(Dataset):
         self.T_inf = pt.empty((N,1), device=device, dtype=dtype, requires_grad=False).uniform_( -self.T_max, self.T_max, generator=gen )
 
         # Also sample the time-points
-        tau = tau_max * pt.rand( (N,1), device=device, dtype=dtype, requires_grad=False, generator=gen)
+        if biased_tau:
+            tau_min = 1e-2
+            gamma = 2.0  # 1 = log-uniform, >1 biases small tau
+            u = pt.rand((N,1), device=device, dtype=dtype, generator=gen)
+            log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
+            tau = pt.exp(log_tau)
+        else:
+            tau = tau_max * pt.rand( (N,1), device=device, dtype=dtype, requires_grad=False, generator=gen)
         self.t = tau / self.k
 
     def __len__( self ):
