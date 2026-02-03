@@ -58,7 +58,7 @@ def getGradientNorm():
     return pt.norm(pt.cat(grads))
 
 # The L-BFGS closure
-last_state = {"loss" : None, "grad_norm" : None}
+last_state = {"loss" : None, "grad_norm" : None, "rel_rms" : None}
 all_loss_evalutaions = []
 all_grad_evaluations = []
 def closure():
@@ -66,13 +66,15 @@ def closure():
     optimizer.zero_grad( set_to_none=True )
 
     # Batched but Deterministic Loss for memory constraints
-    epoch_loss, _, _ = loss_fn( model, t_train, p_train )
+    epoch_loss, loss_rms, total_rms  = loss_fn( model, t_train, p_train )
     epoch_loss.backward( )
+    rel_rms = loss_rms / (total_rms + 1e-12)
 
     # Store some diagnostic information
     last_gradnorm = getGradientNorm().item()
     last_state["loss"] = epoch_loss.item()
     last_state["grad_norm"] = last_gradnorm # type: ignore
+    last_state["rel_rms"] = rel_rms.item()
     all_loss_evalutaions.append( epoch_loss.item() )
     all_grad_evaluations.append( last_gradnorm )
 
@@ -95,6 +97,7 @@ train_losses = []
 train_grads = []
 validation_counter = []
 validation_losses = []
+rel_rms_s = []
 
 epoch = 1
 try:
@@ -116,6 +119,7 @@ try:
         train_counter.append( epoch )
         train_losses.append( last_state["loss"] )
         train_grads.append( last_state["grad_norm"] )
+        rel_rms_s.append( last_state["rel_rms"] )
         validation_counter.append( epoch )
         validation_losses.append( validation_loss.item() )
         learning_rates.append( optimizer.param_groups[0]["lr"] )
@@ -139,7 +143,9 @@ np.save( store_directory + 'LBFGS_Validation_Convergence.npy', np.hstack( (valid
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)
 plt.semilogy(train_counter, train_grads, label='Loss Gradient', alpha=0.5)
+plt.semilogy(train_counter, rel_rms_s, label='Relative Loss RMS', alpha=0.5)
 plt.semilogy(validation_counter, validation_losses, label='Validation Loss', alpha=0.5)
+
 plt.legend()
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
