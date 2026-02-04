@@ -132,6 +132,8 @@ try:
         
         # Update to the next epoch.
         epoch += 1
+    else:
+        print('L-BFGS is done converging.')
 except KeyboardInterrupt:
     pass
 
