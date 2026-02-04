@@ -46,7 +46,7 @@ validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shu
 store_directory = './Results/pinn/'
 pt.save( train_dataset.all().cpu(), store_directory + 'train_data_' + args.tau + '.pth' )
 pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data_' + args.tau + '.pth' )
-pt.save( u0, store_directory + 'initial.pth')
+pt.save( u0, store_directory + 'initial_' + args.tau + '.pth')
 
 # Create the PINO
 z = 64

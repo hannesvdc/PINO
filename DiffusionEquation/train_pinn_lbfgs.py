@@ -12,6 +12,13 @@ pt.set_grad_enabled( True )
 pt.set_default_dtype( dtype )
 pt.set_default_device( device )
 
+import argparse
+def parseArguments( ):
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--tau', dest='tau', default="extra_large")
+    return arg_parser.parse_args( )
+args = parseArguments()
+
 # Create the initial condition. We want T_max to be ~95th percentile, so std=T_max/1.96
 T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
@@ -22,12 +29,12 @@ l = 0.12 # GP correlation length
 
 # Create the training and validation datasets
 store_directory = './Results/pinn/'
-u0 = pt.load(store_directory + 'initial.pth', weights_only=True)
-train_data = pt.load( store_directory + 'train_data.pth', weights_only=True ).to( dtype=dtype )
+u0 = pt.load(store_directory + 'initial_' + args.tau + '.pth', weights_only=True)
+train_data = pt.load( store_directory + 'train_data_' + args.tau + '.pth', weights_only=True ).to( dtype=dtype )
 x_train = train_data[:,0:1]
 t_train = train_data[:,1:2]
 p_train = train_data[:,2:]
-validation_data = pt.load( store_directory + 'validation_data.pth', weights_only=True ).to( dtype=dtype )
+validation_data = pt.load( store_directory + 'validation_data_' + args.tau + '.pth', weights_only=True ).to( dtype=dtype )
 x_validation = validation_data[:,0:1]
 t_validation = validation_data[:,1:2]
 p_validation = validation_data[:,2:]
@@ -36,7 +43,7 @@ p_validation = validation_data[:,2:]
 z = 64
 n_hidden_layers = 2
 model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, logk_max, u0, x_grid, l )
-model.load_state_dict( pt.load(store_directory + '/model_adam.pth', weights_only=True, map_location=device) )
+model.load_state_dict( pt.load(store_directory + '/model_adam_' + args.tau + '.pth', weights_only=True, map_location=device) )
 model = model.to( device=device, dtype=dtype )
 
 plot_grid = pt.linspace(0.0, 1.0, 1001)
@@ -118,8 +125,8 @@ try:
         print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))
         
         # Store the pretrained state
-        pt.save( model.state_dict(), store_directory + 'model_lbfgs.pth')
-        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs.pth')
+        pt.save( model.state_dict(), store_directory + 'model_lbfgs_' + args.tau + '.pth')
+        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs_' + args.tau + '.pth')
 
         train_counter.append( epoch )
         train_losses.append( last_state["loss"] )
@@ -141,8 +148,8 @@ except KeyboardInterrupt:
 
 # Store the per-epoch convergence results
 import numpy as np
-np.save( store_directory + 'LBFGS_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
-np.save( store_directory + 'LBFGS_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses, learning_rates) ) )
+np.save( store_directory + 'LBFGS_Training_Convergence_' + args.tau + '.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory + 'LBFGS_Validation_Convergence_' + args.tau + '.npy', np.hstack( (validation_counter, validation_losses, learning_rates) ) )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)

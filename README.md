@@ -1,16 +1,37 @@
-# PINO - Physics-Informed Neural Operators
-This repository contains my experiments with Physics-Informed Neural Operators (PINOs). Physics-Informed learning has great potential, but for some reason I have never gotten it to work for a real physical model. My goal with this repository is to change that; starting small to master the basics but with the express end goal of learning the 3D solution to a second-order PDE. The precise PDE will be decided later, but it will be a real challenge! 
+# PINO – Physics-Informed Neural Operators
 
-Stay tuned and star this repo if you're interested in following my journey!
+This repository contains my experiments with Physics-Informed Neural Operators (PINOs).  
+Physics-informed learning has huge potential to transform how we do scientific modeling and discovery — but so far, I’ve personally struggled to make these methods work on even moderately realistic physical systems.
 
-There are currently two projects:
--  `NewtonHeat` contains a simple PINO that learns the solution $T(t)$ to Newton's heat law $$\frac{dT(t)}{dt} = -k (T(t) - T_{\infty})$$ with initial condition $T(0) = T_0$. The PINO learns the temperature evolution for any combination of the three model parameteres $(T_0, k, T_{\infty})$.
+The goal of this repo is to change that. I’m starting from very simple models and gradually building toward learning the solution operator of a 3D second-order PDE with non-trivial boundary conditions. The exact PDE is still TBD and will evolve with my interests — but two outcomes are guaranteed: lots of learning, and plenty of frustration.
 
--  2D Steady-State Linear Elasticity equation. The code is spread over `PINN_DeepONet`, `Residual_PINN_Deeponet` and `FiLM_PINN`. This is mostly a learning project for now. None of my approaches have worked yet, which prompted me to go back to basics in the first example.
+If you’re interested in PINNs, PINOs, or scientific ML more broadly, feel free to star the repo and follow along.
 
-I explain these projects and my approach in much more detail below. I will keep the repo and README updated as much as possible.
+## What’s in this repository?
 
-**Just me being pedantic** An operator is a mathematical object that maps functions to functions. The term 'Physics-Informed Neural Operator' is therefore not always correct. For example, in Newton's Heat Law example, we map a discrete state of three parameters onto a scalar variable. The NN is a function, not an operator, but I will mostly ignore this abuse of notation.
+There are currently three main projects:
 
+- **`NewtonHeat`**  
+  A simple PINO for Newton’s law of cooling  
+  $$
+  \frac{dT(t)}{dt} = -k (T(t) - T_s), \quad T(0) = T_0.
+  $$  
+  The model learns the temperature evolution $T(t)$ for arbitrary parameter triples $(T_0, k, T_s)$.
 
-## Starting Simple: Newton's Heat Law
+- **`DiffusionEquation`**  
+  A PINO for the 1D heat equation  
+  $$
+  \frac{\partial T}{\partial t} = \kappa \frac{\partial^2 T}{\partial x^2},
+  $$  
+  with Dirichlet boundary conditions $(0,t) = T(1,t) = T_s$ and initial condition $T(x,0)=T_0(x)$.  
+  At the moment, I have a working model for a *fixed* initial condition; extending this to a true operator over random initial conditions is ongoing work.
+
+- **2D Steady-State Linear Elasticity**  
+  Experiments using PINNs / DeepONets / FiLM-based PINNs (see `PINN_DeepONet`, `Residual_PINN_DeepONet`, `FiLM_PINN`).  
+  This is currently exploratory and largely unsuccessful — which is what motivated me to go back to much simpler test cases.
+
+I describe each experiment and my design choices in more detail in the individual project folders. Also check out my [blog](https://hvandecasteele.com/blog/) and [substack](https://hannesvdc.substack.com) where I regularly post about the things I learned, some results for each project, and the mathematics behind each problem (and many other things.)
+
+## A small terminological nitpick
+
+An operator maps functions to functions. Strictly speaking, not all examples in this repository qualify as “neural operators” (e.g. Newton’s law maps a finite-dimensional parameter vector to a scalar trajectory). Some of these models are therefore just physics-informed neural networks in disguise. I’ll mostly ignore this distinction for readability.
