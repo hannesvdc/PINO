@@ -13,6 +13,13 @@ dtype = pt.float64
 pt.set_grad_enabled( True )
 pt.set_default_dtype( dtype )
 
+import argparse
+def parseArguments( ):
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--tau', dest='tau', default="extra_large")
+    return arg_parser.parse_args( )
+args = parseArguments()
+
 # Create the initial condition. We want T_max to be ~95th percentile, so std=T_max/1.96
 T_max = 10.0
 N_grid_points = 51
@@ -29,16 +36,16 @@ T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
 N_train = 10_000
 N_validation = 5_000
-train_dataset = PINNDataset( N_train, T_max, tau_max, dtype, test=False)
-validation_dataset = PINNDataset( N_validation, T_max, tau_max, dtype, test=False)
+train_dataset = PINNDataset( N_train, T_max, tau_max, dtype, test=False, tau_sampling=args.tau)
+validation_dataset = PINNDataset( N_validation, T_max, tau_max, dtype, test=False, tau_sampling=args.tau)
 B = 128
 train_loader = DataLoader( train_dataset, batch_size=B, shuffle=True )
 validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shuffle=False )
 
 # Also store the dataset for later use
 store_directory = './Results/pinn/'
-pt.save( train_dataset.all().cpu(), store_directory + 'train_data.pth' )
-pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data.pth' )
+pt.save( train_dataset.all().cpu(), store_directory + 'train_data_' + args.tau + '.pth' )
+pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data_' + args.tau + '.pth' )
 pt.save( u0, store_directory + 'initial.pth')
 
 # Create the PINO
@@ -124,8 +131,8 @@ def train( epoch ):
         T_t_rms, T_xx_rms, rms, rel_rms ))
     
     # Store the pretrained state
-    pt.save( model.state_dict(), store_directory + 'model_adam.pth')
-    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam.pth')
+    pt.save( model.state_dict(), store_directory + 'model_adam_' + args.tau + '.pth')
+    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam_' + args.tau + '.pth')
 
 # Validation Function 
 def validate( epoch ):
@@ -157,8 +164,8 @@ except KeyboardInterrupt:
 
 # Store the per-epoch convergence results
 import numpy as np
-np.save( store_directory + 'Adam_Training_Convergence.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
-np.save( store_directory + 'Adam_Validation_Convergence.npy', np.hstack( (validation_counter, validation_losses) ) )
+np.save( store_directory + 'Adam_Training_Convergence_' + args.tau + '.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory + 'Adam_Validation_Convergence_' + args.tau + '.npy', np.hstack( (validation_counter, validation_losses) ) )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)

@@ -9,7 +9,8 @@ class PINNDataset(Dataset):
                        T_max : float,
                        tau_max : float,
                        dtype = pt.float64,
-                       test=False):
+                       test=False,
+                       tau_sampling = "default"):
         super().__init__()
 
         self.T_max = T_max
@@ -29,11 +30,30 @@ class PINNDataset(Dataset):
         self.x = pt.rand( (N,1), dtype=dtype, requires_grad=False, generator=gen)
 
         # Put most tau closer to 0
-        tau_min = 1e-2
-        gamma = 2.0  # 1 = log-uniform, >1 biases small tau
-        u = pt.rand((N,1), dtype=dtype, generator=gen)
-        log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
-        tau = pt.exp(log_tau)
+        if tau_sampling == "default":
+            tau_min = 1e-2
+            gamma = 2.0  # 1 = log-uniform, >1 biases small tau
+            u = pt.rand((N,1), dtype=dtype, generator=gen)
+            log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
+            tau = pt.exp(log_tau)
+        elif tau_sampling == "extra_large":
+            tau_min = 1e-2
+            gamma = 2.0  # 1 = log-uniform, >1 biases small tau
+            u = pt.rand((int(0.7*N),1), dtype=dtype, generator=gen)
+            log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
+            tau = pt.exp(log_tau)
+
+            N_late = int(0.3 * N)  # 30% extra points
+            u_late = pt.rand((N_late, 1), dtype=dtype, generator=gen)
+            tau_late = 1.0 + (tau_max - 1.0) * u_late
+            
+            # concatenate
+            tau = pt.cat([tau, tau_late], dim=0)
+        
+        import matplotlib.pyplot as plt
+        plt.hist( tau.numpy(), bins=50, density=True )
+        plt.show()
+
         self.t = tau / self.k
 
     def __len__( self ):

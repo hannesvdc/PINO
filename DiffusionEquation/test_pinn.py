@@ -78,10 +78,10 @@ for n in range(1, N_tau_fd):
 T_fd_avg = pt.mean(T_sol_fd,dim=0)
 
 # Make the decay
-plt.semilogy( tau_grid.numpy(), pt.abs(a1_ratio).detach().numpy(), label=r'PINO $a_1$ Ratio')
-plt.semilogy( tau_grid.numpy(), pt.abs(a1_ratio_analytic).numpy(), label=r'Analytic $a_1$ Ratio')
-plt.semilogy( tau_grid.numpy(), pt.abs(a2_ratio).detach().numpy(), label=r'PINO $a_2$ Ratio')
-plt.semilogy( tau_grid.numpy(), pt.abs(a2_ratio_analytic).numpy(), label=r'Analytic $a_2$ Ratio')
+plt.plot( tau_grid.numpy(), pt.abs(a1_ratio).detach().numpy(), label=r'PINO $a_1$ Ratio')
+plt.plot( tau_grid.numpy(), pt.abs(a1_ratio_analytic).numpy(), label=r'Analytic $a_1$ Ratio')
+plt.plot( tau_grid.numpy(), pt.abs(a2_ratio).detach().numpy(), label=r'PINO $a_2$ Ratio')
+plt.plot( tau_grid.numpy(), pt.abs(a2_ratio_analytic).numpy(), label=r'Analytic $a_2$ Ratio')
 plt.xlabel(r'$\tau$')
 plt.title(r"$\frac{a_n(t)}{a_n(0)}$")
 plt.legend()
