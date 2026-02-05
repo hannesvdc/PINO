@@ -16,6 +16,7 @@ import argparse
 def parseArguments( ):
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--tau', dest='tau', default="extra_large")
+    arg_parser.add_argument('--time_factor', dest='time_factor', default="tf")
     return arg_parser.parse_args( )
 args = parseArguments()
 
@@ -29,12 +30,12 @@ l = 0.12 # GP correlation length
 
 # Create the training and validation datasets
 store_directory = './Results/pinn/'
-u0 = pt.load(store_directory + 'initial_' + args.tau + '.pth', weights_only=True)
-train_data = pt.load( store_directory + 'train_data_' + args.tau + '.pth', weights_only=True ).to( dtype=dtype )
+u0 = pt.load(store_directory + 'initial_' + args.tau + '_' + args.time_factor + '.pth', weights_only=True)
+train_data = pt.load( store_directory + 'train_data_' + args.tau + '_' + args.time_factor + '.pth', weights_only=True ).to( dtype=dtype )
 x_train = train_data[:,0:1]
 t_train = train_data[:,1:2]
 p_train = train_data[:,2:]
-validation_data = pt.load( store_directory + 'validation_data_' + args.tau + '.pth', weights_only=True ).to( dtype=dtype )
+validation_data = pt.load( store_directory + 'validation_data_' + args.tau + '_' + args.time_factor + '.pth', weights_only=True ).to( dtype=dtype )
 x_validation = validation_data[:,0:1]
 t_validation = validation_data[:,1:2]
 p_validation = validation_data[:,2:]
@@ -43,7 +44,7 @@ p_validation = validation_data[:,2:]
 z = 64
 n_hidden_layers = 2
 model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, logk_max, u0, x_grid, l )
-model.load_state_dict( pt.load(store_directory + '/model_adam_' + args.tau + '.pth', weights_only=True, map_location=device) )
+model.load_state_dict( pt.load(store_directory + '/model_adam_' + args.tau + '_' + args.time_factor + '.pth', weights_only=True, map_location=device) )
 model = model.to( device=device, dtype=dtype )
 
 plot_grid = pt.linspace(0.0, 1.0, 1001)
@@ -125,8 +126,8 @@ try:
         print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))
         
         # Store the pretrained state
-        pt.save( model.state_dict(), store_directory + 'model_lbfgs_' + args.tau + '.pth')
-        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs_' + args.tau + '.pth')
+        pt.save( model.state_dict(), store_directory + 'model_lbfgs_' + args.tau + '_' + args.time_factor + '.pth')
+        pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs_' + args.tau + '_' + args.time_factor + '.pth')
 
         train_counter.append( epoch )
         train_losses.append( last_state["loss"] )
@@ -136,8 +137,8 @@ try:
         learning_rates.append( optimizer.param_groups[0]["lr"] )
 
         if step_norm < 1e-8:
-            print('Lowering L-BFGS Learning Rate to', 0.3 * lr)
             lr = 0.3 * lr
+            print('Lowering L-BFGS Learning Rate to', lr)
             for g in optimizer.param_groups:
                 g["lr"] = lr
         

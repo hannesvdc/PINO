@@ -20,11 +20,11 @@ test_dataset = PINNDataset( N_test, T_max, tau_max, test=True )
 
 # Create the training and validation datasets
 store_directory = './Results/pinn/'
-u0 = pt.load(store_directory + 'initial.pth', weights_only=True)
+u0 = pt.load(store_directory + 'initial_extra_large.pth', weights_only=True)
 z = 64
 n_hidden_layers = 2
 model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, logk_max, u0, x_grid, l )
-model.load_state_dict( pt.load(store_directory + '/model_lbfgs.pth', weights_only=True, map_location=pt.device("cpu")) )
+model.load_state_dict( pt.load(store_directory + '/model_lbfgs_extra_large.pth', weights_only=True, map_location=pt.device("cpu")) )
 
 # General PINO evaluation script
 N_tau = 10001
@@ -93,19 +93,4 @@ plt.xlabel(r'$\tau$')
 plt.title(r"$|a_n(t)|$")
 plt.legend()
 
-plt.figure()
-plt.plot( tau_grid, T_pinn_avg.detach().numpy())
-plt.plot( tau_grid_fd, T_fd_avg.detach().numpy())
 plt.show()
-# Compare the PINN and FD Surface plots.
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection="3d")
-# X, Y = pt.meshgrid( x_grid, tau_grid, indexing="ij" )
-# X_fd, Y_fd = pt.meshgrid( x_grid, tau_grid_fd, indexing="ij" )
-# print(X.shape, T_sol_pinn.shape, T_sol_fd.shape)
-# ax.plot_surface( X, Y, T_sol_pinn.detach().numpy(), label="PINN" ) # pyright: ignore[reportAttributeAccessIssue]
-# #ax.plot_surface( X_fd, Y_fd, T_sol_fd.detach().numpy(), label="Finite Differences" ) # pyright: ignore[reportAttributeAccessIssue]
-# ax.set_xlabel(r"$x$")
-# ax.set_ylabel(r"$\tau$")
-# ax.legend()
-# plt.show()

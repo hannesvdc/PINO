@@ -1,5 +1,7 @@
 import torch as pt
 import torch.nn as nn
+
+from typing import Callable
     
 class FixedInitialPINN( nn.Module ):
     """
@@ -22,6 +24,7 @@ class FixedInitialPINN( nn.Module ):
                   T_max : float,
                   tau_max : float,
                   logk_max : float,
+                  u0_fcn : Callable[[pt.Tensor], pt.Tensor],
                   u0 : pt.Tensor,
                   x_grid : pt.Tensor, 
                   l : float):
@@ -31,11 +34,12 @@ class FixedInitialPINN( nn.Module ):
         self.logk_max = logk_max
 
         # Store the initial condition and grid as non-autograd parameters
-        n_grid_points = pt.numel( u0 )
-        self.register_buffer( "u0", pt.reshape( u0, [1, n_grid_points] ) )
-        self.register_buffer( "x_grid", pt.reshape( x_grid, [1, n_grid_points] ) )
-        self.l = l
-        self.build_rbf_interpolator()
+        # n_grid_points = pt.numel( u0 )
+        # self.register_buffer( "u0", pt.reshape( u0, [1, n_grid_points] ) )
+        # self.register_buffer( "x_grid", pt.reshape( x_grid, [1, n_grid_points] ) )
+        # self.l = l
+        # self.build_rbf_interpolator()
+        self.u0_fcn = u0_fcn
 
         # Hidden layers with differentiable activation function
         self.n_hidden_layers = n_hidden_layers
@@ -95,6 +99,8 @@ class FixedInitialPINN( nn.Module ):
 
         # Form the output 
         g = self.output_layer( y )
-        time_factor = tau / (1.0 + tau)
-        u_hat = u0_at_x + time_factor * x * (1.0 - x) * g
+        alpha_tau = 1.0 / (1.0 + tau)
+        beta_tau = tau * alpha_tau
+        u_hat = alpha_tau * u0_at_x + beta_tau * x * (1.0 - x) * g
+
         return T_s + u_hat * self.T_max

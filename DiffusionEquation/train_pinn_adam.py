@@ -17,6 +17,7 @@ import argparse
 def parseArguments( ):
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--tau', dest='tau', default="extra_large")
+    arg_parser.add_argument('--time_factor', dest='time_factor', default="tf")
     return arg_parser.parse_args( )
 args = parseArguments()
 
@@ -44,9 +45,9 @@ validation_loader = DataLoader( validation_dataset, batch_size=N_validation, shu
 
 # Also store the dataset for later use
 store_directory = './Results/pinn/'
-pt.save( train_dataset.all().cpu(), store_directory + 'train_data_' + args.tau + '.pth' )
-pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data_' + args.tau + '.pth' )
-pt.save( u0, store_directory + 'initial_' + args.tau + '.pth')
+pt.save( train_dataset.all().cpu(), store_directory + 'train_data_' + args.tau + '_' + args.time_factor + '.pth' )
+pt.save( validation_dataset.all().cpu(), store_directory + 'validation_data_' + args.tau + '_' + args.time_factor + '.pth' )
+pt.save( u0, store_directory + 'initial_' + args.tau + '_' + args.time_factor + '.pth')
 
 # Create the PINO
 z = 64
@@ -131,8 +132,8 @@ def train( epoch ):
         T_t_rms, T_xx_rms, rms, rel_rms ))
     
     # Store the pretrained state
-    pt.save( model.state_dict(), store_directory + 'model_adam_' + args.tau + '.pth')
-    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam_' + args.tau + '.pth')
+    pt.save( model.state_dict(), store_directory + 'model_adam_' + args.tau + '_' + args.time_factor + '.pth')
+    pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam_' + args.tau + '_' + args.time_factor + '.pth')
 
 # Validation Function 
 def validate( epoch ):
@@ -164,8 +165,8 @@ except KeyboardInterrupt:
 
 # Store the per-epoch convergence results
 import numpy as np
-np.save( store_directory + 'Adam_Training_Convergence_' + args.tau + '.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
-np.save( store_directory + 'Adam_Validation_Convergence_' + args.tau + '.npy', np.hstack( (validation_counter, validation_losses) ) )
+np.save( store_directory + 'Adam_Training_Convergence_' + args.tau + '_' + args.time_factor + '.npy', np.hstack( (train_counter, train_losses, train_grads) ) )
+np.save( store_directory + 'Adam_Validation_Convergence_' + args.tau + '_' + args.time_factor + '.npy', np.hstack( (validation_counter, validation_losses) ) )
 
 # Show the training results
 plt.semilogy(train_counter, train_losses, label='Training Loss', alpha=0.5)

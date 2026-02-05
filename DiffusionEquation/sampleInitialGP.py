@@ -1,5 +1,7 @@
 import torch as pt
 
+from typing import Callable
+
 """
 Conditional Gaussian Process
 
@@ -35,3 +37,32 @@ def gp(x_grid : pt.Tensor,
     conditional_normal = pt.distributions.MultivariateNormal( 0.0*x_grid[1:-1], K_cond )
     u0 = conditional_normal.rsample( )
     return pt.cat(( pt.tensor([0.0]), u0, pt.tensor([0.0]) ), dim=0)
+
+def build_rbf_interpolator( u0 : pt.Tensor,
+                            x_grid : pt.Tensor,
+                            l : float ) -> pt.Tensor:
+    N_grid = x_grid.shape[1]
+    grid = pt.flatten( x_grid )
+
+    kernel = lambda y, yp: pt.exp(-0.5 * (y - yp)**2 / l**2) # Covariance kernel
+    grid_1, grid_2 = pt.meshgrid( grid, grid, indexing="ij" )
+    K = kernel(grid_1, grid_2) + 1e-4 * pt.eye( N_grid, device=grid.device, dtype=grid.dtype ) 
+
+    u0 = pt.transpose( u0, 0, 1 )
+    L = pt.linalg.cholesky( K )
+    alpha = pt.cholesky_solve( u0, L ) # shape (N_grid,)
+    return alpha
+
+def generateInitial( x_grid : pt.Tensor,
+                     l : float ) -> pt.Tensor:
+    u0 = gp( x_grid, l )
+    return u0
+
+def build_u0_evaluator( u0 : pt.Tensor,
+                        x_grid : pt.Tensor, 
+                        l : float) -> Callable[[pt.Tensor], pt.Tensor]:
+    alpha = build_rbf_interpolator( u0, x_grid, l)
+    def evaluate_u0(x : pt.Tensor ) -> pt.Tensor:        
+        K_x_grid = pt.exp( -0.5 * (x - x_grid)**2 / l**2 )
+        return K_x_grid @ alpha
+    return evaluate_u0
