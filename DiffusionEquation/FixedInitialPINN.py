@@ -25,21 +25,18 @@ class FixedInitialPINN( nn.Module ):
                   tau_max : float,
                   logk_max : float,
                   u0_fcn : Callable[[pt.Tensor], pt.Tensor],
-                  u0 : pt.Tensor,
-                  x_grid : pt.Tensor, 
-                  l : float):
+                  ic_time_factor : bool = False):
         super().__init__()
         self.T_max = T_max
         self.tau_max = tau_max
         self.logk_max = logk_max
 
-        # Store the initial condition and grid as non-autograd parameters
-        # n_grid_points = pt.numel( u0 )
-        # self.register_buffer( "u0", pt.reshape( u0, [1, n_grid_points] ) )
-        # self.register_buffer( "x_grid", pt.reshape( x_grid, [1, n_grid_points] ) )
-        # self.l = l
-        # self.build_rbf_interpolator()
+        # How to treat the initial condition
         self.u0_fcn = u0_fcn
+        if ic_time_factor:
+            self.ic_time_factor = lambda tau : 1. / (1. + tau)
+        else:
+            self.ic_time_factor = lambda tau: 1.0
 
         # Hidden layers with differentiable activation function
         self.n_hidden_layers = n_hidden_layers
@@ -52,28 +49,6 @@ class FixedInitialPINN( nn.Module ):
 
         # Linear output layer
         self.output_layer = nn.Linear(z, 1, bias=True)
-
-    def build_rbf_interpolator( self ):
-        N_grid = self.x_grid.shape[1]
-        grid = pt.flatten(self.x_grid)
-
-        kernel = lambda y, yp: pt.exp(-0.5 * (y - yp)**2 / self.l**2) # Covariance kernel
-        grid_1, grid_2 = pt.meshgrid( grid, grid, indexing="ij" )
-        K = kernel(grid_1, grid_2) + 1e-4 * pt.eye( N_grid, device=grid.device, dtype=grid.dtype ) 
-
-        u0 = pt.transpose( self.u0, 0, 1 )
-        L = pt.linalg.cholesky( K )
-        alpha = pt.cholesky_solve( u0, L ) # shape (N_grid,)
-        self.register_buffer("alpha", alpha) # shape (N_grid,1)
-
-    # Need to make sure the PINN output is fully differentiable w.r.t. x and t.
-    # This means evaluating u0 through interpolation, even if we only actually
-    # evaluate it in grid points (for now). 
-    #
-    # We use a radial basis interpolator: u0(x) = K(x, X_grid) alpha
-    def evaluate_u0(self, x : pt.Tensor ) -> pt.Tensor:        
-        K_x_grid = pt.exp( -0.5 * (x - self.x_grid)**2 / self.l**2 )
-        return K_x_grid @ self.alpha
 
     # Assumes the parameters are p = (k, T_s)
     def forward(self, x : pt.Tensor, # (B, 1)
@@ -90,7 +65,7 @@ class FixedInitialPINN( nn.Module ):
         T_s = p[:,1:2]
         
         # Pre-process the parameters and input
-        u0_at_x = self.evaluate_u0( x )
+        u0_at_x = self.u0_fcn( x )
 
         # Push through the network
         y = pt.cat((x, tau_hat, logk_hat, u0_at_x), dim=1)
@@ -99,8 +74,7 @@ class FixedInitialPINN( nn.Module ):
 
         # Form the output 
         g = self.output_layer( y )
-        alpha_tau = 1.0 / (1.0 + tau)
-        beta_tau = tau * alpha_tau
-        u_hat = alpha_tau * u0_at_x + beta_tau * x * (1.0 - x) * g
+        beta_tau = tau / (1.0 + tau)
+        u_hat = self.ic_time_factor(tau) * u0_at_x + beta_tau * x * (1.0 - x) * g
 
         return T_s + u_hat * self.T_max

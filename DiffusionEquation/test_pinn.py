@@ -1,8 +1,12 @@
+import sys
+sys.path.append('../')
+
 import math
 import torch as pt
 from PINNDataset import PINNDataset
 from FixedInitialPINN import FixedInitialPINN
 import matplotlib.pyplot as plt
+from generateInitialCondition import build_u0_evaluator
 
 pt.set_default_device( pt.device("cpu") )
 pt.set_default_dtype( pt.float64 )
@@ -18,13 +22,19 @@ l = 0.12 # GP correlation length
 N_test = 100
 test_dataset = PINNDataset( N_test, T_max, tau_max, test=True )
 
+# Load the initial condition
+l = 0.12
+u0_fcn, ic = build_u0_evaluator( l, pt.device("cpu"), pt.float64 )
+
 # Create the training and validation datasets
 store_directory = './Results/pinn/'
-u0 = pt.load(store_directory + 'initial_extra_large.pth', weights_only=True)
+u0 = pt.load(store_directory + 'initial_extra_large_tf.pth', weights_only=True)
 z = 64
 n_hidden_layers = 2
-model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, logk_max, u0, x_grid, l )
-model.load_state_dict( pt.load(store_directory + '/model_lbfgs_extra_large.pth', weights_only=True, map_location=pt.device("cpu")) )
+model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, logk_max, u0_fcn, u0, x_grid, l )
+weights = pt.load(store_directory + '/model_lbfgs_extra_large_tf.pth', weights_only=True, map_location=pt.device("cpu"))
+print(weights)
+model.load_state_dict( weights )
 
 # General PINO evaluation script
 N_tau = 10001
