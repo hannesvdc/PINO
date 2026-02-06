@@ -1,0 +1,31 @@
+import sys
+sys.path.append('../')
+
+import torch as pt
+
+from dataset import PINNDataset
+from FixedInitialPINN import FixedInitialPINN
+from test_pinn import test_pinn
+from generateInitialCondition import build_u0_evaluator
+
+dtype = pt.float64
+pt.set_grad_enabled( True )
+pt.set_default_dtype( dtype )
+
+# Create the training and validation datasets
+T_max = 10.0
+tau_max = 8.0 # train to exp( -tau_max )
+N_test = 100
+N_validation = 5_000
+test_dataset = PINNDataset( N_test, T_max, tau_max, dtype, test=True)
+
+# Load the initial condition
+l = 0.12
+u0_fcn, ic = build_u0_evaluator( l, pt.device("cpu"), pt.float64 )
+
+# Create the PINO
+z = 64
+n_hidden_layers = 2
+model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_max, u0_fcn)
+
+test_pinn( model, test_dataset )
