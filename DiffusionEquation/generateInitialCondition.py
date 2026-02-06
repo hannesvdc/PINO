@@ -75,10 +75,8 @@ def build_u0_evaluator( l : float,
     alpha = initial[:,2]
 
     x_grid_eval = x_grid[None,:]
-    print(x_grid_eval.shape)
-    print((x_grid - x_grid_eval).shape)
     def evaluate_u0(x : pt.Tensor ) -> pt.Tensor:        
-        K_x_grid = pt.exp( -0.5 * (x - x_grid[None,:])**2 / l**2 )
+        K_x_grid = pt.exp( -0.5 * (x - x_grid_eval)**2 / l**2 )
         u0_at_x = K_x_grid @ alpha
         return u0_at_x[:,None]
     
