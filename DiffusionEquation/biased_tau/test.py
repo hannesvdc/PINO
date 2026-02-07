@@ -11,6 +11,7 @@ from generateInitialCondition import build_u0_evaluator
 dtype = pt.float64
 pt.set_grad_enabled( True )
 pt.set_default_dtype( dtype )
+device = pt.device( "cpu" )
 
 # Create the training and validation datasets
 T_max = 10.0
@@ -27,5 +28,6 @@ u0_fcn, ic = build_u0_evaluator( l, pt.device("cpu"), pt.float64 )
 z = 64
 n_hidden_layers = 2
 model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_max, u0_fcn)
+model.load_state_dict( pt.load('./Results/model_lbfgs.pth', map_location=device, weights_only=True) )
 
 test_pinn( model, test_dataset )

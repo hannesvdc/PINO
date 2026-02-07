@@ -12,17 +12,21 @@ If you’re interested in PINNs, PINOs, or scientific ML more broadly, feel free
 There are currently three main projects:
 
 - **`NewtonHeat`**  
-  A simple PINO for Newton’s law of cooling  
+  A simple PINO for Newton’s law of cooling 
+
   $$
   \frac{dT(t)}{dt} = -k (T(t) - T_s), \quad T(0) = T_0.
   $$  
+
   The model learns the temperature evolution $T(t)$ for arbitrary parameter triples $(T_0, k, T_s)$.
 
 - **`DiffusionEquation`**  
   A PINO for the 1D heat equation  
+
   $$
   \frac{\partial T}{\partial t} = \kappa \frac{\partial^2 T}{\partial x^2},
   $$  
+  
   with Dirichlet boundary conditions $(0,t) = T(1,t) = T_s$ and initial condition $T(x,0)=T_0(x)$.  
   At the moment, I have a working model for a *fixed* initial condition; extending this to a true operator over random initial conditions is ongoing work.
 
