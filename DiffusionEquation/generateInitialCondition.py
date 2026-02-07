@@ -79,11 +79,6 @@ def build_u0_evaluator( l : float,
         K_x_grid = pt.exp( -0.5 * (x - x_grid_eval)**2 / l**2 )
         u0_at_x = K_x_grid @ alpha
         return u0_at_x[:,None]
-    
-    # Show the fit for good measure
-    plt.plot(x_grid.cpu().numpy(), u0.cpu().numpy())
-    plt.plot(x_grid.cpu().numpy(), evaluate_u0(x_grid[:,None]).cpu().numpy())
-    plt.show()
 
     return evaluate_u0, initial
 

@@ -51,7 +51,8 @@ def finiteDifferences( x_grid : pt.Tensor, u0 : pt.Tensor, p : pt.Tensor, T_f : 
     for n in range(1, N_tau): 
         T_xx = (pt.roll(T, -1) - 2.0 * T + pt.roll(T, 1)) / dx**2
         T = T + dtau * T_xx
-        T[[0,-1]] = T_s
+        T[0] = T_s
+        T[-1] = T_s
         T_sol[:,n] = T
     
     # Return the solution and time grid
@@ -68,7 +69,7 @@ def test_pinn( model, test_dataset ):
     # Load the initial condition
     l = 0.12
     u0_fcn, ic = build_u0_evaluator( l, pt.device("cpu"), pt.float64 )
-    u0 = u0_fcn( x_grid )
+    u0 = u0_fcn( x_grid[:,None] )
 
     # General PINO evaluation script
     N_tau = 1001
@@ -76,11 +77,13 @@ def test_pinn( model, test_dataset ):
     tau_grid = pt.linspace( 1e-2, T_f, N_tau )
 
     # Take one test value and propagate it through the network
+    print('Evaluating PINO')
     idx = 25
     _, _, p = test_dataset[idx]
     T_sol_pinn, tau_grid_pinn = evaluatePINO( model, x_grid, T_f, p )
 
     # Calculate the finite differences ('analytic') solution
+    print('Running Finite Differences')
     T_sol_fd, tau_grid_fd = finiteDifferences( x_grid, u0, p, T_f)
 
     # Compute the leading Fourier mode. It should decay exponentially.
@@ -112,10 +115,13 @@ def test_pinn( model, test_dataset ):
 
     # Plot PINN and FD side by side
     fig, (ax1, ax2) = plt.subplots(1,2)
-    X, Y = pt.meshgrid(x_grid, tau_grid_pinn)
-    ax1.pcolor( X, Y, T_sol_pinn)
-    X, Y = pt.meshgrid(x_grid, tau_grid_fd)
-    ax2.pcolor( X, Y, T_sol_fd)
-    plt.colorbar()
+    vmin = min( pt.min(T_sol_pinn), pt.min(T_sol_fd))
+    vmax = max( pt.max(T_sol_pinn), pt.max(T_sol_fd))
+    X, Y = pt.meshgrid(x_grid, tau_grid_pinn, indexing="ij")
+    ax1.pcolormesh( X.detach().numpy(), Y.detach().numpy(), T_sol_pinn.detach().numpy(), vmin=float(vmin), vmax=float(vmax))
+    ax1.set_title("PINO")
+    X, Y = pt.meshgrid(x_grid, tau_grid_fd, indexing="ij")
+    ax2.pcolormesh( X.detach().numpy(), Y.detach().numpy(), T_sol_fd.detach().numpy(), vmin=float(vmin), vmax=float(vmax))
+    ax2.set_title("Finite Differences")
 
     plt.show()
