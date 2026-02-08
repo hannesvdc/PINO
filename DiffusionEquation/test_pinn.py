@@ -16,15 +16,19 @@ logk_max = math.log( 1e2 )
 def evaluatePINO( model : nn.Module, x_grid : pt.Tensor, T_f : float, p : pt.Tensor) -> Tuple[pt.Tensor, pt.Tensor]:
     B = x_grid.shape[0]
     k = p[0]
+    T_s = p[1]
     p_batch = pt.unsqueeze(p, 0).expand( [B, len(p)] )
 
     N_tau = 1001
-    tau_grid = pt.linspace( 1e-2, T_f, N_tau )
+    tau_grid = pt.linspace( 0, T_f, N_tau )
 
     # Evaluate the network in a fixed grid of tau-values
     N_grid_points = len( x_grid )
     T_sol = pt.zeros( (N_grid_points, N_tau) )
-    for t_idx in range( N_tau ):
+    u0 = model.u0_fcn( x_grid[:,None] )
+    T0 = pt.flatten(T_max * u0 + T_s)
+    T_sol[:,0] = T0
+    for t_idx in range( 1, N_tau ):
         t = tau_grid[t_idx] / k
         T_xt = model( x_grid[:,None], t * pt.ones([B,1]), p_batch )
         T_sol[:,t_idx] = T_xt[:,0]
@@ -117,11 +121,13 @@ def test_pinn( model, test_dataset ):
     fig, (ax1, ax2) = plt.subplots(1,2)
     vmin = min( pt.min(T_sol_pinn), pt.min(T_sol_fd))
     vmax = max( pt.max(T_sol_pinn), pt.max(T_sol_fd))
-    X, Y = pt.meshgrid(x_grid, tau_grid_pinn, indexing="ij")
-    ax1.pcolormesh( X.detach().numpy(), Y.detach().numpy(), T_sol_pinn.detach().numpy(), vmin=float(vmin), vmax=float(vmax))
+    idx_pinn = (tau_grid_pinn <= 1.0)
+    X, Y = pt.meshgrid(x_grid, tau_grid_pinn[idx_pinn], indexing="ij")
+    ax1.pcolormesh( X.detach().numpy(), Y.detach().numpy(), T_sol_pinn[:,idx_pinn].detach().numpy(), vmin=float(vmin), vmax=float(vmax))
     ax1.set_title("PINO")
-    X, Y = pt.meshgrid(x_grid, tau_grid_fd, indexing="ij")
-    ax2.pcolormesh( X.detach().numpy(), Y.detach().numpy(), T_sol_fd.detach().numpy(), vmin=float(vmin), vmax=float(vmax))
+    idx_fd = (tau_grid_fd <= 1.0)
+    X, Y = pt.meshgrid(x_grid, tau_grid_fd[idx_fd], indexing="ij")
+    ax2.pcolormesh( X.detach().numpy(), Y.detach().numpy(), T_sol_fd[:,idx_fd].detach().numpy(), vmin=float(vmin), vmax=float(vmax))
     ax2.set_title("Finite Differences")
 
     plt.show()
