@@ -51,7 +51,7 @@ def optimizeWithAdam( model : nn.Module,
             loss.backward()
             epoch_loss += float( loss.item() )
             pre_grad = getGradientNorm()
-            pt.nn.utils.clip_grad_norm_( model.parameters(), max_norm=clip_level )
+            #pt.nn.utils.clip_grad_norm_( model.parameters(), max_norm=clip_level )
             grad = getGradientNorm()
             rel_rms = rms / (T_t_rms.item() + T_xx_rms.item() + 1e-12)
 
