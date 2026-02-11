@@ -16,7 +16,12 @@ def optimizeWithLBFGS( model : nn.Module,
                       dtype : pt.dtype,
                       lr : float,
                       store_directory : str,
+                      post : bool = False,
                       ) -> Tuple[List, List, List, List, List, List, List]:
+    if post:
+        prepend = "post_"
+    else:
+        prepend = ""
 
     max_iter = 50
     history_size = 50
@@ -85,8 +90,8 @@ def optimizeWithLBFGS( model : nn.Module,
             print('Validation Epoch: {} \tLoss: {:.10E}'.format( epoch, validation_loss.item() ))
             
             # Store the pretrained state
-            pt.save( model.state_dict(), store_directory + 'model_lbfgs.pth')
-            pt.save( optimizer.state_dict(), store_directory + 'optimizer_lbfgs.pth')
+            pt.save( model.state_dict(), store_directory + prepend + 'model_lbfgs.pth')
+            pt.save( optimizer.state_dict(), store_directory + prepend + 'optimizer_lbfgs.pth')
 
             train_counter.append( epoch )
             train_losses.append( last_state["loss"] )

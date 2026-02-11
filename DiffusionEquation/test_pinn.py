@@ -20,15 +20,15 @@ def evaluatePINO( model : nn.Module, x_grid : pt.Tensor, T_f : float, p : pt.Ten
     p_batch = pt.unsqueeze(p, 0).expand( [B, len(p)] )
 
     N_tau = 1001
-    tau_grid = pt.linspace( 0, T_f, N_tau )
+    tau_grid = pt.linspace( 1e-2, T_f, N_tau )
 
     # Evaluate the network in a fixed grid of tau-values
     N_grid_points = len( x_grid )
     T_sol = pt.zeros( (N_grid_points, N_tau) )
-    u0 = model.u0_fcn( x_grid[:,None] )
-    T0 = pt.flatten(T_max * u0 + T_s)
-    T_sol[:,0] = T0
-    for t_idx in range( 1, N_tau ):
+    #u0 = model.u0_fcn( x_grid[:,None] )
+    #T0 = pt.flatten(T_max * u0 + T_s)
+    #T_sol[:,0] = T0
+    for t_idx in range( 0, N_tau ):
         t = tau_grid[t_idx] / k
         T_xt = model( x_grid[:,None], t * pt.ones([B,1]), p_batch )
         T_sol[:,t_idx] = T_xt[:,0]
@@ -102,9 +102,9 @@ def test_pinn( model, test_dataset ):
     a2_ratio_analytic = a2_ratio_analytic / a2_ratio_analytic[0]
 
     # Make the decay
-    plt.plot( tau_grid.numpy(), pt.abs(a1_ratio).detach().numpy(), label=r'PINO $a_1$ Ratio')
+    plt.plot( tau_grid_pinn.numpy(), pt.abs(a1_ratio).detach().numpy(), label=r'PINO $a_1$ Ratio')
     plt.plot( tau_grid.numpy(), pt.abs(a1_ratio_analytic).numpy(), label=r'Analytic $a_1$ Ratio')
-    plt.plot( tau_grid.numpy(), pt.abs(a2_ratio).detach().numpy(), label=r'PINO $a_2$ Ratio')
+    plt.plot( tau_grid_pinn.numpy(), pt.abs(a2_ratio).detach().numpy(), label=r'PINO $a_2$ Ratio')
     plt.plot( tau_grid.numpy(), pt.abs(a2_ratio_analytic).numpy(), label=r'Analytic $a_2$ Ratio')
     plt.xlabel(r'$\tau$')
     plt.title(r"$\frac{a_n(t)}{a_n(0)}$")
