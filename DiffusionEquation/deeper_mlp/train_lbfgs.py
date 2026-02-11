@@ -38,7 +38,7 @@ p_validation = validation_data[:,2:]
 
 # Create the PINO
 z = 64
-n_hidden_layers = 2
+n_hidden_layers = 4
 model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, logk_max, u0_fcn, ic_time_factor=True )
 model.load_state_dict( pt.load(store_directory + '/model_adam.pth', weights_only=True, map_location=device) )
 model = model.to( device=device, dtype=dtype )
