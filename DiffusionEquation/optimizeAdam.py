@@ -37,7 +37,6 @@ def optimizeWithAdam( model : nn.Module,
     # Train Function
     def train( epoch ):
         model.train()
-        clip_level = 5e4
 
         epoch_loss = float( 0.0 )
         for batch_idx, (x, t, p) in enumerate( train_loader ):
@@ -47,12 +46,15 @@ def optimizeWithAdam( model : nn.Module,
             p = p.to(device=device, dtype=dtype)
 
             # Compute the loss and its gradient
-            loss, rms, T_t_rms, T_xx_rms = loss_fn( model, x, t, p )
+            loss, loss_dict = loss_fn( model, x, t, p )
             loss.backward()
             epoch_loss += float( loss.item() )
             pre_grad = getGradientNorm()
-            #pt.nn.utils.clip_grad_norm_( model.parameters(), max_norm=clip_level )
             grad = getGradientNorm()
+
+            rms = loss_dict["rms"]
+            T_t_rms = loss_dict["T_t_rms"]
+            T_xx_rms = loss_dict["T_xx_rms"]
             rel_rms = rms / (T_t_rms.item() + T_xx_rms.item() + 1e-12)
 
             # Update the weights
@@ -68,10 +70,11 @@ def optimizeWithAdam( model : nn.Module,
 
         # Update
         epoch_loss /= len( train_loader )
+        reg_loss = loss_dict.get("reg_loss", 0.0)
         print('\nTrain Epoch: {} \tLoss: {:.4E} \tPre-Clip Loss Gradient: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
                 epoch, epoch_loss, pre_grad.item(), grad.item(), optimizer.param_groups[0]['lr']))
-        print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tTotal RMS: {:.4E} \tLoss Relative RMS: {:.4E}'.format(
-            T_t_rms, T_xx_rms, rms, rel_rms ))
+        print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tTotal RMS: {:.4E} \tLoss Relative RMS: {:.4E} \tRegularization: {:.4E}'.format(
+            T_t_rms, T_xx_rms, rms, rel_rms, reg_loss ))
         
         # Store the pretrained state
         pt.save( model.state_dict(), store_directory + 'model_adam.pth')
@@ -87,7 +90,7 @@ def optimizeWithAdam( model : nn.Module,
             p = p.to(device=device, dtype=dtype)
 
             # Compute the loss and its gradient
-            loss, _, _, _ = loss_fn( model, x, t, p )
+            loss, _ = loss_fn( model, x, t, p )
 
             # Bookkeeping
             validation_counter.append( (1.0*batch_idx) / len(validation_loader) + epoch)
