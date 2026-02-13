@@ -4,8 +4,10 @@ import torch.nn as nn
 from typing import Tuple
 
 class HeatLoss( nn.Module ):
-    def __init__( self, eps=1e-12 ):
+    def __init__( self, weight_decay : float = 0,
+                        eps=1e-12 ):
         super().__init__()
+        self.weight_decay = weight_decay
         self.eps = eps
 
     def forward(self,
@@ -36,6 +38,17 @@ class HeatLoss( nn.Module ):
                                  create_graph=True)[0]
         eq = dT_t / (k + 1e-8) -  dT_xx # Not sure if this is the best formulation, perhaps we need to divide by k to regularize
         loss = pt.mean( eq**2 )
+
+        # Regularize
+        if self.weight_decay > 0:
+            reg_terms = []
+            for name, param in model.named_parameters():
+                if not param.requires_grad:
+                    continue
+                if "bias" in name:
+                    continue
+                reg_terms.append(pt.mean(param**2))
+            loss = loss + self.weight_decay * pt.stack(reg_terms).sum()
 
         # also return some diagnostics
         rms = pt.mean( eq**2 ).sqrt()
