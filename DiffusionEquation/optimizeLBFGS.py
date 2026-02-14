@@ -65,7 +65,7 @@ def optimizeWithLBFGS( model : nn.Module,
         model.eval()
 
         # Just the one validation batch
-        epoch_loss, _, _, _ = loss_fn( model, x_validation, t_validation, p_validation )
+        epoch_loss, _ = loss_fn( model, x_validation, t_validation, p_validation )
         
         return epoch_loss
 

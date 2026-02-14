@@ -26,7 +26,7 @@ u0_fcn, ic = build_u0_evaluator( l, pt.device("cpu"), pt.float64 )
 
 # Create the PINO
 z = 64
-n_hidden_layers = 2
+n_hidden_layers = 4
 model = FixedInitialPINN( n_hidden_layers, z, T_max, tau_max, test_dataset.logk_max, u0_fcn, ic_time_factor=True)
 model.load_state_dict( pt.load('./Results/model_lbfgs.pth', map_location=device, weights_only=True) )
 
