@@ -6,6 +6,20 @@ from ConvDeepONet import DeepONet
 from typing import Tuple, Dict
 
 class HeatLoss( nn.Module ):
+    """
+    PDE residual loss for tensorized DeepONet output.
+
+    Model signature:
+        T = model(x, t, params, u0)
+    where:
+        x:      (Bt, 1)  requires_grad True
+        t:      (Bt, 1)  requires_grad True
+        params:  (Bt, 2)  [k, T_s]
+        u0:     (Bb, n_grid)
+
+    Model output:
+        T: (Bb, Bt)
+    """
     def __init__( self, eps=1e-12 ):
         super().__init__()
         self.eps = eps
@@ -25,26 +39,37 @@ class HeatLoss( nn.Module ):
         u0 = u0.requires_grad_(False)
         T_t = model( x, t, p, u0 ) # Shape (Bb, Bt)
 
-        # Calculate the loss
-        dT_t = pt.autograd.grad( outputs=T_t, 
+        # Pre-sum over branch to keep per-trunk-point derivatives
+        # Tsum: (Bt,) This is mainly for efficiency reasons.
+        Tsum = T_t.sum(dim=0)
+
+        # All shapes (Bt,1)
+        dT_t = pt.autograd.grad( outputs=Tsum, 
                                  inputs=t, 
-                                 grad_outputs=pt.ones_like(T_t),
+                                 grad_outputs=pt.ones_like(Tsum),
                                  create_graph=True )[0]
-        dT_x = pt.autograd.grad( outputs=T_t,
+        dT_x = pt.autograd.grad( outputs=Tsum,
                                  inputs=x,
-                                 grad_outputs=pt.ones_like(T_t),
+                                 grad_outputs=pt.ones_like(Tsum),
                                  create_graph=True)[0]
         dT_xx = pt.autograd.grad(outputs=dT_x,
                                  inputs=x,
                                  grad_outputs=pt.ones_like(dT_x),
                                  create_graph=True)[0]
-        eq = dT_t / (k + 1e-8) -  dT_xx # Not sure if this is the best formulation, perhaps we need to divide by k to regularize
+
+        # Broadcast to (Bb, Bt)
+        dT_dt_mat  = dT_t[:, 0][None, :]    # (1,Bt)
+        dT_dxx_mat = dT_xx[:, 0][None, :]   # (1,Bt)
+        k_mat = k[:, 0][None, :]        # (1,Bt)
+
+        # Compute the PDE residual and average
+        eq = dT_dt_mat / (k_mat + 1e-8) -  dT_dxx_mat
         loss = pt.mean( eq**2 )
 
         # also return some diagnostics
         rms = pt.mean( eq**2 ).sqrt()
-        T_t_rms = pt.mean( (dT_t / k)**2 ).sqrt()
-        T_xx_rms = pt.mean( dT_xx**2 ).sqrt()
+        T_t_rms = pt.mean( (dT_dt_mat / k_mat)**2 ).sqrt()
+        T_xx_rms = pt.mean( dT_dxx_mat**2 ).sqrt()
         return_dict = {"rms": rms, "T_t_rms" : T_t_rms, "T_xx_rms": T_xx_rms}
 
         return loss, return_dict
