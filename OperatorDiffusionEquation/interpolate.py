@@ -1,7 +1,9 @@
 import torch as pt
 
-def interpolateInitialsTensorized(x: pt.Tensor, 
-                                  u0: pt.Tensor,
+from torchcubicspline import natural_cubic_spline_coeffs, NaturalCubicSpline
+
+def interpolateInitialsTensorized(x: pt.Tensor, # (Bt,)
+                                  u0: pt.Tensor, # (Bb, n_grid_points)
                                   x_min: float = 0.0, 
                                   x_max: float = 1.0) -> pt.Tensor:
     """
@@ -44,3 +46,11 @@ def interpolateInitialsTensorized(x: pt.Tensor,
     w = (s - i0.to(s.dtype)).to(u0.dtype)   # (Bt,)
     w = w[None, :]                          # (1, Bt)
     return (1.0 - w) * u0_0 + w * u0_1      # (Bb, Bt)
+
+def evaluateInterpolatingSpline( x: pt.Tensor, #(Bt,)
+                              x_grid : pt.Tensor, # (n_grid_points)
+                              u0: pt.Tensor, # (Bb, n_grid_points)
+                            ) -> pt.Tensor:
+    coeffs = natural_cubic_spline_coeffs(x_grid, u0.T)
+    spline = NaturalCubicSpline(coeffs)
+    return spline.evaluate(x).T
