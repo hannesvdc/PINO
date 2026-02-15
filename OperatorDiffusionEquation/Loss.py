@@ -30,7 +30,7 @@ class HeatLoss( nn.Module ):
                 t : pt.Tensor,
                 p : pt.Tensor,
                 u0 : pt.Tensor) -> Tuple[pt.Tensor, Dict]:
-        k = p[:,0:1]
+        k = p[:,0]
 
         # Propagate through the model
         x = x.requires_grad_(True)
@@ -39,28 +39,31 @@ class HeatLoss( nn.Module ):
         u0 = u0.requires_grad_(False)
         T_t = model( x, t, p, u0 ) # Shape (Bb, Bt)
 
-        # Pre-sum over branch to keep per-trunk-point derivatives
-        # Tsum: (Bt,) This is mainly for efficiency reasons.
-        Tsum = T_t.sum(dim=0)
+        # Pre-average over branch to keep per-trunk-point derivatives
+        # Tmean: (Bt,) This is mainly for efficiency reasons.
+        Tmean = T_t.mean(dim=0) # shape (Bt,)
 
         # All shapes (Bt,1)
-        dT_t = pt.autograd.grad( outputs=Tsum, 
+        dT_t = pt.autograd.grad( outputs=Tmean, 
                                  inputs=t, 
-                                 grad_outputs=pt.ones_like(Tsum),
-                                 create_graph=True )[0]
-        dT_x = pt.autograd.grad( outputs=Tsum,
+                                 grad_outputs=pt.ones_like(Tmean),
+                                 create_graph=True,
+                                 retain_graph=True)[0] # (Bt,)
+        dT_x = pt.autograd.grad( outputs=Tmean,
                                  inputs=x,
-                                 grad_outputs=pt.ones_like(Tsum),
-                                 create_graph=True)[0]
+                                 grad_outputs=pt.ones_like(Tmean),
+                                 create_graph=True,
+                                 retain_graph=True)[0] # (Bt,)
         dT_xx = pt.autograd.grad(outputs=dT_x,
                                  inputs=x,
                                  grad_outputs=pt.ones_like(dT_x),
-                                 create_graph=True)[0]
+                                 create_graph=True,
+                                 retain_graph=True)[0] # (Bt,)
 
         # Broadcast to (Bb, Bt)
-        dT_dt_mat  = dT_t[:, 0][None, :]    # (1,Bt)
-        dT_dxx_mat = dT_xx[:, 0][None, :]   # (1,Bt)
-        k_mat = k[:, 0][None, :]        # (1,Bt)
+        dT_dt_mat  = dT_t[None, :]    # (1,Bt)
+        dT_dxx_mat = dT_xx[None, :]   # (1,Bt)
+        k_mat = k[None, :]        # (1,Bt)
 
         # Compute the PDE residual and average
         eq = dT_dt_mat / (k_mat + 1e-8) -  dT_dxx_mat

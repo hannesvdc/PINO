@@ -66,7 +66,7 @@ class BranchDataset( Dataset ):
     def __len__( self ) -> int:
         return self.N
     
-    def __get_item__( self, idx : int ) -> pt.Tensor:
+    def __getitem__( self, idx : int ) -> pt.Tensor:
         return self.data[idx,:]
     
     def all( self ) -> pt.Tensor:

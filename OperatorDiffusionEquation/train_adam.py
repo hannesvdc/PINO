@@ -88,7 +88,7 @@ def train( epoch : int ):
 
         # Sample a trunk batch
         it = pt.randint(0, N_train_trunk, (Bt,), device=device)
-        trunk_batch = train_trunk_dataset.all()[it,:].to(device=device, dtype=dtype)
+        trunk_batch = train_trunk_dataset.all().to(device=device, dtype=dtype)[it,:]
         x = trunk_batch[:,0]
         t = trunk_batch[:,1]
         params = trunk_batch[:,2:]
