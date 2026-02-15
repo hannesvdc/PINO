@@ -39,19 +39,19 @@ class HeatLoss( nn.Module ):
         u0 = u0.requires_grad_(False)
         T_t = model( x, t, p, u0 ) # Shape (Bb, Bt)
 
-        # Pre-average over branch to keep per-trunk-point derivatives
+        # Pre-sum over branch to keep per-trunk-point derivatives
         # Tmean: (Bt,) This is mainly for efficiency reasons.
-        Tmean = T_t.mean(dim=0) # shape (Bt,)
+        Tsum = T_t.sum(dim=0) # shape (Bt,)
 
         # All shapes (Bt,1)
-        dT_t = pt.autograd.grad( outputs=Tmean, 
+        dT_t = pt.autograd.grad( outputs=Tsum, 
                                  inputs=t, 
-                                 grad_outputs=pt.ones_like(Tmean),
+                                 grad_outputs=pt.ones_like(Tsum),
                                  create_graph=True,
                                  retain_graph=True)[0] # (Bt,)
-        dT_x = pt.autograd.grad( outputs=Tmean,
+        dT_x = pt.autograd.grad( outputs=Tsum,
                                  inputs=x,
-                                 grad_outputs=pt.ones_like(Tmean),
+                                 grad_outputs=pt.ones_like(Tsum),
                                  create_graph=True,
                                  retain_graph=True)[0] # (Bt,)
         dT_xx = pt.autograd.grad(outputs=dT_x,

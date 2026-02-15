@@ -20,9 +20,9 @@ T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
 n_grid_points = 51
 
-N_train_branch = 1_000
+N_train_branch = 10_000
 N_train_trunk = 10_000
-N_validation_branch = 100
+N_validation_branch = 1000
 N_validation_trunk = 1000
 
 train_branch_dataset = BranchDataset( N_train_branch, n_grid_points )
