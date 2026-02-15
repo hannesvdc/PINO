@@ -29,18 +29,12 @@ class TrunkDataset( Dataset ):
         # Put most tau closer to 0
         tau_min = 1e-2
         gamma = 2.0  # 1 = log-uniform, >1 biases small tau
-        u = pt.rand((int(0.7*N),1), dtype=dtype, generator=gen)
+        u = pt.rand((N, 1), dtype=dtype, generator=gen)
         log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
-        tau = pt.exp(log_tau)
-
-        # But also add uniform large values so the network learns these too.
-        N_late = int(0.3 * N)  # 30% of points
-        u_late = pt.rand((N_late, 1), dtype=dtype, generator=gen)
-        tau_late = 1.0 + (tau_max - 1.0) * u_late
+        self.tau = pt.exp( log_tau )
         
-        # concatenate and rescale
-        tau = pt.cat([tau, tau_late], dim=0)
-        self.t = tau / self.k
+        # rescale
+        self.t = self.tau / self.k
 
     def __len__( self ):
         return len( self.k )

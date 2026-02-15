@@ -1,7 +1,7 @@
 import torch as pt
 import torch.nn as nn
 
-from interpolate import interpolateInitialsTensorized
+from interpolate import evaluateInterpolatingSpline
 
 from typing import Dict
     
@@ -107,12 +107,14 @@ class ConvNet( nn.Module ):
 class DeepONet( nn.Module ):
     def __init__(self, branch_setup : Dict, 
                        trunk_setup : Dict,
+                       x_grid : pt.Tensor,
                        T_max : float,
                        tau_max : float,
                        logk_max : float,
                        q : int):
         super().__init__()
         
+        self.x_grid = x_grid
         self.T_max = T_max
         self.tau_max = tau_max
         self.logk_max = logk_max
@@ -155,7 +157,7 @@ class DeepONet( nn.Module ):
         tau_hat = tau / self.tau_max
 
         # Evaluate all initial conditions at all spatial points
-        u0_at_x = interpolateInitialsTensorized( x, u0 ) # Shape (Bb, Bt)
+        u0_at_x = evaluateInterpolatingSpline( x[:,0], self.x_grid, u0 )
 
         # Propagate the branch and trunk
         branch_output = self.branch( u0 ) # (Bb, self.q)
@@ -168,7 +170,7 @@ class DeepONet( nn.Module ):
         # Bring back to the physics
         alpha_tau = 1.0 / (1.0 + tau.T) # (1, Bt)
         beta_tau = tau.T * alpha_tau
-        u_hat = alpha_tau * u0_at_x + beta_tau * x.T * (1.0 - x.T) * g
+        u_hat = u0_at_x + beta_tau * x.T * (1.0 - x.T) * g
 
         # Return actual temperatures
         T_s = params[:,1] # (Bt, )

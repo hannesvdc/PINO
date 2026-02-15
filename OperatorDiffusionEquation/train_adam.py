@@ -20,9 +20,9 @@ T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
 n_grid_points = 51
 
-N_train_branch = 10_000
+N_train_branch = 1_024
 N_train_trunk = 10_000
-N_validation_branch = 1000
+N_validation_branch = 128
 N_validation_trunk = 1000
 
 train_branch_dataset = BranchDataset( N_train_branch, n_grid_points )
@@ -49,11 +49,12 @@ dtype = pt.float32
 q = 25
 branch_architecture = {"n_grid_points" : n_grid_points,
                        "n_hidden_layers" : 3,
-                       "branch_kernel_size" : 5 }
+                       "kernel_size" : 5 }
 trunk_architecture = { "input_dim" : 3,
                        "n_hidden_layers" : 4,
                        "z" : 64 }
-model = DeepONet( branch_architecture, trunk_architecture, T_max, tau_max, train_trunk_dataset.logk_max, q)
+x_grid = pt.linspace( 0.0, 1.0, n_grid_points, device=device, dtype=dtype )
+model = DeepONet( branch_architecture, trunk_architecture, x_grid, T_max, tau_max, train_trunk_dataset.logk_max, q)
 model = model.to( device=device, dtype=dtype )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
@@ -61,7 +62,7 @@ print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.paramet
 loss_fn = HeatLoss()
 
 # Build the Adam optimizer
-lr = 1e-3
+lr = 1e-2
 n_steps = 5
 step_size = 1000
 n_epochs = n_steps * step_size
@@ -77,6 +78,8 @@ validation_losses = []
 T_t_rmss = []
 T_xx_rmss = []
 rel_rmss = []
+train_trunk_dataset_all = train_trunk_dataset.all().to(device=device, dtype=dtype)
+validation_trunk_dataset_all = validation_trunk_dataset.all().to(device=device, dtype=dtype)
 def train( epoch : int ):
     model.train()
 
@@ -88,9 +91,9 @@ def train( epoch : int ):
 
         # Sample a trunk batch
         it = pt.randint(0, N_train_trunk, (Bt,), device=device)
-        trunk_batch = train_trunk_dataset.all().to(device=device, dtype=dtype)[it,:]
-        x = trunk_batch[:,0]
-        t = trunk_batch[:,1]
+        trunk_batch = train_trunk_dataset_all[it,:]
+        x = trunk_batch[:,0:1]
+        t = trunk_batch[:,1:2]
         params = trunk_batch[:,2:]
 
         # Compute the loss and its gradient
@@ -131,9 +134,9 @@ def validate( epoch : int ):
     model.eval()
 
     u0 = validation_branch_dataset.all().to(device=device, dtype=dtype)
-    trunk_batch = validation_trunk_dataset.all().to(device=device, dtype=dtype)
-    x = trunk_batch[:,0]
-    t = trunk_batch[:,1]
+    trunk_batch = validation_trunk_dataset_all
+    x = trunk_batch[:,0:1]
+    t = trunk_batch[:,1:2]
     params = trunk_batch[:,2:]
 
     # Compute the loss and its gradient
