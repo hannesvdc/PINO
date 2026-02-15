@@ -41,6 +41,6 @@ def interpolateInitialsTensorized(x: pt.Tensor,
     u0_1 = pt.gather(u0, dim=1, index=idx1)
 
     # Monotone weights between 0 and 1
-    w = (s - i0.to(s.dtype)).to(u0.dtype)    # (Bt,)
-    w = w[None, :]                            # (1, Bt)
-    return (1.0 - w) * u0_0 + w * u0_1        # (Bb, Bt)
+    w = (s - i0.to(s.dtype)).to(u0.dtype)   # (Bt,)
+    w = w[None, :]                          # (1, Bt)
+    return (1.0 - w) * u0_0 + w * u0_1      # (Bb, Bt)
