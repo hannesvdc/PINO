@@ -31,7 +31,7 @@ def gp(x_grid : pt.Tensor,
     K_cond = K_ii - K_ib @ K_bb_inv @ K_bi + 1e-6 * pt.eye(N-2)
 
     # Sample the conditional GP
-    conditional_normal = pt.distributions.MultivariateNormal( 0.0*x_grid[1:-1], K_cond )
+    conditional_normal = pt.distributions.MultivariateNormal( 0.0*x_grid[1:-1], covariance_matrix=K_cond )
     u0 = conditional_normal.rsample( sample_shape=(N_samples,) ) # (N_samples, N-2)
 
     # Add Dirichlet zero boundary conditions
