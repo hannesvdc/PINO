@@ -45,7 +45,7 @@ model = model.to( device=device, dtype=dtype )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
 # Create the Loss function
-loss_fn = HeatLoss(weight_decay=1e-6)
+loss_fn = HeatLoss(weight_decay=1e-7)
 lr = 1.0
 train_counter, train_losses, train_grads, validation_counter, validation_losses, rel_rmss, learning_rates \
     = optimizeWithLBFGS( model, loss_fn, x_train, t_train, p_train, x_validation, t_validation, p_validation, device, dtype, lr, store_directory)

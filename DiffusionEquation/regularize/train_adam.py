@@ -48,7 +48,7 @@ model = model.to( device=device, dtype=dtype )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
 # Create the Loss function
-loss_fn = HeatLoss(weight_decay=1e-6)
+loss_fn = HeatLoss(weight_decay=1e-7)
 
 # Optimize using Adam
 lr = 1e-2
