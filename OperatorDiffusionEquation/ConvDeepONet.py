@@ -120,13 +120,13 @@ class DeepONet( nn.Module ):
 
         # Setup the branch convolutional network with some good default values.
         n_grid_points = branch_setup[ "n_grid_points" ] # number of discretization points, must be passed explicitly
-        n_branch_layers = branch_setup.get( "n_layers", 3 )
+        n_branch_layers = branch_setup.get( "n_hidden_layers", 3 )
         branch_kernel_size = branch_setup.get( "kernel_size", 5 )
         self.branch = ConvNet( n_grid_points, n_branch_layers, branch_kernel_size, q)
 
         # Setup the trunk network with some good default values.
         trunk_input_dim = trunk_setup.get( "input_dim", 3 )
-        trunk_n_hidden = trunk_setup.get( "n_hidden", 4)
+        trunk_n_hidden = trunk_setup.get( "n_hidden_layers", 4)
         trunk_z = trunk_setup.get( "z", 64 )
         self.trunk = MLP( trunk_input_dim, trunk_n_hidden, trunk_z, q )
 
