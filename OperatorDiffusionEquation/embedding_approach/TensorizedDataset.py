@@ -32,9 +32,16 @@ class TrunkDataset( Dataset ):
         # Put most tau closer to 0
         tau_min = 1e-2
         gamma = 2.0  # 1 = log-uniform, >1 biases small tau
-        u = pt.rand((N, 1), dtype=dtype, generator=gen)
+        u = pt.rand(( int(0.7*N), 1), dtype=dtype, generator=gen)
         log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
-        self.tau = pt.exp( log_tau )
+
+        # Also sample some uniformly
+        tau_extra = 1.0 + pt.rand( (int(0.3*N),1), dtype=dtype, generator=gen ) * (self.tau_max - 1.0)
+        self.tau = pt.cat( (pt.exp( log_tau ), tau_extra), dim=0)
+
+        import matplotlib.pyplot as plt
+        plt.hist(self.tau)
+        plt.show()
         
         # rescale
         self.t = self.tau / self.k
@@ -59,7 +66,7 @@ class BranchDataset( Dataset ):
 
         self.x_grid = pt.linspace(0.0, 1.0, self.n_grid_points)
         self.l = l
-        self.scale = 20.0
+        self.scale = 1.0
         self.data = gp( self.x_grid, self.l, self.N ) / self.scale # (N, n_grid_points)
 
     def __len__( self ) -> int:
@@ -97,9 +104,17 @@ class TensorizedDataset( Dataset ):
         return x, t, params, u0
     
     def all( self ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
-        u0 = self.branch_dataset.all()
-        trunk_all = self.trunk_dataset.all()
-        x, t, params = trunk_all[:,0:1], trunk_all[:,1:2], trunk_all[:,2:]
+        B = self.__len__()
+        x = pt.zeros( (B,1) )
+        t = pt.zeros( (B,1) )
+        params = pt.zeros( (B,2) )
+        u0 = pt.zeros( (B, self.branch_dataset.n_grid_points) )
+        for b in range( B ):
+            xb, tb, pb, u0b = self.__getitem__(b)
+            x[b,:] = xb
+            t[b,:] = tb
+            params[b,:] = pb
+            u0[b,:] = u0b
         return x, t, params, u0
     
 class TestTensorizedDataset( TensorizedDataset ):

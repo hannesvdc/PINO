@@ -105,8 +105,8 @@ class InitialEmbeddingMLP( nn.Module ):
         u0_at_x = jointIndexingRBFInterpolator( self.L, self.x_grid, self.l, x, u0 )
 
         # Bring back to the physics
-        alpha_tau = pt.exp( -2.0 * tau )
-        beta_tau = 1.0 - alpha_tau
+        alpha_tau = 1.0 / (1.0 + tau)# pt.exp( -2.0 * tau )
+        beta_tau = tau * alpha_tau #1.0 - alpha_tau
         u_hat = u0_at_x * alpha_tau + beta_tau * x * (1.0 - x) * g
 
         # Return actual temperatures

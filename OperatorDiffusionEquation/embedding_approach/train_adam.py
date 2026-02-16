@@ -3,10 +3,10 @@ from torch.optim import Adam
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
-from TensorizedDataset import TensorizedDataset, TestTensorizedDataset
+from TensorizedDataset import TensorizedDataset
 from EmbeddingNetwork import InitialEmbeddingMLP
 from Loss import HeatLoss
-from utils import getGradientNorm
+from utils import getGradientNorm, print_gradients
 
 import matplotlib.pyplot as plt
 
@@ -23,9 +23,10 @@ l = 0.2
 
 B = 512
 N_train_branch = 101
-N_train_trunk = 8192
-N_validation_branch = 32
-N_validation_trunk = 512
+N_train_trunk = 10_000
+N_validation_branch = 16
+N_validation_trunk = 300
+B_validation = N_validation_branch * N_validation_trunk
 
 train_dataset = TensorizedDataset( N_train_branch, N_train_trunk, n_grid_points, l, T_max, tau_max, dtype)
 validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk, n_grid_points, l, T_max, tau_max, dtype)
@@ -56,7 +57,7 @@ loss_fn = HeatLoss()
 
 # Build the Adam optimizer
 lr = 1e-2
-n_steps = 10
+n_steps = 5
 step_size = 100
 n_epochs = n_steps * step_size
 optimizer = Adam( model.parameters(), lr, amsgrad=True )
@@ -89,15 +90,16 @@ def train( epoch : int ):
         epoch_loss += float( loss.item() )
         grad = getGradientNorm( model )
 
+        # Update the weights
+        optimizer.step()
+
+        # Bookkeeping ( Part 1 )
         rms = loss_dict["rms"]
         T_t_rms = loss_dict["T_t_rms"]
         T_xx_rms = loss_dict["T_xx_rms"]
         rel_rms = rms / (T_t_rms.item() + T_xx_rms.item() + 1e-12)
 
-        # Update the weights
-        optimizer.step()
-
-        # Bookkeeping
+        # Bookkeeping ( Part 2 )
         train_counter.append( (1.0*batch_idx) / len(train_loader) + epoch)
         train_losses.append( loss.item())
         train_grads.append( grad.cpu() )
@@ -116,15 +118,18 @@ def train( epoch : int ):
     pt.save( model.state_dict(), store_directory + 'model_adam.pth')
     pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam.pth')
 
+# Build the validation dataset just once
+x_val, t_val, params_val, u0_val = validation_dataset.all()
 def validate( epoch : int ):
     model.eval()
 
-    x, t, params, u0 = validation_dataset.all()
-    x = x.to(device=device, dtype=dtype)
-    t = t.to(device=device, dtype=dtype)
-    params = params.to(device=device, dtype=dtype)
-    u0 = u0.to(device=device, dtype=dtype)
-    print(x.shape, t.shape, params.shape, u0.shape)
+    x = x_val.to(device=device, dtype=dtype).requires_grad_( True )
+    t = t_val.to(device=device, dtype=dtype).requires_grad_( True )
+    params = params_val.to(device=device, dtype=dtype)
+    u0 = u0_val.to(device=device, dtype=dtype)
+
+    # make sure no stale grads
+    optimizer.zero_grad(set_to_none=True)
 
     # Compute the loss and its gradient
     loss, _ = loss_fn( model, x, t, params, u0 )
@@ -138,10 +143,10 @@ def validate( epoch : int ):
 
 # Actual training and validation
 try:
-    for epoch in range( n_epochs ):
+    for epoch in range( 1, n_epochs+1 ):
         train( epoch )
-#        validate( epoch )
-#        scheduler.step( )
+        validate( epoch )
+        scheduler.step( )
 except KeyboardInterrupt:
     pass
 
