@@ -65,3 +65,25 @@ class BranchDataset( Dataset ):
     
     def all( self ) -> pt.Tensor:
         return self.data
+    
+class TensorizedDataset( Dataset ):
+    def __init__(self, N_branch : int,
+                       N_trunk : int,
+                       n_grid_points : int,
+                       T_max : float,
+                       tau_max : float,
+                       dtype = pt.float64):
+        super().__init__()
+
+        self.N_branch = N_branch
+        self.N_trunk = N_trunk
+        self.branch_dataset = BranchDataset( N_branch, n_grid_points )
+        self.trunk_dataset = TrunkDataset( N_trunk, T_max, tau_max, dtype )
+
+    def __len__( self ) -> int:
+        return len( self.branch_dataset ) * len( self.trunk_dataset )
+    
+    def __getitem__( self, idx : int ) -> Tuple[pt.Tensor, Tuple[pt.Tensor, pt.Tensor, pt.Tensor]]:
+        branch_idx = idx // self.N_trunk
+        trunk_idx = idx % self.N_trunk
+        return self.branch_dataset[branch_idx], self.trunk_dataset[trunk_idx]

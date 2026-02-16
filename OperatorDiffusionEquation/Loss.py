@@ -20,59 +20,65 @@ class HeatLoss( nn.Module ):
     Model output:
         T: (Bb, Bt)
     """
-    def __init__( self, eps=1e-12 ):
+    def __init__( self, eps=1e-6 ):
         super().__init__()
         self.eps = eps
 
-    def forward(self,
-                model : DeepONet,
-                x : pt.Tensor,
-                t : pt.Tensor,
-                p : pt.Tensor,
-                u0 : pt.Tensor) -> Tuple[pt.Tensor, Dict]:
-        k = p[:,0]
+    def forward(self, model, x, t, params, u0):
+        if x.ndim == 1: x = x[:, None]
+        if t.ndim == 1: t = t[:, None]
 
-        # Propagate through the model
         x = x.requires_grad_(True)
         t = t.requires_grad_(True)
-        p = p.requires_grad_(False)
-        u0 = u0.requires_grad_(False)
-        T_t = model( x, t, p, u0 ) # Shape (Bb, Bt)
 
-        # Pre-sum over branch to keep per-trunk-point derivatives
-        # Tmean: (Bt,) This is mainly for efficiency reasons.
-        Tsum = T_t.sum(dim=0) # shape (Bt,)
+        # params: (Bt,2), u0: (Bb,N)
+        T = model(x, t, params, u0)  # (Bb,Bt)
 
-        # All shapes (Bt,1)
-        dT_t = pt.autograd.grad( outputs=Tsum, 
-                                 inputs=t, 
-                                 grad_outputs=pt.ones_like(Tsum),
-                                 create_graph=True,
-                                 retain_graph=True)[0] # (Bt,)
-        dT_x = pt.autograd.grad( outputs=Tsum,
-                                 inputs=x,
-                                 grad_outputs=pt.ones_like(Tsum),
-                                 create_graph=True,
-                                 retain_graph=True)[0] # (Bt,)
-        dT_xx = pt.autograd.grad(outputs=dT_x,
-                                 inputs=x,
-                                 grad_outputs=pt.ones_like(dT_x),
-                                 create_graph=True,
-                                 retain_graph=True)[0] # (Bt,)
+        Bb, Bt = T.shape
+        dT_dt_list = []
+        dT_dxx_list = []
 
-        # Broadcast to (Bb, Bt)
-        dT_dt_mat  = dT_t[None, :]    # (1,Bt)
-        dT_dxx_mat = dT_xx[None, :]   # (1,Bt)
-        k_mat = k[None, :]        # (1,Bt)
+        for b in range(Bb):
+            Tb = T[b, :].unsqueeze(1)  # (Bt,1)
 
-        # Compute the PDE residual and average
-        eq = dT_dt_mat / (k_mat + 1e-8) -  dT_dxx_mat
-        loss = pt.mean( eq**2 )
+            dTb_dt = pt.autograd.grad(
+                outputs=Tb,
+                inputs=t,
+                grad_outputs=pt.ones_like(Tb),
+                create_graph=True,
+                retain_graph=True,
+            )[0]  # (Bt,1)
 
-        # also return some diagnostics
-        rms = pt.mean( eq**2 ).sqrt()
-        T_t_rms = pt.mean( (dT_dt_mat / k_mat)**2 ).sqrt()
-        T_xx_rms = pt.mean( dT_dxx_mat**2 ).sqrt()
-        return_dict = {"rms": rms, "T_t_rms" : T_t_rms, "T_xx_rms": T_xx_rms}
+            dTb_dx = pt.autograd.grad(
+                outputs=Tb,
+                inputs=x,
+                grad_outputs=pt.ones_like(Tb),
+                create_graph=True,
+                retain_graph=True,
+            )[0]  # (Bt,1)
 
-        return loss, return_dict
+            dTb_dxx = pt.autograd.grad(
+                outputs=dTb_dx,
+                inputs=x,
+                grad_outputs=pt.ones_like(dTb_dx),
+                create_graph=True,
+                retain_graph=True,
+            )[0]  # (Bt,1)
+
+            dT_dt_list.append(dTb_dt.squeeze(1))     # (Bt,)
+            dT_dxx_list.append(dTb_dxx.squeeze(1))   # (Bt,)
+
+        dT_dt = pt.stack(dT_dt_list, dim=0)    # (Bb,Bt)
+        dT_dxx = pt.stack(dT_dxx_list, dim=0)  # (Bb,Bt)
+
+        k = params[:, 0].unsqueeze(0)  # (1,Bt)
+
+        eq = dT_dt / (k + self.eps) - dT_dxx  # (Bb,Bt)
+        loss = (eq**2).mean()
+
+        with pt.no_grad():
+            rms = (eq**2).mean().sqrt()
+            Tt_rms = ((dT_dt / (k + self.eps))**2).mean().sqrt()
+            Txx_rms = (dT_dxx**2).mean().sqrt()
+
+        return loss, {"rms": rms, "T_t_rms": Tt_rms, "T_xx_rms": Txx_rms}

@@ -1,5 +1,5 @@
 import torch as pt
-from torch.optim import Adam
+from torch.optim import Adam, SGD
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
@@ -29,7 +29,7 @@ train_branch_dataset = BranchDataset( N_train_branch, n_grid_points )
 train_trunk_dataset = TrunkDataset( N_train_trunk, T_max, tau_max, dtype )
 validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points )
 validation_trunk_dataset = TrunkDataset( N_validation_trunk, T_max, tau_max, dtype )
-Bb = 64
+Bb = 32
 Bt = 128
 train_loader = DataLoader( train_branch_dataset, batch_size=Bb, shuffle=True )
 validation_loader = DataLoader( validation_branch_dataset, batch_size=N_validation_branch, shuffle=False )
@@ -66,7 +66,7 @@ lr = 1e-2
 n_steps = 5
 step_size = 1000
 n_epochs = n_steps * step_size
-optimizer = Adam( model.parameters(), lr )
+optimizer = Adam( model.parameters(), lr, amsgrad=True )
 scheduler = StepLR( optimizer, step_size=step_size, gamma=0.1 )
 
 # Bookkeeping and storage
@@ -120,11 +120,12 @@ def train( epoch : int ):
 
     # Update
     epoch_loss /= len( train_loader )
-    reg_loss = loss_dict.get("reg_loss", 0.0)
     print('\nTrain Epoch: {} \tLoss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
             epoch, epoch_loss, grad.item(), optimizer.param_groups[0]['lr']))
-    print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tTotal RMS: {:.4E} \tLoss Relative RMS: {:.4E} \tRegularization: {:.4E}'.format(
-        T_t_rms, T_xx_rms, rms, rel_rms, reg_loss ))
+    print("grad trunk head:", model.trunk.head.weight.grad.abs().mean().item())
+    print("grad branch head:", model.branch.head.weight.grad.abs().mean().item())
+    print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tTotal RMS: {:.4E} \tLoss Relative RMS: {:.4E}'.format(
+        T_t_rms, T_xx_rms, rms, rel_rms ))
     
     # Store the pretrained state
     pt.save( model.state_dict(), store_directory + 'model_adam.pth')
