@@ -1,3 +1,7 @@
+import sys
+sys.path.append('../')
+sys.path.append('../../')
+
 import torch as pt
 import torch.nn as nn
 
@@ -110,7 +114,6 @@ class DeepONet( nn.Module ):
         super().__init__()
         
         self.l = l
-        self.x_grid = x_grid
         self.T_max = T_max
         self.tau_max = tau_max
         self.logk_max = logk_max
@@ -119,7 +122,7 @@ class DeepONet( nn.Module ):
         # Precompute the Cholesky factorization
         self.register_buffer( "x_grid", x_grid )
         L = buildCholeskyMatrix( self.x_grid, self.l )
-        self.register_buffer( "L", L)
+        self.register_buffer( "L", L )
 
         # Setup the branch convolutional network with some good default values.
         n_grid_points = branch_setup[ "n_grid_points" ] # number of discretization points, must be passed explicitly

@@ -54,10 +54,10 @@ def tensorizedRBFInterpolator( L : pt.Tensor, # (n_grid_points, n_grid_points)
                               ) -> pt.Tensor:
     # Make sure the shapes and sizes match
     assert L.ndim == 2 and L.shape[0] == L.shape[1], f"`L` must be a square matrix, got shape {L.shape}."
-    assert u0.ndim == 2 and u0.shape[1] == L.shape[0], f"`u0` must have shape `(B, n_grid_points)` but got {u0.shape}."
+    assert u0.ndim == 2 and u0.shape[1] == L.shape[0], f"`u0` must have shape `(Bb, n_grid_points)` but got {u0.shape}."
     if x.ndim == 1:
         x = x[:,None]
-    assert x.ndim == 2 and x.shape[0] == u0.shape[0] and x.shape[1] == 1, f"`x` must have shape (B,1) with `B = u0.shape[0]` but got {x.shape}."
+    assert x.ndim == 2 and x.shape[1] == 1, f"`x` must have shape (Bt,1) but got {x.shape}."
 
     # Solve the Cholesky system in vectorized form.
     with pt.no_grad():

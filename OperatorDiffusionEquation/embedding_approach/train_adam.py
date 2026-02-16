@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 
 from TensorizedDataset import TensorizedDataset
 from EmbeddingNetwork import InitialEmbeddingMLP
-from Loss import HeatLoss
+from deeponet_approach.Loss import HeatLoss
 from utils import getGradientNorm
 
 import matplotlib.pyplot as plt

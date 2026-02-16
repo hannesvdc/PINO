@@ -1,10 +1,6 @@
 import torch as pt
 import torch.nn as nn
 
-from ConvDeepONet import DeepONet
-
-from typing import Tuple, Dict
-
 class HeatLoss( nn.Module ):
     """
     PDE residual loss for tensorized DeepONet output.

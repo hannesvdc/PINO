@@ -1,11 +1,14 @@
+import sys
+sys.path.append('../')
+
 import torch as pt
-from torch.optim import Adam, SGD
+from torch.optim import Adam
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
-from DeepONetDataset import BranchDataset, TrunkDataset
-from ConvDeepONet import DeepONet
-from Loss import HeatLoss
+from TensorizedDataset import BranchDataset, TrunkDataset
+from deeponet_approach.ConvDeepONet import DeepONet
+from deeponet_approach.Loss import HeatLoss
 from utils import getGradientNorm
 
 import matplotlib.pyplot as plt
@@ -18,16 +21,17 @@ store_directory = './Results/'
 # Create the training and validation datasets
 T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
+l = 0.2
 n_grid_points = 51
 
-N_train_branch = 1_024
+N_train_branch = 101
 N_train_trunk = 10_000
-N_validation_branch = 128
-N_validation_trunk = 1000
+N_validation_branch = 16
+N_validation_trunk = 300
 
-train_branch_dataset = BranchDataset( N_train_branch, n_grid_points )
+train_branch_dataset = BranchDataset( N_train_branch, n_grid_points, l)
 train_trunk_dataset = TrunkDataset( N_train_trunk, T_max, tau_max, dtype )
-validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points )
+validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points, l)
 validation_trunk_dataset = TrunkDataset( N_validation_trunk, T_max, tau_max, dtype )
 Bb = 32
 Bt = 128
@@ -53,8 +57,8 @@ branch_architecture = {"n_grid_points" : n_grid_points,
 trunk_architecture = { "input_dim" : 3,
                        "n_hidden_layers" : 4,
                        "z" : 64 }
-x_grid = pt.linspace( 0.0, 1.0, n_grid_points, device=device, dtype=dtype )
-model = DeepONet( branch_architecture, trunk_architecture, x_grid, T_max, tau_max, train_trunk_dataset.logk_max, q)
+x_grid = pt.linspace( 0.0, 1.0, n_grid_points)
+model = DeepONet( branch_architecture, trunk_architecture, x_grid, l, T_max, tau_max, train_trunk_dataset.logk_max, q)
 model = model.to( device=device, dtype=dtype )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
@@ -64,7 +68,7 @@ loss_fn = HeatLoss()
 # Build the Adam optimizer
 lr = 1e-2
 n_steps = 5
-step_size = 1000
+step_size = 100
 n_epochs = n_steps * step_size
 optimizer = Adam( model.parameters(), lr, amsgrad=True )
 scheduler = StepLR( optimizer, step_size=step_size, gamma=0.1 )
@@ -122,8 +126,6 @@ def train( epoch : int ):
     epoch_loss /= len( train_loader )
     print('\nTrain Epoch: {} \tLoss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
             epoch, epoch_loss, grad.item(), optimizer.param_groups[0]['lr']))
-    print("grad trunk head:", model.trunk.head.weight.grad.abs().mean().item())
-    print("grad branch head:", model.branch.head.weight.grad.abs().mean().item())
     print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tTotal RMS: {:.4E} \tLoss Relative RMS: {:.4E}'.format(
         T_t_rms, T_xx_rms, rms, rel_rms ))
     
