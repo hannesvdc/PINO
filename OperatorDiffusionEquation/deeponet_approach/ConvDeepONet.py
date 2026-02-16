@@ -1,44 +1,37 @@
 import torch as pt
 import torch.nn as nn
 
-from interpolate import evaluateInterpolatingSpline
+from collections import OrderedDict
 
-from typing import Dict
+from rbf_interpolation import buildCholeskyMatrix, tensorizedRBFInterpolator
+
+from typing import Dict, Callable
     
 class MLP( nn.Module ):
     def __init__( self, input_dim : int,
                         n_hidden_layers : int,
                         z : int,
-                        q : int):
+                        output_dim : int,
+                        act : Callable = nn.GELU(),
+                        name : str = ""):
         super().__init__()
+        self.act = act
 
-        self.stem = nn.Linear( input_dim, z, bias=True )
-        self.act = nn.Tanh()
-
-        self.n_hidden_layers = n_hidden_layers
+        neurons_per_layer = [input_dim] + [z]*n_hidden_layers + [output_dim]
         layers = []
-        for _ in range( self.n_hidden_layers ):
-            hidden_layer = nn.Linear( z, z, bias=True )
-            layers.append( hidden_layer )
-        self.hidden_layers = nn.ModuleList( layers )
-
-        self.head = nn.Linear( z, q, bias=True )
+        for n in range( 1, len(neurons_per_layer) ):
+            n_in = neurons_per_layer[n-1]
+            n_out = neurons_per_layer[n]
+            layers.append( (f"{name}linear {n}", nn.Linear(n_in, n_out, bias=True)) )
+            if n < len(neurons_per_layer)-1: # no activation after the last layer
+                layers.append( (f"{name}act {n}", self.act))
+        self.layers = nn.Sequential( OrderedDict( layers ) )
 
     def getNumberOfTrainableParameters( self ):
         return sum( [param.numel() for param in self.parameters() if param.requires_grad] )
     
     def forward(self, x : pt.Tensor ) -> pt.Tensor:
-        # Project to z dimensions
-        x = self.act( self.stem(x) )
-
-        for n in range( self.n_hidden_layers ):
-            x = self.hidden_layers[n] (x)
-            x = self.act( x )
-        
-        # Project back to q dimensions
-        y = self.head( x )
-
-        return y
+        return self.layers( x )
     
 class ConvNet( nn.Module ):
     """
@@ -109,17 +102,24 @@ class DeepONet( nn.Module ):
     def __init__(self, branch_setup : Dict, 
                        trunk_setup : Dict,
                        x_grid : pt.Tensor,
+                       l : float,
                        T_max : float,
                        tau_max : float,
                        logk_max : float,
                        q : int):
         super().__init__()
         
+        self.l = l
         self.x_grid = x_grid
         self.T_max = T_max
         self.tau_max = tau_max
         self.logk_max = logk_max
         self.q = q
+
+        # Precompute the Cholesky factorization
+        self.register_buffer( "x_grid", x_grid )
+        L = buildCholeskyMatrix( self.x_grid, self.l )
+        self.register_buffer( "L", L)
 
         # Setup the branch convolutional network with some good default values.
         n_grid_points = branch_setup[ "n_grid_points" ] # number of discretization points, must be passed explicitly
@@ -158,7 +158,7 @@ class DeepONet( nn.Module ):
         tau_hat = tau / self.tau_max
 
         # Evaluate all initial conditions at all spatial points
-        u0_at_x = evaluateInterpolatingSpline( x[:,0], self.x_grid, u0 )
+        u0_at_x = tensorizedRBFInterpolator( self.L, self.x_grid, self.l, x, u0 ) # (Bb, Bt)
 
         # Propagate the branch and trunk
         branch_output = self.branch( u0 ) # (Bb, self.q)
@@ -169,7 +169,7 @@ class DeepONet( nn.Module ):
         g = branch_output @ trunk_output.T # (Bb, q) @ (q, Bt) = (Bb, Bt)
 
         # Bring back to the physics
-        alpha_tau = pt.exp( -2.0 * tau.T ) # (1, Bt)
+        alpha_tau = 1.0 / (1.0 + tau.T) # (1, Bt)
         beta_tau = 1.0 - alpha_tau
         u_hat = u0_at_x * alpha_tau + beta_tau * x.T * (1.0 - x.T) * g
 

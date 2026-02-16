@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 import torch as pt
 from torch.optim import Adam
 from torch.optim.lr_scheduler import StepLR
@@ -6,7 +9,7 @@ from torch.utils.data import DataLoader
 from TensorizedDataset import TensorizedDataset
 from EmbeddingNetwork import InitialEmbeddingMLP
 from Loss import HeatLoss
-from utils import getGradientNorm, print_gradients
+from utils import getGradientNorm
 
 import matplotlib.pyplot as plt
 
