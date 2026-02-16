@@ -1,10 +1,10 @@
 import torch as pt
-from torch.optim import Adam, SGD
+from torch.optim import Adam
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
-from DeepONetDataset import BranchDataset, TrunkDataset
-from ConvDeepONet import DeepONet
+from TensorizedDataset import TensorizedDataset
+from EmbeddingNetwork import EmbeddingNetwork
 from Loss import HeatLoss
 from utils import getGradientNorm
 
@@ -20,41 +20,33 @@ T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
 n_grid_points = 51
 
-N_train_branch = 1_024
-N_train_trunk = 10_000
-N_validation_branch = 128
-N_validation_trunk = 1000
+B = 512
+N_train_branch = 128
+N_train_trunk = 5_000
+N_validation_branch = 32
+N_validation_trunk = 512
 
-train_branch_dataset = BranchDataset( N_train_branch, n_grid_points )
-train_trunk_dataset = TrunkDataset( N_train_trunk, T_max, tau_max, dtype )
-validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points )
-validation_trunk_dataset = TrunkDataset( N_validation_trunk, T_max, tau_max, dtype )
-Bb = 32
-Bt = 128
-train_loader = DataLoader( train_branch_dataset, batch_size=Bb, shuffle=True )
-validation_loader = DataLoader( validation_branch_dataset, batch_size=N_validation_branch, shuffle=False )
+train_dataset = TensorizedDataset( N_train_branch, N_train_trunk, n_grid_points, T_max, tau_max, dtype)
+validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk, n_grid_points, T_max, tau_max, dtype)
+train_loader = DataLoader( train_dataset, batch_size=B, shuffle=True )
 
 # Also store the dataset for later use
 data_store_directory = './data/'
-pt.save( train_branch_dataset.all().cpu(), data_store_directory + 'train_branch_data.pth' )
-pt.save( train_trunk_dataset.all().cpu(), data_store_directory + 'train_trunk_data.pth' )
-pt.save( validation_branch_dataset.all().cpu(), data_store_directory + 'validation_branch_data.pth' )
-pt.save( validation_trunk_dataset.all().cpu(), data_store_directory + 'validation_trunk_data.pth' )
+pt.save( train_dataset.branch_dataset.all().cpu(), data_store_directory + 'train_branch_data.pth' )
+pt.save( train_dataset.trunk_dataset.all().cpu(), data_store_directory + 'train_trunk_data.pth' )
+pt.save( validation_dataset.branch_dataset.all().cpu(), data_store_directory + 'validation_branch_data.pth' )
+pt.save( validation_dataset.trunk_dataset.all().cpu(), data_store_directory + 'validation_trunk_data.pth' )
 
 # Now do everything on the GPU
 device = pt.device("mps")
 dtype = pt.float32
 
 # Create the DeepONet PINO
-q = 25
-branch_architecture = {"n_grid_points" : n_grid_points,
-                       "n_hidden_layers" : 3,
-                       "kernel_size" : 5 }
-trunk_architecture = { "input_dim" : 3,
-                       "n_hidden_layers" : 4,
-                       "z" : 64 }
+embedding_setup = { "n_grid_points" : n_grid_points, "n_hidden_layers" : 3, "kernel_size" : 5, "q": 10 }
+n_hidden_layers = 4
+z = 64
 x_grid = pt.linspace( 0.0, 1.0, n_grid_points, device=device, dtype=dtype )
-model = DeepONet( branch_architecture, trunk_architecture, x_grid, T_max, tau_max, train_trunk_dataset.logk_max, q)
+model = EmbeddingNetwork( embedding_setup, n_hidden_layers, z, x_grid, T_max, tau_max, train_dataset.trunk_dataset.logk_max )
 model = model.to( device=device, dtype=dtype )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
@@ -78,26 +70,20 @@ validation_losses = []
 T_t_rmss = []
 T_xx_rmss = []
 rel_rmss = []
-train_trunk_dataset_all = train_trunk_dataset.all().to(device=device, dtype=dtype)
-validation_trunk_dataset_all = validation_trunk_dataset.all().to(device=device, dtype=dtype)
 def train( epoch : int ):
     model.train()
 
     epoch_loss = float( 0.0 )
-    for batch_idx, u0_batch in enumerate( train_loader ):
+    for batch_idx, (x, t, params, u0) in enumerate( train_loader ):
         optimizer.zero_grad( set_to_none=True )
 
-        u0_batch = u0_batch.to( device=device, dtype=dtype )
-
-        # Sample a trunk batch
-        it = pt.randint(0, N_train_trunk, (Bt,), device=device)
-        trunk_batch = train_trunk_dataset_all[it,:]
-        x = trunk_batch[:,0:1]
-        t = trunk_batch[:,1:2]
-        params = trunk_batch[:,2:]
+        x = x.to(device=device, dtype=dtype)
+        t = t.to(device=device, dtype=dtype)
+        params = params.to(device=device, dtype=dtype)
+        u0 = u0.to(device=device, dtype=dtype)
 
         # Compute the loss and its gradient
-        loss, loss_dict = loss_fn( model, x, t, params, u0_batch )
+        loss, loss_dict = loss_fn( model, x, t, params, u0 )
         loss.backward()
         epoch_loss += float( loss.item() )
         grad = getGradientNorm( model )
@@ -106,6 +92,7 @@ def train( epoch : int ):
         T_t_rms = loss_dict["T_t_rms"]
         T_xx_rms = loss_dict["T_xx_rms"]
         rel_rms = rms / (T_t_rms.item() + T_xx_rms.item() + 1e-12)
+        print(T_xx_rms)
 
         # Update the weights
         optimizer.step()
@@ -122,8 +109,6 @@ def train( epoch : int ):
     epoch_loss /= len( train_loader )
     print('\nTrain Epoch: {} \tLoss: {:.4E} \tLoss Gradient: {:.4E} \tlr: {:.2E}'.format(
             epoch, epoch_loss, grad.item(), optimizer.param_groups[0]['lr']))
-    print("grad trunk head:", model.trunk.head.weight.grad.abs().mean().item())
-    print("grad branch head:", model.branch.head.weight.grad.abs().mean().item())
     print('T_t RMS: {:.4E} \tT_xx RMS: {:.4E} \tTotal RMS: {:.4E} \tLoss Relative RMS: {:.4E}'.format(
         T_t_rms, T_xx_rms, rms, rel_rms ))
     
@@ -134,11 +119,12 @@ def train( epoch : int ):
 def validate( epoch : int ):
     model.eval()
 
-    u0 = validation_branch_dataset.all().to(device=device, dtype=dtype)
-    trunk_batch = validation_trunk_dataset_all
-    x = trunk_batch[:,0:1]
-    t = trunk_batch[:,1:2]
-    params = trunk_batch[:,2:]
+    x, t, params, u0 = validation_dataset.all()
+    x = x.to(device=device, dtype=dtype)
+    t = t.to(device=device, dtype=dtype)
+    params = params.to(device=device, dtype=dtype)
+    u0 = u0.to(device=device, dtype=dtype)
+    print(x.shape, t.shape, params.shape, u0.shape)
 
     # Compute the loss and its gradient
     loss, _ = loss_fn( model, x, t, params, u0 )
@@ -154,7 +140,7 @@ def validate( epoch : int ):
 try:
     for epoch in range( n_epochs ):
         train( epoch )
-        validate( epoch )
+#        validate( epoch )
         scheduler.step( )
 except KeyboardInterrupt:
     pass

@@ -23,6 +23,8 @@ class MLP( nn.Module ):
         self.hidden_layers = nn.ModuleList( layers )
 
         self.head = nn.Linear( z, output_dim, bias=True )
+        nn.init.zeros_( self.head.weight )
+        nn.init.zeros_( self.head.bias )
 
     def getNumberOfTrainableParameters( self ):
         return sum( [param.numel() for param in self.parameters() if param.requires_grad] )
@@ -125,15 +127,18 @@ class EmbeddingNetwork( nn.Module ):
         # Setup the branch convolutional network with some good default values.
         n_grid_points = embedding_setup[ "n_grid_points" ] # number of discretization points, must be passed explicitly
         n_branch_layers = embedding_setup.get( "n_hidden_layers", 3 )
-        branch_kernel_size = embedding_setup.get( "kernel_size", 5 )
         q = embedding_setup.get( "q", 10 )
-        self.embedding = EmbeddingConvNet( n_grid_points, n_branch_layers, branch_kernel_size, q)
+        self.embedding = MLP( n_grid_points, n_branch_layers, z, q)
 
         # Setup the trunk network with some good default values.
         self.n_input_dim = 3 + q
         self.n_hidden_layers = n_hidden_layers
         self.z = z
         self.mlp = MLP( self.n_input_dim, self.n_hidden_layers, self.z, 1 )
+
+        # Initialize the head layer with zeros to avoid T_xx from blowing up
+        nn.init.zeros_( self.mlp.head.weight )
+        nn.init.zeros_( self.mlp.head.bias )
 
     def getNumberOfTrainableParameters( self ):
         return sum( [param.numel() for param in self.parameters() if param.requires_grad] )
@@ -167,8 +172,8 @@ class EmbeddingNetwork( nn.Module ):
         g = self.mlp( input ) # (B, 1)
 
         # Evaluate all initial conditions at all spatial points
-        u0_at_x = evaluateInterpolatingSpline( x[:,0], self.x_grid, u0 ) # check this shape.
-        print(u0_at_x.shape)
+        u0_at_x_tensor = evaluateInterpolatingSpline( x[:,0], self.x_grid, u0 ) # check this shape.
+        u0_at_x = pt.diag( u0_at_x_tensor )[:,None]
 
         # Bring back to the physics
         alpha_tau = 1.0 / (1.0 + tau)

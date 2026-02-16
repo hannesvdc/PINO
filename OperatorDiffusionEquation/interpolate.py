@@ -48,8 +48,8 @@ def interpolateInitialsTensorized(x: pt.Tensor, # (Bt,)
     return (1.0 - w) * u0_0 + w * u0_1      # (Bb, Bt)
 
 def evaluateInterpolatingSpline( x: pt.Tensor, #(Bt,)
-                              x_grid : pt.Tensor, # (n_grid_points)
-                              u0: pt.Tensor, # (Bb, n_grid_points)
+                                x_grid : pt.Tensor, # (n_grid_points)
+                                u0: pt.Tensor, # (Bb, n_grid_points)
                             ) -> pt.Tensor:
     coeffs = natural_cubic_spline_coeffs(x_grid, u0.T)
     spline = NaturalCubicSpline(coeffs)

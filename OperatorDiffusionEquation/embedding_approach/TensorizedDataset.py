@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 import math
 import torch as pt
 from torch.utils.data import Dataset
@@ -27,7 +30,7 @@ class TrunkDataset( Dataset ):
         self.x = pt.rand( (N,1), dtype=dtype, requires_grad=False, generator=gen)
 
         # Put most tau closer to 0
-        tau_min = 1e-1
+        tau_min = 1e-2
         gamma = 2.0  # 1 = log-uniform, >1 biases small tau
         u = pt.rand((N, 1), dtype=dtype, generator=gen)
         log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
@@ -83,7 +86,15 @@ class TensorizedDataset( Dataset ):
     def __len__( self ) -> int:
         return len( self.branch_dataset ) * len( self.trunk_dataset )
     
-    def __getitem__( self, idx : int ) -> Tuple[pt.Tensor, Tuple[pt.Tensor, pt.Tensor, pt.Tensor]]:
-        branch_idx = idx // self.N_trunk
-        trunk_idx = idx % self.N_trunk
-        return self.branch_dataset[branch_idx], self.trunk_dataset[trunk_idx]
+    def __getitem__( self, idx : int ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
+        branch_idx = idx % self.N_branch
+        trunk_idx = idx // self.N_branch
+        u0 = self.branch_dataset[branch_idx]
+        x, t, params = self.trunk_dataset[trunk_idx]
+        return x, t, params, u0
+    
+    def all( self ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
+        u0 = self.branch_dataset.all()
+        trunk_all = self.trunk_dataset.all()
+        x, t, params = trunk_all[:,0:1], trunk_all[:,1:2], trunk_all[:,2:]
+        return x, t, params, u0
