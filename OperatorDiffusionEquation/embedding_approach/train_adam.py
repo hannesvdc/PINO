@@ -3,8 +3,8 @@ from torch.optim import Adam
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
-from TensorizedDataset import TensorizedDataset
-from EmbeddingNetwork import EmbeddingNetwork
+from TensorizedDataset import TensorizedDataset, TestTensorizedDataset
+from EmbeddingNetwork import InitialEmbeddingMLP
 from Loss import HeatLoss
 from utils import getGradientNorm
 
@@ -19,15 +19,16 @@ store_directory = './Results/'
 T_max = 10.0
 tau_max = 8.0 # train to exp( -tau_max )
 n_grid_points = 51
+l = 0.2
 
 B = 512
-N_train_branch = 128
-N_train_trunk = 5_000
+N_train_branch = 101
+N_train_trunk = 8192
 N_validation_branch = 32
 N_validation_trunk = 512
 
-train_dataset = TensorizedDataset( N_train_branch, N_train_trunk, n_grid_points, T_max, tau_max, dtype)
-validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk, n_grid_points, T_max, tau_max, dtype)
+train_dataset = TensorizedDataset( N_train_branch, N_train_trunk, n_grid_points, l, T_max, tau_max, dtype)
+validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk, n_grid_points, l, T_max, tau_max, dtype)
 train_loader = DataLoader( train_dataset, batch_size=B, shuffle=True )
 
 # Also store the dataset for later use
@@ -45,8 +46,8 @@ dtype = pt.float32
 embedding_setup = { "n_grid_points" : n_grid_points, "n_hidden_layers" : 3, "kernel_size" : 5, "q": 10 }
 n_hidden_layers = 4
 z = 64
-x_grid = pt.linspace( 0.0, 1.0, n_grid_points, device=device, dtype=dtype )
-model = EmbeddingNetwork( embedding_setup, n_hidden_layers, z, x_grid, T_max, tau_max, train_dataset.trunk_dataset.logk_max )
+x_grid = train_dataset.branch_dataset.x_grid
+model = InitialEmbeddingMLP( embedding_setup, n_hidden_layers, z, x_grid, l, T_max, tau_max, train_dataset.trunk_dataset.logk_max )
 model = model.to( device=device, dtype=dtype )
 print('Number of Trainable Parameters: ', sum([ p.numel() for p in model.parameters() ]))
 
@@ -55,8 +56,8 @@ loss_fn = HeatLoss()
 
 # Build the Adam optimizer
 lr = 1e-2
-n_steps = 5
-step_size = 1000
+n_steps = 10
+step_size = 100
 n_epochs = n_steps * step_size
 optimizer = Adam( model.parameters(), lr, amsgrad=True )
 scheduler = StepLR( optimizer, step_size=step_size, gamma=0.1 )
@@ -92,7 +93,6 @@ def train( epoch : int ):
         T_t_rms = loss_dict["T_t_rms"]
         T_xx_rms = loss_dict["T_xx_rms"]
         rel_rms = rms / (T_t_rms.item() + T_xx_rms.item() + 1e-12)
-        print(T_xx_rms)
 
         # Update the weights
         optimizer.step()
@@ -141,7 +141,7 @@ try:
     for epoch in range( n_epochs ):
         train( epoch )
 #        validate( epoch )
-        scheduler.step( )
+#        scheduler.step( )
 except KeyboardInterrupt:
     pass
 

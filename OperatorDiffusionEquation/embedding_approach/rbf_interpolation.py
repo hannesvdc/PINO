@@ -32,7 +32,8 @@ def jointIndexingRBFInterpolator( L : pt.Tensor,
 
     # Solve the Cholesky system in vectorized form.
     with pt.no_grad():
-        alpha = pt.cholesky_solve( u0.T, L ) # Shape (n_grid_points, B)
+        z = pt.linalg.solve_triangular(L, u0.T, upper=False)
+        alpha = pt.linalg.solve_triangular(L.transpose(-1, -2), z, upper=True)
 
     # Build a joint-indexing RBF interpolator
     if x_grid.ndim == 1:

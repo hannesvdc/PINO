@@ -17,6 +17,14 @@ u0.requires_grad_( False )
 # Build the Cholesky factorization
 L = buildCholeskyMatrix( x_grid, l )
 
+device = pt.device("mps")
+dtype = pt.float32
+pt.set_default_device(device)
+pt.set_default_dtype(dtype)
+L = L.to(device=device, dtype=dtype)
+u0 = u0.to(device=device, dtype=dtype)
+x_grid = x_grid.to(device=device, dtype=dtype)
+
 # Do joint indexig interpolation. This means replicating u0 for all `x`.
 n_plot_points = 10001
 x = pt.linspace( 0.0, 1.0, n_plot_points, requires_grad=True )
@@ -29,10 +37,10 @@ du0_dx = pt.autograd.grad(outputs=u0_int_der, inputs=x, create_graph=True, grad_
 du0_dxx = pt.autograd.grad(outputs=du0_dx, inputs=x, create_graph=True, grad_outputs=pt.ones_like(du0_dx))[0]
 
 # Plot for a visual comparison
-plt.plot( x_grid.flatten().numpy(), u0.flatten().numpy(), label="Original cGP")
-plt.plot( x.flatten().detach().numpy(), u0_interpolated.flatten().detach().numpy(), linestyle='--', label="RBF Interpolator")
-plt.plot( x.flatten().detach().numpy(), du0_dx.flatten().detach().numpy(), linestyle='--', label="First Derivative")
-plt.plot( x.flatten().detach().numpy(), du0_dxx.flatten().detach().numpy(), linestyle='--', label="Second Derivative")
+plt.plot( x_grid.flatten().cpu().numpy(), u0.flatten().cpu().numpy(), label="Original cGP")
+plt.plot( x.flatten().detach().cpu().numpy(), u0_interpolated.flatten().detach().cpu().numpy(), linestyle='--', label="RBF Interpolator")
+plt.plot( x.flatten().detach().cpu().numpy(), du0_dx.flatten().detach().cpu().numpy(), linestyle='--', label="First Derivative")
+plt.plot( x.flatten().detach().cpu().numpy(), du0_dxx.flatten().detach().cpu().numpy(), linestyle='--', label="Second Derivative")
 plt.xlabel( r"$x$" )
 plt.legend()
 plt.show()

@@ -50,15 +50,17 @@ class TrunkDataset( Dataset ):
     
 class BranchDataset( Dataset ):
     def __init__( self, N : int,
-                        n_grid_points : int):
+                        n_grid_points : int,
+                        l : float):
         super().__init__()
 
         self.N = N
         self.n_grid_points = n_grid_points
 
         self.x_grid = pt.linspace(0.0, 1.0, self.n_grid_points)
-        self.l = 0.12
-        self.data = gp( self.x_grid, self.l, self.N ) # (N, n_grid_points)
+        self.l = l
+        self.scale = 20.0
+        self.data = gp( self.x_grid, self.l, self.N ) / self.scale # (N, n_grid_points)
 
     def __len__( self ) -> int:
         return self.N
@@ -73,6 +75,7 @@ class TensorizedDataset( Dataset ):
     def __init__(self, N_branch : int,
                        N_trunk : int,
                        n_grid_points : int,
+                       l : float,
                        T_max : float,
                        tau_max : float,
                        dtype = pt.float64):
@@ -80,7 +83,7 @@ class TensorizedDataset( Dataset ):
 
         self.N_branch = N_branch
         self.N_trunk = N_trunk
-        self.branch_dataset = BranchDataset( N_branch, n_grid_points )
+        self.branch_dataset = BranchDataset( N_branch, n_grid_points, l)
         self.trunk_dataset = TrunkDataset( N_trunk, T_max, tau_max, dtype )
 
     def __len__( self ) -> int:
@@ -98,3 +101,16 @@ class TensorizedDataset( Dataset ):
         trunk_all = self.trunk_dataset.all()
         x, t, params = trunk_all[:,0:1], trunk_all[:,1:2], trunk_all[:,2:]
         return x, t, params, u0
+    
+class TestTensorizedDataset( TensorizedDataset ):
+    def __init__(self, N_branch : int,
+                       N_trunk : int,
+                       n_grid_points : int,
+                       l : float,
+                       T_max : float,
+                       tau_max : float,
+                       dtype = pt.float64):
+        super().__init__(N_branch, N_trunk, n_grid_points, l, T_max, tau_max, dtype)
+        tau = 0.1
+        t = tau / self.trunk_dataset.k
+        self.trunk_dataset.t = t
