@@ -24,4 +24,4 @@ class MSETestLoss( nn.Module ):
         reference = x**2
         loss = pt.mean( (T - reference)**2 )
 
-        return loss, {"rms": None, "T_t_rms": None, "T_xx_rms": None}
+        return loss, {"rms": loss, "T_t_rms": loss, "T_xx_rms": loss}

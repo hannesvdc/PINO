@@ -16,7 +16,7 @@ class HeatLoss( nn.Module ):
     Model output:
         T: (B,)
     """
-    def __init__( self, eps=1e-6 ):
+    def __init__( self, eps=1e-10 ):
         super().__init__()
         self.eps = eps
 
@@ -26,8 +26,8 @@ class HeatLoss( nn.Module ):
 
         x = x.requires_grad_(True)
         t = t.requires_grad_(True)
-        params = params.requires_grad_(False)
-        u0 = u0.requires_grad_(False)
+        params = params.requires_grad_(True)
+        u0 = u0.requires_grad_(True)
 
         # params: (B,2), u0: (B, n_grid_points)
         T = model(x, t, params, u0)  # (B,1)
@@ -54,12 +54,13 @@ class HeatLoss( nn.Module ):
             )[0]  # (B,1)
 
         k = params[:, 0:1]
-        eq = dT_dt / (k + self.eps) - dT_dxx  # (B,1)
+        #eq = dT_dt / (k + self.eps) - dT_dxx  # (B,1)
+        eq = dT_dt - k * dT_dxx
         loss = (eq**2).mean()
 
         with pt.no_grad():
             rms = (eq**2).mean().sqrt()
-            Tt_rms = ((dT_dt / (k + self.eps))**2).mean().sqrt()
-            Txx_rms = (dT_dxx**2).mean().sqrt()
+            Tt_rms = ((dT_dt)**2).mean().sqrt()
+            Txx_rms = ((k*dT_dxx)**2).mean().sqrt()
 
         return loss, {"rms": rms, "T_t_rms": Tt_rms, "T_xx_rms": Txx_rms}

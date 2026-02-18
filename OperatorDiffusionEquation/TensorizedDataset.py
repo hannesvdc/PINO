@@ -13,7 +13,9 @@ class TrunkDataset( Dataset ):
     def __init__(self, N : int,
                        T_max : float,
                        tau_max : float,
-                       dtype = pt.float64 ):
+                       dtype = pt.float64,
+                       plot : bool = False, 
+                       tau_sampling : str = "uniform" ):
         super().__init__()
 
         self.T_max = T_max
@@ -31,17 +33,21 @@ class TrunkDataset( Dataset ):
 
         # Put most tau closer to 0
         tau_min = 1e-2
-        gamma = 2.0  # 1 = log-uniform, >1 biases small tau
-        u = pt.rand(( int(0.7*N), 1), dtype=dtype, generator=gen)
-        log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
+        if tau_sampling == "uniform":
+            self.tau = (tau_max - tau_min) * pt.rand( (N,1), generator=gen)
+        else:
+            gamma = 1.5  # 1 = log-uniform, >1 biases small tau
+            u = pt.rand(( int(0.7*N), 1), dtype=dtype, generator=gen)
+            log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
 
-        # Also sample some uniformly
-        tau_extra = 1.0 + pt.rand( (int(0.3*N),1), dtype=dtype, generator=gen ) * (self.tau_max - 1.0)
-        self.tau = pt.cat( (pt.exp( log_tau ), tau_extra), dim=0)
+            # Also sample some uniformly
+            tau_extra = 1.0 + pt.rand( (N-log_tau.shape[0],1), dtype=dtype, generator=gen ) * (self.tau_max - 1.0)
+            self.tau = pt.cat( (pt.exp( log_tau ), tau_extra), dim=0)
 
-        import matplotlib.pyplot as plt
-        plt.hist(self.tau)
-        plt.show()
+        if plot:
+            import matplotlib.pyplot as plt
+            plt.hist(self.tau)
+            plt.show()
         
         # rescale
         self.t = self.tau / self.k
@@ -58,7 +64,8 @@ class TrunkDataset( Dataset ):
 class BranchDataset( Dataset ):
     def __init__( self, N : int,
                         n_grid_points : int,
-                        l : float):
+                        l : float,
+                        plot : bool = False):
         super().__init__()
 
         self.N = N
@@ -66,8 +73,14 @@ class BranchDataset( Dataset ):
 
         self.x_grid = pt.linspace(0.0, 1.0, self.n_grid_points)
         self.l = l
-        self.scale = 1.0
+        self.scale = 2.0
         self.data = gp( self.x_grid, self.l, self.N ) / self.scale # (N, n_grid_points)
+
+        if plot:
+            import matplotlib.pyplot as plt
+            plt.plot(self.x_grid.detach().cpu().numpy(), self.data.detach().cpu().numpy().T, label="u0")
+            plt.xlabel(r"$x$")
+            plt.show()
 
     def __len__( self ) -> int:
         return self.N
@@ -85,13 +98,15 @@ class TensorizedDataset( Dataset ):
                        l : float,
                        T_max : float,
                        tau_max : float,
-                       dtype = pt.float64):
+                       dtype = pt.float64,
+                       plot : bool = False,
+                       tau_sampling : str = "uniform"):
         super().__init__()
 
         self.N_branch = N_branch
         self.N_trunk = N_trunk
-        self.branch_dataset = BranchDataset( N_branch, n_grid_points, l)
-        self.trunk_dataset = TrunkDataset( N_trunk, T_max, tau_max, dtype )
+        self.branch_dataset = BranchDataset( N_branch, n_grid_points, l, plot)
+        self.trunk_dataset = TrunkDataset( N_trunk, T_max, tau_max, dtype, plot, tau_sampling )
 
     def __len__( self ) -> int:
         return len( self.branch_dataset ) * len( self.trunk_dataset )
