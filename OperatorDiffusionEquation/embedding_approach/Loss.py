@@ -63,4 +63,4 @@ class HeatLoss( nn.Module ):
             Tt_rms = ((dT_dt)**2).mean().sqrt()
             Txx_rms = ((k*dT_dxx)**2).mean().sqrt()
 
-        return loss, {"rms": rms, "T_t_rms": Tt_rms, "T_xx_rms": Txx_rms}
+        return loss, {"rms": float(rms), "T_t_rms": float(Tt_rms), "T_xx_rms": float(Txx_rms)}
