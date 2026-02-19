@@ -1,6 +1,7 @@
 import sys
 sys.path.append('../')
 
+import math
 import torch as pt
 import torch.nn as nn
 import torch.nn.functional as F
@@ -42,7 +43,7 @@ class BranchEmbeddingNetwork( nn.Module ):
         self.forward_mlp = MultiLayerPerceptron( forward_layers, act=nn.Tanh )
 
         # Time decay parameter
-        self.rate_c = nn.Parameter( pt.tensor(1.0) )
+        #self.rate_c = nn.Parameter( pt.tensor( math.pi**2 ) )
 
     def forward( self, x : pt.Tensor, # (B,1)
                        t : pt.Tensor, # (B,1)
@@ -64,7 +65,8 @@ class BranchEmbeddingNetwork( nn.Module ):
         # Extract parameters and process the input
         k = params[:,0:1]
         logk_hat = pt.log( k ) / self.logk_max
-        Ts_hat = params[:,1:2] / self.T_max
+        Ts = params[:,1:2]
+        Ts_hat = Ts / self.T_max
         tau = t * k
         tau_hat = tau / self.tau_max
 
@@ -76,12 +78,21 @@ class BranchEmbeddingNetwork( nn.Module ):
         forward_input = pt.cat( (x, tau_hat, logk_hat, Ts_hat, u0_embed_norm), dim=1)
         forward_output = self.forward_mlp( forward_input )
 
-        # Include the Dirichlet boundary condition
+        # Interpolate the initial condition to be evaluated at every input `x`.
+        #B = len(x)
         u0_at_x = jointIndexingRBFInterpolator( self.cholesky_L, self.x_grid, self.l, x, u0 )
-        c = F.softplus( self.rate_c )
-        beta = 1.0 - pt.exp( -c * tau_hat )
+        #right_idx = pt.searchsorted(self.x_grid.flatten(), x.flatten(), side='right')
+        #batch_indices = pt.arange( B, device=u0.device)
+        #left_idx = right_idx-1
+        #u0_values_right = u0[batch_indices, right_idx]
+        #u0_values_left = u0[batch_indices, left_idx]
+        #print(u0_values_left.flatten()[0:2], u0_at_x.flatten()[0:2], u0_values_right.flatten()[0:2])
+
+        # Include the Dirichlet boundary condition
+        c = math.pi**2 #F.softplus( self.rate_c )
+        beta = 1.0 - pt.exp( -c * tau )
         u_xt = u0_at_x + beta * x * (1.0 - x) * forward_output
 
         # Go back to the physics
-        T_xt = self.T_max * ( Ts_hat + u_xt )
+        T_xt = Ts + self.T_max * u_xt
         return T_xt

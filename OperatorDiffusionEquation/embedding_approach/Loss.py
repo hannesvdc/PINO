@@ -54,13 +54,13 @@ class HeatLoss( nn.Module ):
             )[0]  # (B,1)
 
         k = params[:, 0:1]
-        #eq = dT_dt / (k + self.eps) - dT_dxx  # (B,1)
-        eq = dT_dt - k * dT_dxx
-        loss = (eq**2).mean()
+        eq = dT_dt / (k + self.eps) - dT_dxx  # (B,1)
+        # eq = dT_dt - k * dT_dxx
+        loss = ( eq**2 ).mean()
 
         with pt.no_grad():
             rms = (eq**2).mean().sqrt()
-            Tt_rms = ((dT_dt)**2).mean().sqrt()
-            Txx_rms = ((k*dT_dxx)**2).mean().sqrt()
+            Tt_rms = ( (dT_dt / k)**2 ).mean().sqrt()
+            Txx_rms = ( dT_dxx**2 ).mean().sqrt()
 
         return loss, {"rms": float(rms), "T_t_rms": float(Tt_rms), "T_xx_rms": float(Txx_rms)}

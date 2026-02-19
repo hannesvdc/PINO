@@ -34,7 +34,7 @@ class TrunkDataset( Dataset ):
         # Put most tau closer to 0
         tau_min = 1e-2
         if tau_sampling == "uniform":
-            self.tau = (tau_max - tau_min) * pt.rand( (N,1), generator=gen)
+            self.tau = tau_min + (tau_max - tau_min) * pt.rand( (N,1), generator=gen)
         else:
             gamma = 1.5  # 1 = log-uniform, >1 biases small tau
             u = pt.rand(( int(0.7*N), 1), dtype=dtype, generator=gen)

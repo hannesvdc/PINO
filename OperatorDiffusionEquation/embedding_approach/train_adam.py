@@ -15,14 +15,13 @@ from Loss import HeatLoss
 
 # Do everything on the CPU in double precision first
 dtype = pt.float64
-pt.set_default_device( pt.device("cpu") )
 pt.set_default_dtype( dtype )
 
 # Physics parameters
 n_grid_points = 51
 T_max = 10.0
 tau_max = 8.0
-l = 0.2
+l = 0.5
 
 # Create a training and validation dataset
 sampling_strat = "uniform"
@@ -36,31 +35,29 @@ validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk,
                                        l, T_max, tau_max, dtype, plot=False, tau_sampling=sampling_strat)
 
 # Create a training loader only
-B = 2048
-training_loader = DataLoader( train_dataset, B, shuffle=True )
+B = 512
+training_loader = DataLoader( train_dataset, batch_size=B, shuffle=True )
 
 # Setup the network
 n_embedding_hidden_layers = 4
 n_hidden_layers = 4
 z = 64
-q = 10
+q = 25
 x_grid = train_dataset.branch_dataset.x_grid
 logk_max = train_dataset.trunk_dataset.logk_max
 model = BranchEmbeddingNetwork( n_embedding_hidden_layers, n_hidden_layers, z, q, x_grid, l, T_max, tau_max, logk_max)
 
 # Translate the model to GPU
-device = pt.device( "mps" )
-dtype = pt.float32
-pt.set_default_device( device )
-pt.set_default_dtype( dtype )
+device = pt.device( "cpu" )
+dtype = pt.float64
 model = model.to(device=device, dtype=dtype)
 
 # Heat loss fcn
 loss_fcn = HeatLoss( )
 
 # Setup the optimizer and learning rate scheduler
-lr = 0.01
-n_epochs = 1000
+lr = 1e-3
+n_epochs = 300
 optimizer = optim.Adam( model.parameters(), lr )
 scheduler = optim.lr_scheduler.CosineAnnealingLR( optimizer, n_epochs, 1e-6 )
 
@@ -89,29 +86,42 @@ def train_epoch( epoch : int ):
         u0_b = u0_b.to( device=device, dtype=dtype )
 
         # Compute the loss and its gradient
-        loss, loss_info = loss_fcn( x_b, t_b, params_b, u0_b )
+        loss, loss_info = loss_fcn( model, x_b, t_b, params_b, u0_b )
         loss.backward()
         loss_grad = getGradientNorm( model )
 
         # Update the weights internally
+        pt.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
         optimizer.step( )
 
         # Keep track of important metrics
         T_t_rms = loss_info["T_t_rms"]
         T_xx_rms = loss_info["T_xx_rms"]
         rel_rms = loss_info["rms"] / (T_t_rms + T_xx_rms)
-        train_counter.append( epoch + batch_idx / len(training_loader))
+        train_counter.append( epoch-1 + batch_idx / len(training_loader))
         train_losses.append( float(loss.item()) )
         train_grads.append( float(loss_grad.item()) )
         train_rms.append( float(rel_rms) )
 
         if batch_idx % 100 == 0:
-            print_str = f'Epoch {epoch} [{batch_idx}/{len(training_loader)} ({batch_idx/len(training_loader)*100.0}%)]:'
-            print_str += "\tLoss: {:4d} \tGradient: {:4d}".format( loss.item(), loss_grad.item())
-            print( print_str )
+            progress = 100.0 * batch_idx / len(training_loader)
+            print_str = (
+                f"\nEpoch {epoch:04d} "
+                f"[{batch_idx:05d}/{len(training_loader):05d} | {progress:6.2f}%]  "
+                f"Loss: {loss.item():.3e}  "
+                f"Grad: {loss_grad.item():.3e}  "
+                f"Lr: {optimizer.param_groups[0]['lr']:.3e}"
+            )
+            print(print_str)
 
-            info_str = f"T_t RMS: {T_t_rms} \tT_xx RMS: {T_xx_rms} \tRelative RMS: {rel_rms}"
-            print( info_str )
+            info_str = (
+                f"    RMS:  T_t = {T_t_rms:.3e}   "
+                f"T_xx = {T_xx_rms:.3e}   "
+                f"Rel = {rel_rms:.3e}"
+            )
+            print(info_str)
+
+            #print( model.rate_c )
 
 # Validation function
 validation_counter = []
@@ -120,7 +130,7 @@ def validate_epoch( epoch : int ):
     model.eval( )
 
     # Compute the loss and its gradient
-    loss, loss_info = loss_fcn( x_val, t_val, params_val, u0_val )
+    loss, loss_info = loss_fcn( model, x_val, t_val, params_val, u0_val )
     rel_rms = loss_info["rms"] / (loss_info["T_t_rms"] + loss_info["T_xx_rms"])
 
     # Store
@@ -128,7 +138,7 @@ def validate_epoch( epoch : int ):
     validation_losses.append( float(loss.item()) )
 
     # Print and done.
-    print_str = f'Validation Epoch {epoch}: \tLoss: {loss.item()} \tRelative RMS: {rel_rms}'
+    print_str = f'\nValidation Epoch {epoch:04d}: \tLoss: {loss.item():.3e} \tRelative RMS: {rel_rms:.3e}'
     print(print_str)
 
 # Main training loop
