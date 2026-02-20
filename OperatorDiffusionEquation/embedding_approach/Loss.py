@@ -26,8 +26,8 @@ class HeatLoss( nn.Module ):
 
         x = x.requires_grad_(True)
         t = t.requires_grad_(True)
-        params = params.requires_grad_(True)
-        u0 = u0.requires_grad_(True)
+        params = params.requires_grad_(False)
+        u0 = u0.requires_grad_(False)
 
         # params: (B,2), u0: (B, n_grid_points)
         T = model(x, t, params, u0)  # (B,1)
@@ -55,7 +55,6 @@ class HeatLoss( nn.Module ):
 
         k = params[:, 0:1]
         eq = dT_dt / (k + self.eps) - dT_dxx  # (B,1)
-        # eq = dT_dt - k * dT_dxx
         loss = ( eq**2 ).mean()
 
         with pt.no_grad():

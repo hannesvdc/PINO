@@ -13,6 +13,7 @@ class TrunkDataset( Dataset ):
     def __init__(self, N : int,
                        T_max : float,
                        tau_max : float,
+                       logk_max : float,
                        dtype = pt.float64,
                        plot : bool = False, 
                        tau_sampling : str = "uniform" ):
@@ -20,7 +21,7 @@ class TrunkDataset( Dataset ):
 
         self.T_max = T_max
         self.tau_max = tau_max
-        self.logk_max = math.log(1e2)
+        self.logk_max = logk_max
 
         # Sample log_k and T_s uniformly
         gen = pt.Generator( )
@@ -35,7 +36,7 @@ class TrunkDataset( Dataset ):
         tau_min = 1e-2
         if tau_sampling == "uniform":
             self.tau = tau_min + (tau_max - tau_min) * pt.rand( (N,1), generator=gen)
-        else:
+        elif tau_sampling == "initial_bias":
             gamma = 1.5  # 1 = log-uniform, >1 biases small tau
             u = pt.rand(( int(0.7*N), 1), dtype=dtype, generator=gen)
             log_tau = math.log(tau_min) + (math.log(tau_max) - math.log(tau_min)) * (u ** gamma)
@@ -43,6 +44,8 @@ class TrunkDataset( Dataset ):
             # Also sample some uniformly
             tau_extra = 1.0 + pt.rand( (N-log_tau.shape[0],1), dtype=dtype, generator=gen ) * (self.tau_max - 1.0)
             self.tau = pt.cat( (pt.exp( log_tau ), tau_extra), dim=0)
+        else:
+            print( "This tau-sampling strategy is not supported. Aborting.")
 
         if plot:
             import matplotlib.pyplot as plt
@@ -98,6 +101,7 @@ class TensorizedDataset( Dataset ):
                        l : float,
                        T_max : float,
                        tau_max : float,
+                       logk_max : float,
                        dtype = pt.float64,
                        plot : bool = False,
                        tau_sampling : str = "uniform"):
@@ -106,7 +110,7 @@ class TensorizedDataset( Dataset ):
         self.N_branch = N_branch
         self.N_trunk = N_trunk
         self.branch_dataset = BranchDataset( N_branch, n_grid_points, l, plot)
-        self.trunk_dataset = TrunkDataset( N_trunk, T_max, tau_max, dtype, plot, tau_sampling )
+        self.trunk_dataset = TrunkDataset( N_trunk, T_max, tau_max, logk_max, dtype, plot, tau_sampling )
 
     def __len__( self ) -> int:
         return len( self.branch_dataset ) * len( self.trunk_dataset )
@@ -139,8 +143,9 @@ class TestTensorizedDataset( TensorizedDataset ):
                        l : float,
                        T_max : float,
                        tau_max : float,
+                       logk_max : float,
                        dtype = pt.float64):
-        super().__init__(N_branch, N_trunk, n_grid_points, l, T_max, tau_max, dtype)
+        super().__init__(N_branch, N_trunk, n_grid_points, l, T_max, tau_max, logk_max, dtype)
         tau = 0.1
         t = tau / self.trunk_dataset.k
         self.trunk_dataset.t = t

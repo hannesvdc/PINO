@@ -35,7 +35,7 @@ class BranchEmbeddingNetwork( nn.Module ):
         # Construct the embedding layer with GELU activation functions.
         self.n_grid_points = len( self.x_grid )
         embedding_layers = [self.n_grid_points] + [z] * n_embedding_hidden_layers + [q]
-        self.embedding_mlp = MultiLayerPerceptron( embedding_layers, act=nn.GELU )
+        self.embedding_mlp = MultiLayerPerceptron( embedding_layers, act=nn.GELU, init_zero=False )
         self.embedding_norm = nn.LayerNorm( q )
 
         # Setup the forward network. Tanh has more stable second derivatives, no blow-up.
