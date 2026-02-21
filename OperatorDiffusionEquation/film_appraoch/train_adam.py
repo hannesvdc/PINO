@@ -11,7 +11,7 @@ from utils import getGradientNorm
 import matplotlib.pyplot as plt
 
 from TensorizedDataset import TensorizedDataset
-from ConvBranchEmbeddingNetwork import ConvBranchEmbeddingNetwork
+from TrunkFiLMNetwork import TrunkFilmNetwork
 from Loss import HeatLoss
 
 from typing import List
@@ -28,8 +28,8 @@ logk_max = math.log(1e2)
 l = 0.5
 
 # Create a training and validation dataset
-sampling_strat = "initial_bias"
 B = 512
+sampling_strat = "initial_bias"
 N_train_branch = 500
 N_train_trunk = 10_000
 N_validation_branch = 10
@@ -40,10 +40,9 @@ validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk,
 # Setup the network
 n_hidden_layers = 4
 z = 64
-channels = [1, 8, 16, 32, 32, 32, 32, 32, 32, 32] # increase gradually
-q = 32
+film_channels = [1, 8, 16, 32, 32, 32, 32, 32, 32, 32] # increase gradually
 x_grid = validation_dataset.branch_dataset.x_grid
-model = ConvBranchEmbeddingNetwork( channels, n_hidden_layers, z, q, x_grid, l, T_max, tau_max, logk_max)
+model = TrunkFilmNetwork( film_channels, n_hidden_layers, z, x_grid, l, T_max, tau_max, logk_max )
 print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parameters() if p.requires_grad ]))
 
 # Translate the model to GPU

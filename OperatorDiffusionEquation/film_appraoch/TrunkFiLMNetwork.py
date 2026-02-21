@@ -4,20 +4,18 @@ sys.path.append('../')
 import math
 import torch as pt
 import torch.nn as nn
-import torch.nn.functional as F
 
-from MLP import MultiLayerPerceptron
-from ConvNet import ConvolutionalNetwork
-from rbf_interpolation import buildCholeskyMatrix, jointIndexingRBFInterpolator
-
+from collections import OrderedDict
 from typing import List
 
-class ConvBranchEmbeddingNetwork( nn.Module ):
+from FiLM import ConvFiLMNet
+from rbf_interpolation import buildCholeskyMatrix, jointIndexingRBFInterpolator
 
-    def __init__( self, channels : List[int],
+class TrunkFilmNetwork( nn.Module ):
+
+    def __init__( self, film_channels : List[int],
                         n_hidden_layers : int,
                         z : int,
-                        q : int,
                         x_grid : pt.Tensor,
                         l : float,
                         T_max : float,
@@ -35,19 +33,26 @@ class ConvBranchEmbeddingNetwork( nn.Module ):
         cholesky_L = buildCholeskyMatrix( self.x_grid, self.l )
         self.register_buffer( "cholesky_L", cholesky_L )
 
-        # Construct the embedding layer with GELU activation functions.
+        # Construct the FiLM embedding with GELU actication functions
         self.n_grid_points = len( self.x_grid )
-        self.embedding_convnet = ConvolutionalNetwork( self.n_grid_points, q, channels, kernel_size=5, 
-                                                      act=nn.GELU, padding_mode="replicate", init_zeros=False )
-        self.embedding_norm = nn.LayerNorm( q )
+        self.n_hidden_layers = n_hidden_layers
+        self.film = ConvFiLMNet( self.n_grid_points, z, self.n_hidden_layers, film_channels, kernel_size=5, act=nn.GELU(), film_hidden_dim=128)
 
         # Setup the forward network. Tanh has more stable second derivatives, no blow-up.
-        forward_layers = [4+q] + [z] * n_hidden_layers + [1]
-        self.forward_mlp = MultiLayerPerceptron( forward_layers, act=nn.Tanh )
+        forward_layers = [4] + [z] * self.n_hidden_layers + [1]
+        layers = []
+        for n in range(1, len(forward_layers)-1 ):
+            n_in = forward_layers[n-1]
+            n_out = forward_layers[n]
+            layers.append( ( f"linear_{n}", nn.Linear(n_in, n_out, bias=True) ) )
+        self.hidden_layers = nn.Sequential( OrderedDict(layers) )
+        self.output_layer = nn.Linear(n_out, forward_layers[-1], bias=True)
+        self.act = nn.Tanh()
 
-        # Time decay parameter
-        #self.rate_c = nn.Parameter( pt.tensor( math.pi**2 ) )
-
+        # Initialize the last layer at zero.
+        nn.init.zeros_( self.output_layer.weight )
+        nn.init.zeros_( self.output_layer.bias )
+        
     def forward( self, x : pt.Tensor, # (B,1)
                        t : pt.Tensor, # (B,1)
                        params : pt.Tensor, # (B,2)
@@ -74,12 +79,15 @@ class ConvBranchEmbeddingNetwork( nn.Module ):
         tau_hat = tau / self.tau_max
 
         # Calculate the embedding
-        u0_embed = self.embedding_convnet( u0 ) # (B, q)
-        u0_embed_norm = self.embedding_norm( u0_embed )
+        gamma_raw, beta_raw = self.film( u0 )
 
         # Main prediction layer
-        forward_input = pt.cat( (x, tau_hat, logk_hat, Ts_hat, u0_embed_norm), dim=1)
-        forward_output = self.forward_mlp( forward_input )
+        y = pt.cat( (x, tau_hat, logk_hat, Ts_hat ), dim=1)
+        for i in range( len( self.hidden_layers ) ):
+            y = self.hidden_layers[i](y)
+            y = (1.0 + gamma_raw[:,i,:] ) * y + beta_raw[:,i,:]
+            y = self.act( y )
+        y = self.output_layer( y )
 
         # Interpolate the initial condition to be evaluated at every input `x`.
         u0_at_x = jointIndexingRBFInterpolator( self.cholesky_L, self.x_grid, self.l, x, u0 )
@@ -87,7 +95,7 @@ class ConvBranchEmbeddingNetwork( nn.Module ):
         # Include the Dirichlet boundary condition
         c = math.pi**2 #F.softplus( self.rate_c )
         beta = 1.0 - pt.exp( -c * tau )
-        u_xt = u0_at_x + beta * x * (1.0 - x) * forward_output
+        u_xt = u0_at_x + beta * x * (1.0 - x) * y
 
         # Go back to the physics
         T_xt = Ts + self.T_max * u_xt

@@ -46,7 +46,7 @@ B = 512
 n_embedding_hidden_layers = 5
 n_hidden_layers = 4
 z = 64
-q = 64
+q = 32
 x_grid = validation_dataset.branch_dataset.x_grid
 model = BranchEmbeddingNetwork( n_embedding_hidden_layers, n_hidden_layers, z, q, x_grid, l, T_max, tau_max, logk_max)
 print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parameters() if p.requires_grad ]))
