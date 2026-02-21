@@ -52,7 +52,7 @@ class ConvFiLMNet(nn.Module):
         out_dim = 2 * n_trunk_layers * trunk_width
         self.head = nn.Sequential(
             nn.Linear(channels[-1], film_hidden_dim, bias=True),
-            nn.GELU(),
+            act,
             nn.Linear(film_hidden_dim, out_dim, bias=True),
         )
 
@@ -66,7 +66,7 @@ class ConvFiLMNet(nn.Module):
             u0 = u0[:, None, :]  # (B,1,n_grid)
 
         # Push through the convolution layers.
-        x = self.conv(u0)        # (B, C, n_grid)
+        x = self.conv_layers(u0)        # (B, C, n_grid)
         x = self.pool(x)         # (B, C, 1)
         x = x[:, :, 0]           # (B, C)
 
