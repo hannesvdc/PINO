@@ -70,11 +70,9 @@ def closure():
 
     # for logging
     loss_sum = 0.0
-    T_t_sum = 0.0
-    T_xx_sum = 0.0
-    rel_rms_sum = 0.0
-
     n_batches = len( train_loader )
+
+    # Mini batch due to limited memory.
     for _batch_idx, (x_b, t_b, params_b, u0_b) in enumerate( train_loader ):
 
         # Batched but Deterministic Loss for memory constraints
@@ -84,17 +82,14 @@ def closure():
 
         # Store some diagnostic information
         loss_sum += float( batch_loss.item() )
-        T_t_sum += loss_info["T_t_rms"]
-        T_xx_sum += loss_info["T_xx_rms"]
-        rel_rms_sum += loss_info["rms"] / (loss_info["T_t_rms"] + loss_info["T_xx_rms"])
     gradnorm = float(getGradientNorm(model).item())
 
     # Store averaged metrics
     last_state["loss"] = loss_sum
     last_state["grad_norm"] = gradnorm
-    last_state["T_t rms"] = T_t_sum / n_batches
-    last_state["T_xx rms"] = T_xx_sum / n_batches
-    last_state["rel_rms"] = rel_rms_sum / n_batches
+    last_state["T_t rms"] = loss_info["T_t_rms"]
+    last_state["T_xx rms"] = loss_info["T_xx_rms"]
+    last_state["rel_rms"] = loss_info["rms"] / (loss_info["T_t_rms"] + loss_info["T_xx_rms"])
     all_loss_evalutaions.append( loss_sum )
     all_grad_evaluations.append( gradnorm )
 

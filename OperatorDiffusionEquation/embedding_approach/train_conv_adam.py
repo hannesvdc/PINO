@@ -110,12 +110,12 @@ def train_epoch( epoch : int ):
         T_t_rms = loss_info["T_t_rms"]
         T_xx_rms = loss_info["T_xx_rms"]
         rel_rms = loss_info["rms"] / (T_t_rms + T_xx_rms)
-        train_counter.append( epoch-1 + batch_idx / max_batches)
-        train_losses.append( float(loss.item()) )
-        train_grads.append( float(loss_grad.item()) )
-        train_rms.append( float(rel_rms) )
+        if batch_idx == 1:
+            train_counter.append( epoch-1 + batch_idx / max_batches)
+            train_losses.append( float(loss.item()) )
+            train_grads.append( float(loss_grad.item()) )
+            train_rms.append( float(rel_rms) )
 
-        if batch_idx % 50 == 0:
             progress = 100.0 * batch_idx / max_batches
             print_str = (
                 f"\nEpoch {epoch:04d} "

@@ -12,7 +12,7 @@ x_grid = pt.linspace( 0.0, 1.0, n_grid_points )
 
 # Sample the GP
 l = 0.12
-N_samples = 128
+N_samples = 10
 u0 = gp(x_grid, l, N_samples)
 
 # Interpolate
@@ -28,4 +28,6 @@ plt.xlabel(r"$x$")
 plt.figure()
 plt.plot( x_int, u0_int.T )
 plt.xlabel(r"$x$")
+plt.ylabel(r"$u_0$")
+plt.title(r"Conditional Gaussian Process for $u_0$")
 plt.show()

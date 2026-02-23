@@ -29,21 +29,16 @@ l = 0.5
 
 # Create a training and validation dataset
 sampling_strat = "initial_bias"
+B = 512
 N_train_branch = 500
 N_train_trunk = 10_000
-#train_dataset = TensorizedDataset( N_train_branch, N_train_trunk, n_grid_points, 
-#                                  l, T_max, tau_max, dtype, plot=False, tau_sampling=sampling_strat)
 N_validation_branch = 10
 N_validation_trunk = 1000
 validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk, n_grid_points, 
                                        l, T_max, tau_max, logk_max, dtype, plot=False, tau_sampling=sampling_strat)
 
-# Create a training loader only
-B = 512
-#training_loader = DataLoader( train_dataset, batch_size=B, shuffle=True )
-
 # Setup the network
-n_embedding_hidden_layers = 5
+n_embedding_hidden_layers = 4
 n_hidden_layers = 4
 z = 64
 q = 32
@@ -66,7 +61,7 @@ optimizer = optim.Adam( model.parameters(), lr )
 # Scheduler: constant for the first `n_epochs` epochs, decrease by cosine for `annealing_epochs` later.
 min_lr  = 1e-6
 warm_epochs = 1000
-anneal_epochs = 2000
+anneal_epochs = 10000
 scheduler = optim.lr_scheduler.CosineAnnealingLR(
     optimizer,
     T_max=anneal_epochs,
@@ -115,12 +110,12 @@ def train_epoch( epoch : int ):
         T_t_rms = loss_info["T_t_rms"]
         T_xx_rms = loss_info["T_xx_rms"]
         rel_rms = loss_info["rms"] / (T_t_rms + T_xx_rms)
-        train_counter.append( epoch-1 + batch_idx / max_batches)
-        train_losses.append( float(loss.item()) )
-        train_grads.append( float(loss_grad.item()) )
-        train_rms.append( float(rel_rms) )
+        if batch_idx == 1:
+            train_counter.append( epoch-1 + batch_idx / max_batches)
+            train_losses.append( float(loss.item()) )
+            train_grads.append( float(loss_grad.item()) )
+            train_rms.append( float(rel_rms) )
 
-        if batch_idx % 50 == 0:
             progress = 100.0 * batch_idx / max_batches
             print_str = (
                 f"\nEpoch {epoch:04d} "
