@@ -40,7 +40,7 @@ validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk,
 # Setup the network
 n_hidden_layers = 4
 z = 64
-channels = [1, 8, 16, 32, 32, 32, 32, 32, 32, 32] # increase gradually
+channels = [1, 8, 16, 32, 32, 32, 32, 32, 32, 32, 32] # increase gradually
 q = 32
 x_grid = validation_dataset.branch_dataset.x_grid
 model = ConvBranchEmbeddingNetwork( channels, n_hidden_layers, z, q, x_grid, l, T_max, tau_max, logk_max)
@@ -205,4 +205,6 @@ plt.semilogy( validation_counter, validation_losses, alpha=0.5, label="Validatio
 plt.semilogy( validation_counter, validation_rms, alpha=0.5, label="Validation Relative RMS" )
 plt.xlabel( "Epoch" )
 plt.legend()
+plt.tight_layout()
+plt.savefig( store_directory + 'convergence_conv_adam.png', transparent=True )
 plt.show()

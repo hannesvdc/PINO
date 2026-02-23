@@ -47,8 +47,8 @@ model = BranchEmbeddingNetwork( n_embedding_hidden_layers, n_hidden_layers, z, q
 print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parameters() if p.requires_grad ]))
 
 # Translate the model to GPU
-device = pt.device( "cpu" )
-dtype = pt.float64
+device = pt.device( "mps" )
+dtype = pt.float32
 model = model.to(device=device, dtype=dtype)
 
 # Heat loss fcn
@@ -205,4 +205,6 @@ plt.semilogy( validation_counter, validation_losses, alpha=0.5, label="Validatio
 plt.semilogy( validation_counter, validation_rms, alpha=0.5, label="Validation Relative RMS" )
 plt.xlabel( "Epoch" )
 plt.legend()
+plt.tight_layout()
+plt.savefig( store_directory + 'convergence_mlp_adam.png', transparent=True )
 plt.show()

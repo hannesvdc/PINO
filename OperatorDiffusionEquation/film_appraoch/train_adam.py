@@ -40,7 +40,7 @@ validation_dataset = TensorizedDataset( N_validation_branch, N_validation_trunk,
 # Setup the network
 n_hidden_layers = 4
 z = 64
-film_channels = [1, 8, 16, 32, 32, 32, 32, 32, 32, 32] # increase gradually
+film_channels = [1, 8, 16, 32, 32, 32, 32, 32, 32, 32, 32] # increase gradually
 x_grid = validation_dataset.branch_dataset.x_grid
 model = TrunkFilmNetwork( film_channels, n_hidden_layers, z, x_grid, l, T_max, tau_max, logk_max )
 print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parameters() if p.requires_grad ]))
@@ -203,5 +203,8 @@ plt.semilogy( train_counter, train_rms, alpha=0.5, label="Training Relative RMS"
 plt.semilogy( validation_counter, validation_losses, alpha=0.5, label="Validation Loss" )
 plt.semilogy( validation_counter, validation_rms, alpha=0.5, label="Validation Relative RMS" )
 plt.xlabel( "Epoch" )
+plt.title("FiLM")
 plt.legend()
+plt.tight_layout()
+plt.savefig( store_directory + 'convergence_adam.png', transparent=True )
 plt.show()
