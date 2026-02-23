@@ -3,79 +3,10 @@ sys.path.append('../')
 
 import math
 import torch as pt
-import torch.nn as nn
 import matplotlib.pyplot as plt
 
-from conditionalGP import gp
-
-from typing import Tuple
-
-T_max = 10.0
-tau_max = 8.0 # train to exp( -tau_max )
-logk_max = math.log( 1e2 )
-
-def evaluatePINO( model : nn.Module, x_grid : pt.Tensor, T_f : float, p : pt.Tensor, u0 : pt.Tensor) -> Tuple[pt.Tensor, pt.Tensor]:
-    B = x_grid.shape[0]
-    k = p[0]
-    p_batch = pt.unsqueeze(p, 0).expand( [B, len(p)] )
-    u0_batch = pt.unsqueeze(u0, 0).expand( [B, u0.numel() ])
-
-    N_tau = 1001
-    tau_grid = pt.linspace( 1e-2, T_f, N_tau )
-
-    # Evaluate the network in a fixed grid of tau-values
-    N_grid_points = len( x_grid )
-    T_sol = pt.zeros( (N_grid_points, N_tau) )
-    for t_idx in range( 0, N_tau ):
-        t = tau_grid[t_idx] / k
-        T_xt = model( x_grid[:,None], t * pt.ones([B,1]), p_batch, u0_batch )
-        T_sol[:,t_idx] = T_xt[:,0]
-    
-    return T_sol, tau_grid
-
-def finiteDifferences( x_grid : pt.Tensor, T0 : pt.Tensor, p : pt.Tensor, T_f : float ) -> Tuple[pt.Tensor, pt.Tensor]:
-    # Extract boundary temperature (Dirichlet value)
-    T_s = p[1]
-
-    # Flatten shapes defensively
-    xg = x_grid.reshape(-1)
-    T = T0.reshape(-1).clone()
-
-    # Basic grid info
-    dx = float(xg[1] - xg[0])
-    N = xg.numel()
-
-    # Choose a stable explicit timestep in tau:
-    dtau = 0.5 * dx * dx / 100.0
-    N_tau = max(2, int(math.ceil(T_f / dtau)) + 1)  # include tau=0
-    dtau = T_f / (N_tau - 1)
-
-    # Proper tau grid consistent with dtau and including tau=0
-    tau_grid = 1.e-2 + dtau * pt.arange(N_tau, dtype=xg.dtype, device=xg.device)
-    T_sol = pt.zeros((N, N_tau), dtype=T.dtype, device=T.device)
-
-    # Enforce BCs at tau=0 as well
-    T[0] = T_s
-    T[-1] = T_s
-    T_sol[:, 0] = T
-
-    # Time stepping
-    for n in range(1, N_tau):
-        # Second derivative with *Dirichlet* boundaries (no pt.roll / no periodicity)
-        T_xx = pt.zeros_like(T)
-        T_xx[1:-1] = (T[2:] - 2.0 * T[1:-1] + T[:-2]) / (dx * dx)
-
-        # Forward Euler step in tau
-        T = T + dtau * T_xx
-
-        # Re-impose Dirichlet BCs
-        T[0] = T_s
-        T[-1] = T_s
-
-        # Store
-        T_sol[:, n] = T
-
-    return T_sol, tau_grid
+from fd import finiteDifferences
+from evaluatePINO import evaluatePINO
 
 def test_pinn( model, test_dataset ):
 
