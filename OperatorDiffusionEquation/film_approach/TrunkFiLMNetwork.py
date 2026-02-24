@@ -1,4 +1,5 @@
 import sys
+sys.path.append('./')
 sys.path.append('../')
 
 import math
@@ -8,7 +9,10 @@ import torch.nn as nn
 from collections import OrderedDict
 from typing import List
 
-from FiLM import ConvFiLMNet
+try:
+    from FiLM import ConvFiLMNet
+except:
+    from film_approach.FiLM import ConvFiLMNet
 from rbf_interpolation import buildCholeskyMatrix, jointIndexingRBFInterpolator
 
 class TrunkFilmNetwork( nn.Module ):

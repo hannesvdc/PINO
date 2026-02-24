@@ -16,7 +16,7 @@ def finiteDifferences( x_grid : pt.Tensor, T0 : pt.Tensor, p : pt.Tensor, T_f : 
     N = xg.numel()
 
     # Choose a stable explicit timestep in tau:
-    dtau = 0.5 * dx * dx / 100.0
+    dtau = 0.5 * dx * dx / 4.0
     N_tau = max(2, int(math.ceil(T_f / dtau)) + 1)  # include tau=0
     dtau = T_f / (N_tau - 1)
 

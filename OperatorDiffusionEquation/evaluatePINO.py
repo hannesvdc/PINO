@@ -2,6 +2,7 @@ import torch as pt
 
 from typing import Tuple
 
+@pt.no_grad()
 def evaluatePINO( model : pt.nn.Module, 
                   x_grid : pt.Tensor, 
                   T_f : float, 
@@ -13,6 +14,7 @@ def evaluatePINO( model : pt.nn.Module,
 
     return T_sol, tau_grid
 
+@pt.no_grad()
 def evaluatePINOAt( model : pt.nn.Module, 
                    x_grid : pt.Tensor, 
                    tau_values: pt.Tensor, 
@@ -28,8 +30,10 @@ def evaluatePINOAt( model : pt.nn.Module,
     N_grid_points = len( x_grid )
     T_sol = pt.zeros( (N_grid_points, N_tau) )
     for t_idx in range( 0, N_tau ):
+        if t_idx % 1000 == 0:
+            print(t_idx)
         t = tau_values[t_idx] / k
-        T_xt = model( x_grid[:,None], t * pt.ones([B,1]), p_batch, u0_batch )
+        T_xt = model( x_grid[:,None].to(device=u0.device,dtype=u0.dtype), t * pt.ones([B,1],device=u0.device,dtype=u0.dtype), p_batch, u0_batch )
         T_sol[:,t_idx] = T_xt[:,0]
     
     return T_sol
