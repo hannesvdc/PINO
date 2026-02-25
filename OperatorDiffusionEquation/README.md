@@ -47,6 +47,6 @@ Builds a full PINO using the Feature-wise Linear Modulation framework for proces
 |   train_adam.py                       # Training script of the Film approach using the Adam optimizer.
 
 ## deeponet_approach/
-Unfinished experiments with vanilla deeponet.
+Unfinished experiments with vanilla deeponet. Will do a comparison with FNO soon.
 
 Enjoy!

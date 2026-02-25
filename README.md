@@ -9,7 +9,7 @@ If you’re interested in PINNs, PINOs, or scientific ML more broadly, feel free
 
 ## What’s in this repository?
 
-There are currently three main projects:
+There are currently four projects:
 
 - **`NewtonHeat`**  
   A simple PINO for Newton’s law of cooling 
@@ -27,12 +27,14 @@ There are currently three main projects:
   \frac{\partial T}{\partial t} = \kappa \frac{\partial^2 T}{\partial x^2},
   $$  
   
-  with Dirichlet boundary conditions $(0,t) = T(1,t) = T_s$ and initial condition $T(x,0)=T_0(x)$.  
-  At the moment, I have a working model for a *fixed* initial condition; extending this to a true operator over random initial conditions is ongoing work.
+  with Dirichlet boundary conditions $(0,t) = T(1,t) = T_s$ and *fixed* initial condition $T(x,0)=T_0(x)$.  
 
-- **2D Steady-State Linear Elasticity**  
+- **`OperatorDiffusionEquation`**
+  A *real* PINO for solving the 1D heat equation with unknown initial condition $T(x,0) = T_0(x)$. We study two alternative approaches for dealing with the initial condition: (1) embedding it as input to the 'trunk' network via a low-dimensional representation learned by a branch netwowrk; (2) feature-wise linear modulation of every trunk layer.
+
+- **2D Steady-State Linear Elasticity**
   Experiments using PINNs / DeepONets / FiLM-based PINNs (see `PINN_DeepONet`, `Residual_PINN_DeepONet`, `FiLM_PINN`).  
-  This is currently exploratory and largely unsuccessful — which is what motivated me to go back to much simpler test cases.
+  This is currently exploratory and largely unsuccessful — which is what motivated me to go back to much simpler test cases. Given the three succesful projects above, I am ready to return to this model.
 
 I describe each experiment and my design choices in more detail in the individual project folders. Also check out my [blog](https://hvandecasteele.com/blog/) and [substack](https://hannesvdc.substack.com) where I regularly post about the things I learned, some results for each project, and the mathematics behind each problem (and many other things.)
 
