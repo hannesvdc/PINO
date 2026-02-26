@@ -1,0 +1,128 @@
+import torch as pt
+import torch.nn as nn
+from torch.func import jacrev, vmap # type: ignore
+from rbf_interpolation import buildCholeskyMatrix, tensorizedRBFInterpolator
+
+from typing import Tuple, Dict
+
+class EnergyLoss( nn.Module ):
+    """
+    PDE residual loss for tensorized DeepONet output.
+
+    Model signature:
+        u,v = model(x, y, nu, gx, gy)
+    where:
+        x:  (Bt,)  or  (Bt, 1)  requires_grad True
+        y:  (Bt,)  or  (Bt, 1)  requires_grad True
+        nu:  (Bb, 1)
+        gx:   (Bb, n_grid_points)
+        gy:   (Bb, n_grid_points)
+
+    Model output:
+        u, v: (Bb,Bt)
+    """
+    def __init__( self, y_grid : pt.Tensor,
+                        l : float ):
+        super().__init__()
+
+        self.l = l
+
+        # Build the interpolating cholesky matrix.
+        self.register_buffer( "y_grid", y_grid )
+        cholesky_L = buildCholeskyMatrix( self.y_grid, self.l )
+        self.register_buffer( "cholesky_L", cholesky_L )
+
+    def forward(self, model : nn.Module, 
+                      x : pt.Tensor, # (Bt,1)
+                      y : pt.Tensor, # (Bt,1)
+                      nu : pt.Tensor, # (Bb,1)
+                      bc_y : pt.Tensor, # (Bt_bc,1)
+                      gx : pt.Tensor, # (Bb, n_grid_points)
+                      gy : pt.Tensor, # (Bb, n_grid_points)
+                ) -> Tuple[pt.Tensor, Dict]:
+        if x.ndim == 1: x = x[:, None]
+        if y.ndim == 1: y = y[:, None]
+        if nu.ndim == 1: nu = nu[:, None]
+        if bc_y.ndim == 1: bc_y = bc_y[:,None]
+
+        Bb = gx.shape[0]
+        Bt = x.shape[0]
+
+        x = x.requires_grad_(True)
+        y = y.requires_grad_(True)
+        nu = nu.requires_grad_(False)
+        gx = gx.requires_grad_(False)
+        gy = gy.requires_grad_(False)
+
+        # Evaluate the model in the interior points
+        u, v, u_x, u_y, v_x, v_y = grads_uv_jacrev(model, x, y, nu, gx, gy) # (Bb, Bt)
+
+        # Evalutate the model *only* in the boundary points
+        bc_x = pt.ones_like( bc_y )
+        u_bc, v_bc = model( bc_x, bc_y, nu, gx, gy )
+
+        # Compute the interior strain energy
+        area = 1.0
+        nu_rempat = nu.flatten()[:,None].expand(Bb, Bt)
+        C11 = 1.0 / (1.0 - nu_rempat**2)
+        C12 = nu_rempat / (1.0 - nu_rempat**2)
+        C66 = 0.5 * (1.0 - nu_rempat) / (1.0 + nu_rempat)
+        strain_energy = 0.5 * ( C11 * (u_x**2 + v_y**2) + 2.0*C12*u_x*v_y + C66 * (u_y + v_x)**2 )
+        strain_integral = area * pt.mean( strain_energy, dim=1 )
+
+        # Compute the boundary traction energy
+        length = 1.0
+        gx_int, gy_int = tensorizedRBFInterpolator( self.cholesky_L, self.y_grid, self.l, bc_y, gx, gy )
+        bc_integral = length * pt.mean( gx_int * u_bc + gy_int * v_bc, dim=1 )
+
+        # subtract and average over Bb
+        energy = strain_integral.mean()
+        boundary = bc_integral.mean()
+        loss = energy - boundary
+
+        loss_info = {"energy" : float(energy.mean().item()), "boundary" : float(bc_integral.mean().item()), "rms" : float(loss.item())}
+        return loss, loss_info
+
+def grads_uv_jacrev(model, x, y, nu, gx, gy):
+    """
+    x,y: (Bt,1)
+    nu: (Bb,1)
+    gx,gy: (Bb, n_grid_points)
+    Returns: u,v and u_x,u_y,v_x,v_y each (Bb,Bt)
+    """
+    if x.ndim == 1: x = x[:, None]
+    if y.ndim == 1: y = y[:, None]
+    if nu.ndim == 1: nu = nu[:, None]
+
+    Bt = x.shape[0]
+    Bb = nu.shape[0]
+
+    # Pack points as (Bt,2)
+    xy_points = pt.cat([x, y], dim=1)  # (Bt,2)
+
+    # pointwise wrapper
+    def uv_at_xy(xy):
+        # xy: (2,)
+        x1 = xy[0].view(1, 1)  # Bt=1
+        y1 = xy[1].view(1, 1)
+        u, v = model(x1, y1, nu, gx, gy)  # (Bb,1), (Bb,1) or (Bb,1) each
+        return u[:, 0], v[:, 0]          # (Bb,), (Bb,)
+
+    # Jacobian wrt xy for u and v separately: returns (Bb,2)
+    Ju_fn = jacrev(lambda xy: uv_at_xy(xy)[0])  # d u_vec / d(xy)
+    Jv_fn = jacrev(lambda xy: uv_at_xy(xy)[1])  # d v_vec / d(xy)
+
+    # vmap over Bt points => (Bt,Bb,2)
+    Ju = vmap(Ju_fn)(xy_points)  # (Bt,Bb,2)
+    Jv = vmap(Jv_fn)(xy_points)  # (Bt,Bb,2)
+
+    # Extract and transpose to (Bb,Bt)
+    u_x = Ju[:, :, 0].T
+    u_y = Ju[:, :, 1].T
+    v_x = Jv[:, :, 0].T
+    v_y = Jv[:, :, 1].T
+
+    # Also compute u,v on all Bt points in one call (efficient)
+    u_all, v_all = model(x, y, nu, gx, gy)  # (Bb,Bt) each
+
+    return u_all, v_all, u_x, u_y, v_x, v_y

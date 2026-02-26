@@ -8,20 +8,15 @@ from typing import Tuple
 
 class TrunkDataset( Dataset ):
     def __init__(self, N : int,
-                       nu_max : float,
                        dtype = pt.float64 ):
         super().__init__()
 
         self.N = N
-        self.nu_max = nu_max
-
-        # nu uniformly
-        gen = pt.Generator( )
-        self.nu = pt.empty((self.N,1), dtype=dtype, requires_grad=False).uniform_( 0.0, self.nu_max, generator=gen )
 
         # Sample spatial coordinates.
         #       x: 60% uniform in [0,1], 20% in [0,0.2], 20% in [0.8,1]
         #       y: uniform in [0,1]
+        gen = pt.Generator( )
         x_mid = pt.rand( (int(0.6*self.N),1), dtype=dtype, requires_grad=False, generator=gen)
         x_left = 0.2 * pt.rand( (int(0.2*self.N),1), dtype=dtype, requires_grad=False, generator=gen)
         x_right = 0.8 + 0.2 * pt.rand( (int(0.2*self.N),1), dtype=dtype, requires_grad=False, generator=gen)
@@ -31,21 +26,49 @@ class TrunkDataset( Dataset ):
     def __len__( self ) -> int:
         return self.N
     
-    def __getitem__(self, idx : int) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
-        return self.x[idx], self.y[idx], self.nu[idx]
+    def __getitem__(self, idx : int) -> Tuple[pt.Tensor, pt.Tensor]:
+        return self.x[idx], self.y[idx]
+    
+    def all( self ) -> Tuple[pt.Tensor, pt.Tensor]:
+        return self.x, self.y
+    
+class BoundaryDataset( Dataset ):
+    def __init__(self, N : int,
+                       dtype = pt.float64 ):
+        super().__init__()
+
+        self.N = N
+
+        # Sample spatial coordinates.
+        #       y: uniform in [0,1]
+        gen = pt.Generator( )
+        self.y_bc = pt.rand( (self.N,1), dtype=dtype, requires_grad=False, generator=gen)
+
+    def __len__( self ) -> int:
+        return self.N
+    
+    def __getitem__(self, idx : int) -> pt.Tensor:
+        return self.y_bc[idx]
     
     def all( self ) -> pt.Tensor:
-        return pt.cat( (self.x, self.y, self.nu), dim=1 )
+        return self.y_bc
     
 class BranchDataset( Dataset ):
     def __init__( self, N : int,
                         n_grid_points : int,
                         l : float,
+                        nu_max : float,
+                        dtype = pt.float64,
                         plot : bool = False):
         super().__init__()
 
         self.N = N
         self.n_grid_points = n_grid_points
+        self.nu_max = nu_max
+
+        # nu uniformly
+        gen = pt.Generator( )
+        self.nu = pt.empty((self.N,1), dtype=dtype, requires_grad=False).uniform_( 0.0, self.nu_max, generator=gen )
 
         self.y_grid = pt.linspace(0.0, 1.0, self.n_grid_points)
         self.l = l
@@ -63,50 +86,50 @@ class BranchDataset( Dataset ):
     def __len__( self ) -> int:
         return self.N
     
-    def __getitem__( self, idx : int ) -> Tuple[pt.Tensor, pt.Tensor]:
-        return self.gx[idx,:], self.gy[idx,:]
+    def __getitem__( self, idx : int ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
+        return self.gx[idx,:], self.gy[idx,:], self.nu[idx]
     
-    def all( self ) -> Tuple[pt.Tensor, pt.Tensor]:
-        return self.gx, self.gy
+    def all( self ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
+        return self.gx, self.gy, self.nu
     
-class PlateDataset( Dataset ):
-    def __init__(self, N_branch : int,
-                       N_trunk : int,
-                       n_grid_points : int,
-                       l : float,
-                       nu_max : float,
-                       dtype = pt.float64,
-                       plot : bool = False):
-        super().__init__()
+# class PlateDataset( Dataset ):
+#     def __init__(self, N_branch : int,
+#                        N_trunk : int,
+#                        n_grid_points : int,
+#                        l : float,
+#                        nu_max : float,
+#                        dtype = pt.float64,
+#                        plot : bool = False):
+#         super().__init__()
 
-        self.N_branch = N_branch
-        self.N_trunk = N_trunk
-        self.branch_dataset = BranchDataset( N_branch, n_grid_points, l, plot)
-        self.trunk_dataset = TrunkDataset( N_trunk, nu_max, dtype )
+#         self.N_branch = N_branch
+#         self.N_trunk = N_trunk
+#         self.branch_dataset = BranchDataset( N_branch, n_grid_points, l, nu_max, dtype, plot )
+#         self.trunk_dataset = TrunkDataset( N_trunk, dtype )
 
-    def __len__( self ) -> int:
-        return len( self.branch_dataset ) * len( self.trunk_dataset )
+#     def __len__( self ) -> int:
+#         return len( self.branch_dataset ) * len( self.trunk_dataset )
     
-    def __getitem__( self, idx : int ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
-        branch_idx = idx % self.N_branch
-        trunk_idx = idx // self.N_branch
-        gx, gy = self.branch_dataset[branch_idx]
-        x, y, nu = self.trunk_dataset[trunk_idx]
-        return x, y, nu, gx, gy
+#     def __getitem__( self, idx : int ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
+#         branch_idx = idx % self.N_branch
+#         trunk_idx = idx // self.N_branch
+#         gx, gy, nu = self.branch_dataset[branch_idx]
+#         x, y = self.trunk_dataset[trunk_idx]
+#         return x, y, nu, gx, gy
     
-    # Totally inefficient implementation, but only called once in the training script.
-    def all( self ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
-        B = self.__len__()
-        x = pt.zeros( (B,1) )
-        y = pt.zeros( (B,1) )
-        nu = pt.zeros( (B,2) )
-        gx = pt.zeros( (B, self.branch_dataset.n_grid_points) )
-        gy = pt.zeros( (B, self.branch_dataset.n_grid_points) )
-        for b in range( B ):
-            xb, yb, nub, gxb, gyb = self.__getitem__(b)
-            x[b,:] = xb
-            y[b,:] = yb
-            nu[b,:] = nub
-            gx[b,:] = gxb
-            gy[b,:] = gyb
-        return x, y, nu, gx, gy
+#     # Totally inefficient implementation, but only called once in the training script.
+#     def all( self ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
+#         B = self.__len__()
+#         x = pt.zeros( (B,1) )
+#         y = pt.zeros( (B,1) )
+#         nu = pt.zeros( (B,2) )
+#         gx = pt.zeros( (B, self.branch_dataset.n_grid_points) )
+#         gy = pt.zeros( (B, self.branch_dataset.n_grid_points) )
+#         for b in range( B ):
+#             xb, yb, nub, gxb, gyb = self.__getitem__(b)
+#             x[b,:] = xb
+#             y[b,:] = yb
+#             nu[b,:] = nub
+#             gx[b,:] = gxb
+#             gy[b,:] = gyb
+#         return x, y, nu, gx, gy
