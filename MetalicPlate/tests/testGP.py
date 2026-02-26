@@ -20,7 +20,6 @@ y_int = pt.linspace( 0.0, 1.0, n_int)
 gx_repmat = gx.repeat( n_int, 1 )
 gy_repmat = gy.repeat( n_int, 1 )
 L = buildCholeskyMatrix(y_grid, l)
-print(L.shape, y_grid.shape, y_int.shape, gx_repmat.shape, gy_repmat.shape)
 gx_int, gy_int = jointIndexingRBFInterpolator( L, y_grid, l, y_int, gx_repmat, gy_repmat )
 
 # Original Dataset

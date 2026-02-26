@@ -2,7 +2,6 @@ import sys
 sys.path.append('../')
 
 from PlateDataset import PlateDataset
-from rbf_interpolation import buildCholeskyMatrix, jointIndexingRBFInterpolator
 
 import torch as pt
 from torch.utils.data import DataLoader
