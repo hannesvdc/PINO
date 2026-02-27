@@ -1,7 +1,3 @@
-import sys
-sys.path.append('../')
-
-import math
 import numpy as np
 import torch as pt
 import torch.optim as optim
@@ -27,7 +23,7 @@ l = 0.2
 
 # Create a training and validation dataset
 B = 512
-N_train_branch = 500
+N_train_branch = 20*B
 N_train_trunk = 10_000
 N_train_bc = 10_000
 N_validation_branch = 10
@@ -56,17 +52,17 @@ loss_fcn.to( device=device, dtype=dtype )
 
 # Setup the optimizer and learning rate scheduler
 lr = 1e-4
-optimizer = optim.Adam( model.parameters(), lr )
+optimizer = optim.Adam( model.parameters(), lr, amsgrad=True )
 
 # Scheduler: constant for the first `n_epochs` epochs, decrease by cosine for `annealing_epochs` later.
-# min_lr  = 1e-6
-# warm_epochs = 1000
-# anneal_epochs = 10000
-# scheduler = optim.lr_scheduler.CosineAnnealingLR(
-#     optimizer,
-#     T_max=anneal_epochs,
-#     eta_min=min_lr
-# )
+min_lr  = 1e-8
+warm_epochs = 1000
+anneal_epochs = 10000
+scheduler = optim.lr_scheduler.CosineAnnealingLR(
+    optimizer,
+    T_max=anneal_epochs,
+    eta_min=min_lr
+)
 
 # Load the validation dataset all at once
 x_val, y_val = validation_trunk_dataset.all()
@@ -164,7 +160,7 @@ def validate_epoch( epoch : int ):
 
 # Main training loop
 store_directory = './Results/'
-n_epochs = 10_000
+n_epochs = warm_epochs + anneal_epochs
 try:
     for epoch in range( 1, n_epochs+1 ):
         # Train using the new dataset
@@ -172,6 +168,9 @@ try:
 
         # Validate on independent but fixed data
         validate_epoch( epoch )
+
+        if epoch > warm_epochs:
+            scheduler.step( )
 
         # Store the current model and optimizer weights.
         pt.save( model.state_dict(), store_directory + 'model_adam.pth')
