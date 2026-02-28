@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import torch as pt
 import torch.optim as optim
@@ -51,11 +52,11 @@ model = model.to(device=device, dtype=dtype)
 loss_fcn.to( device=device, dtype=dtype )
 
 # Setup the optimizer and learning rate scheduler
-lr = 1e-3
+lr = 1e-4
 optimizer = optim.Adam( model.parameters(), lr, amsgrad=True )
 
 # Scheduler: constant for the first `n_epochs` epochs, decrease by cosine for `annealing_epochs` later.
-min_lr  = 1e-6
+min_lr  = 1e-8
 anneal_epochs = 10000
 scheduler = optim.lr_scheduler.CosineAnnealingLR(
     optimizer,
@@ -143,7 +144,7 @@ def train_epoch( epoch : int ):
 # Validation function
 validation_counter : List = []
 validation_losses : List = []
-def validate_epoch( epoch : int ):
+def validate_epoch( epoch : int ) -> float:
     model.eval( )
 
     # Compute the loss and its gradient
@@ -157,17 +158,20 @@ def validate_epoch( epoch : int ):
     print_str = f'\nValidation Epoch {epoch:03d}: \tLoss: {loss.item():.3e}'
     print(print_str)
 
+    return float( loss.detach().item() )
+
 # Main training loop
 store_directory = './Results/'
 warm_epochs = 0
 n_epochs = warm_epochs + anneal_epochs
+best_val_loss = math.inf
 try:
     for epoch in range( 1, n_epochs+1 ):
         # Train using the new dataset
         train_epoch( epoch )
 
         # Validate on independent but fixed data
-        validate_epoch( epoch )
+        val_loss = validate_epoch( epoch )
 
         if epoch > warm_epochs:
             scheduler.step( )
@@ -175,6 +179,10 @@ try:
         # Store the current model and optimizer weights.
         pt.save( model.state_dict(), store_directory + 'model_adam.pth')
         pt.save( optimizer.state_dict(), store_directory + 'optimizer_adam.pth')
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            print("Storing the best model.")
+            pt.save( model.state_dict(), store_directory + 'best_model.pth')
 except KeyboardInterrupt:
     print( 'Aborting Training.')
     pass

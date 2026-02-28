@@ -1,4 +1,5 @@
 import torch as pt
+import numpy as np
 
 from typing import Tuple
 
@@ -32,3 +33,10 @@ def gp(y_grid : pt.Tensor,
 
     # Add Dirichlet zero boundary conditions
     return g_x, g_y
+
+def gp_numpy( y_grid : np.ndarray,
+              l : float,
+              jitter : float = 1e-4) -> Tuple[np.ndarray, np.ndarray]:
+    y_grid_pt = pt.tensor( y_grid )
+    g_x, g_y = gp( y_grid_pt, l, 1, jitter )
+    return g_x.flatten().numpy(), g_y.flatten().numpy()
