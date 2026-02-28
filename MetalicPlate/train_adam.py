@@ -22,10 +22,10 @@ nu_max = 0.45
 l = 0.2
 
 # Create a training and validation dataset
-B = 512
-N_train_branch = 20*B
-N_train_trunk = 10_000
-N_train_bc = 10_000
+B = 32
+N_train_branch = B
+N_train_trunk = 5000
+N_train_bc = 1000
 N_validation_branch = 10
 N_validation_trunk = 1000
 N_validation_bc = 1000
@@ -51,12 +51,11 @@ model = model.to(device=device, dtype=dtype)
 loss_fcn.to( device=device, dtype=dtype )
 
 # Setup the optimizer and learning rate scheduler
-lr = 1e-4
+lr = 1e-3
 optimizer = optim.Adam( model.parameters(), lr, amsgrad=True )
 
 # Scheduler: constant for the first `n_epochs` epochs, decrease by cosine for `annealing_epochs` later.
-min_lr  = 1e-8
-warm_epochs = 1000
+min_lr  = 1e-6
 anneal_epochs = 10000
 scheduler = optim.lr_scheduler.CosineAnnealingLR(
     optimizer,
@@ -83,10 +82,10 @@ def train_epoch( epoch : int ):
     model.train( )
 
     # Sample a new dataset every time
-    branch_dataset = BranchDataset( N_validation_branch, n_grid_points, l, nu_max, dtype, plot=False )
-    trunk_dataset = TrunkDataset( N_validation_trunk)
-    bc_dataset = BoundaryDataset( N_validation_bc, dtype )
-    branch_loader = DataLoader( branch_dataset, batch_size=B, shuffle=True )
+    branch_dataset = BranchDataset( N_train_branch, n_grid_points, l, nu_max, dtype, plot=False )
+    trunk_dataset = TrunkDataset( N_train_trunk)
+    bc_dataset = BoundaryDataset( N_train_bc, dtype )
+    branch_loader = DataLoader( branch_dataset, batch_size=min(B,N_train_branch), shuffle=True )
 
     max_batches = 50
     for _batch_idx, (gx_b, gy_b, nu_b) in enumerate( branch_loader ):
@@ -114,7 +113,7 @@ def train_epoch( epoch : int ):
         loss_grad = getGradientNorm( model )
 
         # Update the weights internally
-        pt.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
+        pt.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step( )
 
         # Keep track of important metrics
@@ -160,6 +159,7 @@ def validate_epoch( epoch : int ):
 
 # Main training loop
 store_directory = './Results/'
+warm_epochs = 0
 n_epochs = warm_epochs + anneal_epochs
 try:
     for epoch in range( 1, n_epochs+1 ):

@@ -68,7 +68,7 @@ class BranchDataset( Dataset ):
 
         # nu uniformly
         gen = pt.Generator( )
-        self.nu = pt.empty((self.N,1), dtype=dtype, requires_grad=False).uniform_( 0.0, self.nu_max, generator=gen )
+        self.nu = pt.empty((self.N,1), dtype=dtype, requires_grad=False).uniform_( 0.1, self.nu_max, generator=gen )
 
         self.y_grid = pt.linspace(0.0, 1.0, self.n_grid_points)
         self.l = l
