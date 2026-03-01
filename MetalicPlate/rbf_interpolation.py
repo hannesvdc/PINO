@@ -56,9 +56,10 @@ def jointIndexingRBFInterpolator( L : pt.Tensor,
 def tensorizedRBFInterpolator( L : pt.Tensor,
                                y_grid : pt.Tensor,
                                l : float, 
-                               y : pt.Tensor,
-                               gx : pt.Tensor,
-                               gy : pt.Tensor, ) -> Tuple[pt.Tensor,pt.Tensor]:
+                               y : pt.Tensor, # (Bt, 1)
+                               gx : pt.Tensor, # (Bb, n_grid_points)
+                               gy : pt.Tensor, # (Bb, n_grid_points)
+                            ) -> Tuple[pt.Tensor,pt.Tensor]:
     # Make sure the shapes and sizes match
     assert L.ndim == 2 and L.shape[0] == L.shape[1], f"`L` must be a square matrix, got shape {L.shape}."
     assert gx.ndim == 2 and gx.shape[1] == L.shape[0], f"`gx` must have shape `(B, n_grid_points)` but got {gx.shape}."

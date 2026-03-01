@@ -20,6 +20,7 @@ gen = pt.Generator()
 
 # Physics parameters
 n_grid_points = 101
+y_grid = pt.linspace(0.0, 1.0, n_grid_points)
 nu_max = 0.45
 l = 0.2
 
@@ -29,17 +30,13 @@ N_train_branch = B
 N_train_trunk = 5000
 N_train_bc = 1000
 N_validation_branch = 10
-N_validation_trunk = 1000
+N_validation_trunk = 5000
 N_validation_bc = 1000
-validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points, l, nu_max, gen, dtype, plot=False )
-validation_trunk_dataset = TrunkDataset( N_validation_trunk, gen, dtype)
-validation_bc_dataset = BoundaryDataset( N_validation_bc, gen, dtype )
 
 # Setup the network
 n_hidden_layers = 4
 z = 128
-film_channels = [2, 8, 16, 32, 32, 32, 32, 32, 32] # increase gradually
-y_grid = validation_branch_dataset.y_grid
+film_channels = [2, 8, 16, 32, 32, 32, 32, 32, 32, 32, 32] # increase gradually
 model = TrunkFilmNetwork( film_channels, n_grid_points, n_hidden_layers, z, nu_max )
 print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parameters() if p.requires_grad ]))
 
@@ -47,8 +44,10 @@ print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parame
 loss_fcn = EnergyLoss( y_grid, l )
 
 # Translate the model to GPU
-device = pt.device( "mps" )
-dtype = pt.float32
+#device = pt.device( "mps" )
+#dtype = pt.float32
+device = pt.device("cpu")
+dtype=pt.float64
 model = model.to(device=device, dtype=dtype)
 loss_fcn.to( device=device, dtype=dtype )
 
@@ -64,18 +63,6 @@ scheduler = optim.lr_scheduler.CosineAnnealingLR(
     T_max=anneal_epochs,
     eta_min=min_lr
 )
-
-# Load the validation dataset all at once
-x_val, y_val, w_val = validation_trunk_dataset.all()
-x_val = x_val.to(device=device, dtype=dtype)
-y_val = y_val.to(device=device, dtype=dtype)
-w_val = w_val.to(device=device, dtype=dtype)
-gx_val, gy_val, nu_val = validation_branch_dataset.all()
-gx_val = gx_val.to(device=device, dtype=dtype)
-gy_val = gy_val.to(device=device, dtype=dtype)
-nu_val = nu_val.to(device=device, dtype=dtype)
-y_bc_val = validation_bc_dataset.all()
-y_bc_val = y_bc_val.to(device=device, dtype=dtype)
 
 # Main training routine
 train_counter : List = []
@@ -141,6 +128,20 @@ validation_counter : List = []
 validation_losses : List = []
 def validate_epoch( epoch : int ) -> float:
     optimizer.zero_grad( set_to_none=True )
+
+    validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points, l, nu_max, gen, dtype, plot=False )
+    validation_trunk_dataset = TrunkDataset( N_validation_trunk, gen, dtype)
+    validation_bc_dataset = BoundaryDataset( N_validation_bc, gen, dtype )
+    x_val, y_val, w_val = validation_trunk_dataset.all()
+    x_val = x_val.to(device=device, dtype=dtype)
+    y_val = y_val.to(device=device, dtype=dtype)
+    w_val = w_val.to(device=device, dtype=dtype)
+    gx_val, gy_val, nu_val = validation_branch_dataset.all()
+    gx_val = gx_val.to(device=device, dtype=dtype)
+    gy_val = gy_val.to(device=device, dtype=dtype)
+    nu_val = nu_val.to(device=device, dtype=dtype)
+    y_bc_val = validation_bc_dataset.all()
+    y_bc_val = y_bc_val.to(device=device, dtype=dtype)
 
     # Compute the loss and its gradient
     loss, loss_info = loss_fcn( model, x_val, y_val, w_val, nu_val, y_bc_val, gx_val, gy_val )
