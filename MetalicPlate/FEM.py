@@ -51,41 +51,6 @@ def fem( nu_val : float,
         def value_shape(self):
             return (2,)
     T = TractionY( y_points, f_1, f_2 )
-    # class RandomForce(UserExpression):
-    #     def __init__(self, mesh, **kwargs):
-    #         super().__init__(**kwargs)
-    #         self.mesh = mesh
-    #         self.forces = {}
-
-    #         # Gather all boundary y-values
-    #         y_coords = []
-    #         facet_to_y = {}
-    #         for f in facets(mesh):
-    #             if near(f.midpoint()[0], 1.0):
-    #                 y = f.midpoint()[1]
-    #                 y_coords.append(y)
-    #                 facet_to_y[f.index()] = y
-    #         y_points = np.sort(np.unique(y_coords))
-
-    #         # Apply the traction to every boundary facet
-    #         for f in facets(mesh):
-    #             if f.index() in facet_to_y:
-    #                 y = facet_to_y[f.index()]
-    #                 idx = np.searchsorted(y_points, y)  # Find index in sorted y_points
-    #                 self.forces[f.index()] = (f_1[idx], f_2[idx])
-    #         print('f_1', f_1)
-    #         print('f_2', f_2)
-
-    #     # Quickly evaluate the random forcing
-    #     def eval(self, values, x):
-    #         for f in facets(self.mesh):
-    #             if near(f.midpoint()[0], 1.0):
-    #                 values[0], values[1] = self.forces.get(f.index(), (0.0, 0.0))
-    #                 return
-    #         values[0], values[1] = (0.0, 0.0)
-    #     def value_shape(self):
-    #         return (2,)
-    # T = RandomForce(mesh)  # External traction force
 
     # Define weak form
     a = inner(stress(u, E, nu), grad(v)) * dx

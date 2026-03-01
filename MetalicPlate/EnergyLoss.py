@@ -39,6 +39,7 @@ class EnergyLoss( nn.Module ):
     def forward(self, model : nn.Module, 
                       x : pt.Tensor, # (Bt,1)
                       y : pt.Tensor, # (Bt,1)
+                      mc_weights : pt.Tensor, # (Bt,1)
                       nu : pt.Tensor, # (Bb,1)
                       bc_y : pt.Tensor, # (Bt_bc,1)
                       gx : pt.Tensor, # (Bb, n_grid_points)
@@ -46,6 +47,7 @@ class EnergyLoss( nn.Module ):
                 ) -> Tuple[pt.Tensor, Dict]:
         if x.ndim == 1: x = x[:, None]
         if y.ndim == 1: y = y[:, None]
+        if mc_weights.ndim == 2: mc_weights = mc_weights.flatten()
         if nu.ndim == 1: nu = nu[:, None]
         if bc_y.ndim == 1: bc_y = bc_y[:,None]
 
@@ -78,15 +80,15 @@ class EnergyLoss( nn.Module ):
 
             # Boundary values only (no spatial derivatives needed)
             bc_x = pt.ones_like( bc_y )
-            u_bc, v_bc = model(bc_x, bc_y, nu_c, gx_c, gy_c)  # (Bc,Bt_bc)
+            u_bc, v_bc, u_xb, u_yb, v_xb, v_yb = grads_uv_jacrev(model, bc_x, bc_y, nu_c, gx_c, gy_c)
 
             # Interior strain energy
             nu_flat = nu_c[:, 0][:, None]            # (Bc,1) broadcasts over Bt
             C11 = 1.0 / (1.0 - nu_flat**2)
             C12 = nu_flat / (1.0 - nu_flat**2)
-            C66 = 0.5 * (1.0 - nu_flat) / (1.0 + nu_flat)
+            C66 = 0.5 / (1.0 + nu_flat)
             strain_energy = 0.5 * ( C11 * (u_x**2 + v_y**2) + 2.0*C12*u_x*v_y + C66 * (u_y + v_x)**2 )
-            strain_integral = strain_energy.mean(dim=1)
+            strain_integral = pt.sum(strain_energy * mc_weights[None,:], dim=1) / pt.sum( mc_weights )
 
             gx_int, gy_int = tensorizedRBFInterpolator( self.cholesky_L, self.y_grid, self.l, bc_y, gx_c, gy_c )                                                    # (Bc,Bt_bc) each
             bc_integral = (gx_int * u_bc + gy_int * v_bc).mean(dim=1)  # (Bc,)
@@ -96,11 +98,20 @@ class EnergyLoss( nn.Module ):
             total_boundary = total_boundary + w * bc_integral.mean()
             total_weight += w
 
+            # Traction loss for reference
+            nu_b = nu_c[:, 0][:, None]  # (Bc,1) broadcast over Bt_bc
+            t_x = (1.0 / (1.0 - nu_b**2)) * (u_xb + nu_b * v_yb)                 # (Bc,Bt_bc)
+            t_y = (1.0 / (2.0 * (1.0 + nu_b))) * (u_yb + v_xb)                   # (Bc,Bt_bc)
+            traction_residual = ((t_x - gx_int)**2 + (t_y - gy_int)**2).mean()  / ( gx_int**2 + gy_int**2 ).mean() # (Bc,)
+
             # free refs early for memory
             del u_x, u_y, v_x, v_y, u_bc, v_bc, gx_int, gy_int, strain_energy
 
-        loss = total_energy - total_boundary
-        loss_info = {"energy" : float(total_energy.detach().item()), "boundary" : float(total_boundary.detach().item()), "rms" : float(loss.detach().item())}
+        avg_energy = total_energy / total_weight
+        avg_boundary = total_boundary / total_weight
+        loss = avg_energy - avg_boundary
+        loss_info = {"energy" : float(avg_energy.detach().item()), "boundary" : float(avg_boundary.detach().item()), 
+                     "rms" : float(loss.detach().item()), "traction" : float(traction_residual.detach().item())}
         return loss, loss_info
 
 def grads_uv_jacrev(model, x, y, nu, gx, gy):
@@ -113,9 +124,6 @@ def grads_uv_jacrev(model, x, y, nu, gx, gy):
     if x.ndim == 1: x = x[:, None]
     if y.ndim == 1: y = y[:, None]
     if nu.ndim == 1: nu = nu[:, None]
-
-    Bt = x.shape[0]
-    Bb = nu.shape[0]
 
     # Pack points as (Bt,2)
     xy_points = pt.cat([x, y], dim=1)  # (Bt,2)

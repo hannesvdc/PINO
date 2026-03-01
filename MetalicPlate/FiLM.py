@@ -57,8 +57,8 @@ class ConvFiLMNet(nn.Module):
         )
 
         # Start with gamma_raw=0, beta=0 => gamma≈1, beta=0
-        #nn.init.zeros_(self.head[-1].weight)
-        #nn.init.zeros_(self.head[-1].bias)
+        nn.init.zeros_(self.head[-1].weight)
+        nn.init.zeros_(self.head[-1].bias)
 
     def forward(self, g: pt.Tensor) -> tuple[pt.Tensor, pt.Tensor]:
         # g: (B, 2, self.n_grid_points)

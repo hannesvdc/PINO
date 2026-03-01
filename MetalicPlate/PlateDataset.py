@@ -8,7 +8,8 @@ from typing import Tuple
 
 class TrunkDataset( Dataset ):
     def __init__(self, N : int,
-                       dtype = pt.float64 ):
+                       gen : pt.Generator,
+                       dtype = pt.float64, ):
         super().__init__()
 
         self.N = N
@@ -16,24 +17,35 @@ class TrunkDataset( Dataset ):
         # Sample spatial coordinates.
         #       x: 60% uniform in [0,1], 20% in [0,0.2], 20% in [0.8,1]
         #       y: uniform in [0,1]
-        gen = pt.Generator( )
-        x_mid = pt.rand( (int(0.6*self.N),1), dtype=dtype, requires_grad=False, generator=gen)
-        x_left = 0.2 * pt.rand( (int(0.2*self.N),1), dtype=dtype, requires_grad=False, generator=gen)
-        x_right = 0.8 + 0.2 * pt.rand( (int(0.2*self.N),1), dtype=dtype, requires_grad=False, generator=gen)
-        self.x = pt.cat( (x_left, x_mid, x_right), dim=0 )
-        self.y = pt.rand( (self.N,1), dtype=dtype, requires_grad=False, generator=gen)
+        # The probability distribution is 
+        # sample x from your mixture
+        x_mid  = pt.rand((int(0.6*self.N), 1), dtype=dtype, requires_grad=False, generator=gen)            # U(0,1)
+        x_left = 0.2 * pt.rand((int(0.2*self.N), 1), dtype=dtype, requires_grad=False, generator=gen)      # U(0,0.2)
+        x_right = 0.8 + 0.2 * pt.rand((int(0.2*self.N), 1), dtype=dtype, requires_grad=False, generator=gen) # U(0.8,1)
+
+        self.x = pt.cat((x_left, x_mid, x_right), dim=0)
+        self.y = pt.rand((self.N, 1), dtype=dtype, requires_grad=False, generator=gen)
+
+        # importance weights based on *location* (because x_mid can fall in the edge bands)
+        x_flat = self.x[:, 0]
+        q = pt.where((x_flat < 0.2) | (x_flat > 0.8),
+                    pt.full_like(x_flat, 1.6),   # edge density
+                    pt.full_like(x_flat, 0.6))   # middle density
+
+        self.w = (1.0 / q).unsqueeze(1)           # (N,1)
 
     def __len__( self ) -> int:
         return self.N
     
-    def __getitem__(self, idx : int) -> Tuple[pt.Tensor, pt.Tensor]:
-        return self.x[idx], self.y[idx]
+    def __getitem__(self, idx : int) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
+        return self.x[idx], self.y[idx], self.w[idx]
     
-    def all( self ) -> Tuple[pt.Tensor, pt.Tensor]:
-        return self.x, self.y
+    def all( self ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
+        return self.x, self.y, self.w
     
 class BoundaryDataset( Dataset ):
     def __init__(self, N : int,
+                       gen : pt.Generator,
                        dtype = pt.float64 ):
         super().__init__()
 
@@ -41,7 +53,6 @@ class BoundaryDataset( Dataset ):
 
         # Sample spatial coordinates.
         #       y: uniform in [0,1]
-        gen = pt.Generator( )
         self.y_bc = pt.rand( (self.N,1), dtype=dtype, requires_grad=False, generator=gen)
 
     def __len__( self ) -> int:
@@ -58,6 +69,7 @@ class BranchDataset( Dataset ):
                         n_grid_points : int,
                         l : float,
                         nu_max : float,
+                        gen : pt.Generator,
                         dtype = pt.float64,
                         plot : bool = False):
         super().__init__()
@@ -67,7 +79,6 @@ class BranchDataset( Dataset ):
         self.nu_max = nu_max
 
         # nu uniformly
-        gen = pt.Generator( )
         self.nu = pt.empty((self.N,1), dtype=dtype, requires_grad=False).uniform_( 0.1, self.nu_max, generator=gen )
 
         self.y_grid = pt.linspace(0.0, 1.0, self.n_grid_points)
@@ -91,45 +102,3 @@ class BranchDataset( Dataset ):
     
     def all( self ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
         return self.gx, self.gy, self.nu
-    
-# class PlateDataset( Dataset ):
-#     def __init__(self, N_branch : int,
-#                        N_trunk : int,
-#                        n_grid_points : int,
-#                        l : float,
-#                        nu_max : float,
-#                        dtype = pt.float64,
-#                        plot : bool = False):
-#         super().__init__()
-
-#         self.N_branch = N_branch
-#         self.N_trunk = N_trunk
-#         self.branch_dataset = BranchDataset( N_branch, n_grid_points, l, nu_max, dtype, plot )
-#         self.trunk_dataset = TrunkDataset( N_trunk, dtype )
-
-#     def __len__( self ) -> int:
-#         return len( self.branch_dataset ) * len( self.trunk_dataset )
-    
-#     def __getitem__( self, idx : int ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
-#         branch_idx = idx % self.N_branch
-#         trunk_idx = idx // self.N_branch
-#         gx, gy, nu = self.branch_dataset[branch_idx]
-#         x, y = self.trunk_dataset[trunk_idx]
-#         return x, y, nu, gx, gy
-    
-#     # Totally inefficient implementation, but only called once in the training script.
-#     def all( self ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor, pt.Tensor]:
-#         B = self.__len__()
-#         x = pt.zeros( (B,1) )
-#         y = pt.zeros( (B,1) )
-#         nu = pt.zeros( (B,2) )
-#         gx = pt.zeros( (B, self.branch_dataset.n_grid_points) )
-#         gy = pt.zeros( (B, self.branch_dataset.n_grid_points) )
-#         for b in range( B ):
-#             xb, yb, nub, gxb, gyb = self.__getitem__(b)
-#             x[b,:] = xb
-#             y[b,:] = yb
-#             nu[b,:] = nub
-#             gx[b,:] = gxb
-#             gy[b,:] = gyb
-#         return x, y, nu, gx, gy
