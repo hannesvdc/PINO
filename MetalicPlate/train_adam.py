@@ -31,6 +31,12 @@ N_train_bc = 1000
 N_validation_branch = 10
 N_validation_trunk = 5000
 N_validation_bc = 1000
+trunk_dataset = TrunkDataset( N_train_trunk, gen )
+bc_dataset = BoundaryDataset( N_train_bc, gen, dtype )
+x_b, y_b, w_b = trunk_dataset.all()
+y_bc_b = bc_dataset.all()
+np.save( './data/trunk_dataset.npy', pt.cat( (x_b, y_b, w_b), dim=1).detach().numpy() )
+np.save( './data/bc_dataset.npy', y_bc_b.detach().numpy() )
 
 # Setup the network
 n_hidden_layers = 4
@@ -71,14 +77,13 @@ scheduler = optim.lr_scheduler.StepLR( optimizer, step_size, gamma )
 train_counter : List = []
 train_losses : List = []
 train_grads : List = []
+train_tractions : List = []
 def train_epoch( epoch : int ):
     model.train( )
     optimizer.zero_grad( set_to_none=True )
 
     # Sample a new dataset every time
     branch_dataset = BranchDataset( N_train_branch, n_grid_points, l, nu_max, gen, dtype=dtype, plot=False )
-    trunk_dataset = TrunkDataset( N_train_trunk, gen )
-    bc_dataset = BoundaryDataset( N_train_bc, gen, dtype )
         
     # Fetch the trunk inputs
     x_b, y_b, w_b = trunk_dataset.all()
@@ -110,6 +115,7 @@ def train_epoch( epoch : int ):
     train_counter.append( epoch-1)
     train_losses.append( float(loss.item()) )
     train_grads.append( float(loss_grad.item()) )
+    train_tractions.append( traction )
 
     # Print some diagnostics
     print_str = (
@@ -129,13 +135,12 @@ def train_epoch( epoch : int ):
 # Validation function
 validation_counter : List = []
 validation_losses : List = []
+validation_tractions : List = []
 def validate_epoch( epoch : int ) -> float:
     optimizer.zero_grad( set_to_none=True )
 
     validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points, l, nu_max, gen, dtype, plot=False )
-    validation_trunk_dataset = TrunkDataset( N_validation_trunk, gen, dtype)
-    validation_bc_dataset = BoundaryDataset( N_validation_bc, gen, dtype )
-    x_val, y_val, w_val = validation_trunk_dataset.all()
+    x_val, y_val, w_val = trunk_dataset.all()
     x_val = x_val.to(device=device, dtype=dtype)
     y_val = y_val.to(device=device, dtype=dtype)
     w_val = w_val.to(device=device, dtype=dtype)
@@ -143,7 +148,7 @@ def validate_epoch( epoch : int ) -> float:
     gx_val = gx_val.to(device=device, dtype=dtype)
     gy_val = gy_val.to(device=device, dtype=dtype)
     nu_val = nu_val.to(device=device, dtype=dtype)
-    y_bc_val = validation_bc_dataset.all()
+    y_bc_val = bc_dataset.all()
     y_bc_val = y_bc_val.to(device=device, dtype=dtype)
 
     # Compute the loss and its gradient
@@ -152,6 +157,7 @@ def validate_epoch( epoch : int ) -> float:
     # Store
     validation_counter.append( epoch )
     validation_losses.append( float(loss.item()) )
+    validation_tractions.append( float(loss_info["traction"]) )
 
     # Print and done.
     print_str = f'\nValidation Epoch {epoch:03d}: \tLoss: {loss.item():.3e} \tTraction: {loss_info["traction"]:.3e}'
@@ -207,6 +213,11 @@ ax1.plot(validation_counter, validation_losses, color="tab:orange", alpha=0.7, l
 ax1.set_xlabel("Epoch")
 ax1.set_ylabel("Energy", color="black")
 ax1.tick_params(axis="y")
+plt.legend()
+fig = plt.figure()
+plt.semilogy( train_counter, np.array( train_tractions), label="Training boundary traction loss" )
+plt.semilogy( validation_counter, np.array( validation_tractions), label="Validation boundary traction loss" )
+plt.xlabel( "Epoch" )
 plt.legend()
 fig = plt.figure()
 ax2 = fig.gca()
