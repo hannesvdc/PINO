@@ -2,7 +2,6 @@ import math
 import numpy as np
 import torch as pt
 import torch.optim as optim
-from torch.utils.data import DataLoader
 from utils import getGradientNorm
 
 import matplotlib.pyplot as plt
@@ -56,13 +55,17 @@ lr = 1e-3
 optimizer = optim.Adam( model.parameters(), lr, amsgrad=True )
 
 # Scheduler: constant for the first `n_epochs` epochs, decrease by cosine for `annealing_epochs` later.
-min_lr  = 1e-8
-anneal_epochs = 10000
-scheduler = optim.lr_scheduler.CosineAnnealingLR(
-    optimizer,
-    T_max=anneal_epochs,
-    eta_min=min_lr
-)
+step_size = 1000
+gamma = 0.1
+n_steps = 5
+scheduler = optim.lr_scheduler.StepLR( optimizer, step_size, gamma )
+# min_lr  = 1e-8
+# anneal_epochs = 10000
+# scheduler = optim.lr_scheduler.CosineAnnealingLR(
+#     optimizer,
+#     T_max=anneal_epochs,
+#     eta_min=min_lr
+# )
 
 # Main training routine
 train_counter : List = []
@@ -159,7 +162,8 @@ def validate_epoch( epoch : int ) -> float:
 # Main training loop
 store_directory = './Results/'
 warm_epochs = 0
-n_epochs = warm_epochs + anneal_epochs
+# n_epochs = warm_epochs + anneal_epochs
+n_epochs = step_size * n_steps
 best_val_loss = math.inf
 try:
     for epoch in range( 1, n_epochs+1 ):
@@ -196,19 +200,19 @@ np.save( store_directory + 'validation_data.npy', validation_data)
 
 # Make a plot of the training progress
 
-fig, ax1 = plt.subplots()
+fig = plt.figure()
+ax1 = fig.gca()
 ax1.plot(train_counter, train_losses, color="tab:blue", alpha=0.7, label="Train Loss")
 ax1.plot(validation_counter, validation_losses, color="tab:orange", alpha=0.7, label="Validation Loss")
 ax1.set_xlabel("Epoch")
 ax1.set_ylabel("Energy", color="black")
 ax1.tick_params(axis="y")
-ax2 = ax1.twinx()
+plt.legend()
+fig = plt.figure()
+ax2 = fig.gca()
 ax2.semilogy(train_counter, train_grads, color="tab:red", alpha=0.7, label="Grad Norm")
 ax2.set_ylabel("Gradient Norm", color="tab:red")
-ax2.tick_params(axis="y", labelcolor="tab:red")
-lines1, labels1 = ax1.get_legend_handles_labels()
-lines2, labels2 = ax2.get_legend_handles_labels()
-ax1.legend(lines1 + lines2, labels1 + labels2, loc="best")
+ax2.set_xlabel("Epoch")
+plt.legend()
 plt.tight_layout()
-plt.savefig(store_directory + 'convergence_adam.png', transparent=True)
 plt.show()
