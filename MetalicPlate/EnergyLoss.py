@@ -79,11 +79,11 @@ class EnergyLoss( nn.Module ):
             gy_c = gy[s:e,:]   # (Bc, n_grid_points)
 
             # Evaluate model derivatives on interior points for this branch chunk
-            _, _, u_x, u_y, v_x, v_y = grads_uv_jacrev(model, x, y, nu_c, gx_c, gy_c)  # (Bc,Bt)
+            _, _, u_x, u_y, v_x, v_y = grads_uv_autograd(model, x, y, nu_c, gx_c, gy_c)  # (Bc,Bt)
 
             # Boundary values only (no spatial derivatives needed)
             bc_x = pt.ones_like( bc_y )
-            u_bc, v_bc, u_xb, u_yb, v_xb, v_yb = grads_uv_jacrev(model, bc_x, bc_y, nu_c, gx_c, gy_c)
+            u_bc, v_bc, u_xb, u_yb, v_xb, v_yb = grads_uv_autograd(model, bc_x, bc_y, nu_c, gx_c, gy_c)
 
             # Interior strain energy
             nu_flat = nu_c[:, 0][:, None]            # (Bc,1) broadcasts over Bt
@@ -167,3 +167,37 @@ def grads_uv_jacrev(model, x, y, nu, gx, gy):
     u_all, v_all = model(x, y, nu, gx, gy)  # (Bb,Bt) each
 
     return u_all, v_all, u_x, u_y, v_x, v_y
+
+def grads_uv_autograd(model, x, y, nu, gx, gy):
+    """
+    x,y: (Bt,1)
+    nu: (Bb,1)
+    gx,gy: (Bb, n_grid_points)
+    Returns: u,v and u_x,u_y,v_x,v_y each (Bb,Bt)
+
+    Uses torch.autograd.grad instead of jacrev+vmap for CUDA compatibility.
+    """
+    if x.ndim == 1: x = x[:, None]
+    if y.ndim == 1: y = y[:, None]
+    if nu.ndim == 1: nu = nu[:, None]
+
+    x = x.requires_grad_(True)
+    y = y.requires_grad_(True)
+
+    u, v = model(x, y, nu, gx, gy)  # (Bb, Bt)
+
+    Bb = u.shape[0]
+    u_x_all = []
+    u_y_all = []
+    v_x_all = []
+    v_y_all = []
+
+    for b in range(Bb):
+        u_x_b, u_y_b = pt.autograd.grad(u[b].sum(), [x, y], create_graph=True)
+        v_x_b, v_y_b = pt.autograd.grad(v[b].sum(), [x, y], create_graph=True)
+        u_x_all.append(u_x_b[:, 0])
+        u_y_all.append(u_y_b[:, 0])
+        v_x_all.append(v_x_b[:, 0])
+        v_y_all.append(v_y_b[:, 0])
+
+    return u, v, pt.stack(u_x_all), pt.stack(u_y_all), pt.stack(v_x_all), pt.stack(v_y_all)
