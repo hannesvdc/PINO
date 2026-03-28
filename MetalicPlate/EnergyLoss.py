@@ -122,7 +122,7 @@ class EnergyLoss( nn.Module ):
         avg_energy = total_energy / total_weight
         avg_boundary = total_boundary / total_weight
         avg_traction = total_traction / total_weight
-        loss = avg_energy - avg_boundary #+ self.lambda_trac * avg_traction
+        loss = avg_energy - avg_boundary + self.lambda_trac * avg_traction
         loss_info = {"energy" : float(avg_energy.detach().item()), "boundary" : float(avg_boundary.detach().item()),
                      "rms" : float(loss.detach().item()), "traction" : float(avg_traction.detach().item())}
         return loss, loss_info

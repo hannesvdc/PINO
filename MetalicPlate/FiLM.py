@@ -22,6 +22,7 @@ class ConvFiLMNet(nn.Module):
         kernel_size: int = 5,
         act: nn.Module = nn.GELU(),
         film_hidden_dim: int = 128,
+        pool_size: int = 1,
     ):
         super().__init__()
         assert kernel_size % 2 == 1, "kernel_size must be odd to keep length with symmetric padding."
@@ -29,6 +30,7 @@ class ConvFiLMNet(nn.Module):
         self.trunk_width = trunk_width
         self.n_trunk_layers = n_trunk_layers
         self.act = act
+        self.pool_size = pool_size
 
         # Conv stack (keeps spatial length fixed)
         conv_layers = []
@@ -45,13 +47,13 @@ class ConvFiLMNet(nn.Module):
                 conv_layers.append( (f"act_{i}", act) )
         self.conv_layers = nn.Sequential( OrderedDict(conv_layers) )
 
-        # Global pooling over x: (B, C, n_grid) -> (B, C)
-        self.pool = nn.AdaptiveAvgPool1d(1)
+        # Spatial pooling: (B, C, n_grid) -> (B, C, pool_size)
+        self.pool = nn.AdaptiveAvgPool1d(pool_size)
 
         # Head produces 2*L*z outputs
         out_dim = 2 * n_trunk_layers * trunk_width
         self.head = nn.Sequential(
-            nn.Linear(channels[-1], film_hidden_dim, bias=True),
+            nn.Linear(channels[-1] * pool_size, film_hidden_dim, bias=True),
             act,
             nn.Linear(film_hidden_dim, out_dim, bias=True),
         )
@@ -67,8 +69,8 @@ class ConvFiLMNet(nn.Module):
 
         # Push through the convolution layers.
         x = self.conv_layers(g)  # (B, C, n_grid)
-        x = self.pool(x)         # (B, C, 1)
-        x = x[:, :, 0]           # (B, C)
+        x = self.pool(x)         # (B, C, pool_size)
+        x = x.flatten(1)         # (B, C * pool_size)
 
         # Apply the head layers
         film = self.head(x)      # (B, 2*L*z)

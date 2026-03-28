@@ -20,7 +20,7 @@ class TrunkFilmNetwork( nn.Module ):
         # Construct the FiLM embedding with GELU actication functions
         self.n_grid_points = n_grid_points
         self.n_hidden_layers = n_hidden_layers
-        self.film = ConvFiLMNet( self.n_grid_points, z, self.n_hidden_layers, film_channels, kernel_size=5, act=nn.GELU(), film_hidden_dim=128)
+        self.film = ConvFiLMNet( self.n_grid_points, z, self.n_hidden_layers, film_channels, kernel_size=5, act=nn.GELU(), film_hidden_dim=128, pool_size=4)
 
         # Setup the forward network. Tanh has more stable derivatives, no blow-up.
         forward_layers = [3] + [z] * self.n_hidden_layers + [2]

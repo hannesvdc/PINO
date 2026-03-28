@@ -24,7 +24,7 @@ nu_max = 0.45
 l = 0.2
 
 # Create a training and validation dataset
-B = 32
+B = 256
 N_train_branch = B
 N_train_trunk = 5000
 N_train_bc = 1000
@@ -41,12 +41,12 @@ np.save( './data/bc_dataset.npy', y_bc_b.detach().numpy() )
 # Setup the network
 n_hidden_layers = 4
 z = 128
-film_channels = [2, 16, 32, 64, 64, 64, 64, 64, 64 ] # increase gradually
+film_channels = [2, 32, 32, 64, 64, 64, 64, 64, 64 ] # increase gradually
 model = TrunkFilmNetwork( film_channels, n_grid_points, n_hidden_layers, z, nu_max )
 print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parameters() if p.requires_grad ]))
 
 # Heat loss fcn
-lambda_trac = 0.1
+lambda_trac = 1.0
 loss_fcn = EnergyLoss( y_grid, l, lambda_trac=lambda_trac )
 
 # Translate the model to GPU
@@ -64,25 +64,17 @@ step_size = 1000
 gamma = 0.1
 n_steps = 5
 scheduler = optim.lr_scheduler.StepLR( optimizer, step_size, gamma )
-# min_lr  = 1e-8
-# anneal_epochs = 10000
-# scheduler = optim.lr_scheduler.CosineAnnealingLR(
-#     optimizer,
-#     T_max=anneal_epochs,
-#     eta_min=min_lr
-# )
 
 # Main training routine
 train_counter : List = []
 train_losses : List = []
 train_grads : List = []
 train_tractions : List = []
+# Sample a new dataset every time
+branch_dataset = BranchDataset( N_train_branch, n_grid_points, l, nu_max, gen, dtype=dtype, plot=False )
 def train_epoch( epoch : int ):
     model.train( )
     optimizer.zero_grad( set_to_none=True )
-
-    # Sample a new dataset every time
-    branch_dataset = BranchDataset( N_train_branch, n_grid_points, l, nu_max, gen, dtype=dtype, plot=False )
         
     # Fetch the trunk inputs
     x_b, y_b, w_b = trunk_dataset.all()
@@ -132,13 +124,12 @@ def train_epoch( epoch : int ):
     print(info_str)
 
 # Validation function
+validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points, l, nu_max, gen, dtype, plot=False )
 validation_counter : List = []
 validation_losses : List = []
 validation_tractions : List = []
 def validate_epoch( epoch : int ) -> float:
-    optimizer.zero_grad( set_to_none=True )
 
-    validation_branch_dataset = BranchDataset( N_validation_branch, n_grid_points, l, nu_max, gen, dtype, plot=False )
     x_val, y_val, w_val = trunk_dataset.all()
     x_val = x_val.to(device=device, dtype=dtype)
     y_val = y_val.to(device=device, dtype=dtype)
