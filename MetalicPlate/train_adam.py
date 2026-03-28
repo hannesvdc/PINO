@@ -41,18 +41,17 @@ np.save( './data/bc_dataset.npy', y_bc_b.detach().numpy() )
 # Setup the network
 n_hidden_layers = 4
 z = 128
-film_channels = [2, 8, 16, 32, 32, 32, 32, 32, 32, 32, 32] # increase gradually
+film_channels = [2, 16, 32, 64, 64, 64, 64, 64, 64 ] # increase gradually
 model = TrunkFilmNetwork( film_channels, n_grid_points, n_hidden_layers, z, nu_max )
 print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parameters() if p.requires_grad ]))
 
 # Heat loss fcn
-loss_fcn = EnergyLoss( y_grid, l )
+lambda_trac = 0.1
+loss_fcn = EnergyLoss( y_grid, l, lambda_trac=lambda_trac )
 
 # Translate the model to GPU
-#device = pt.device( "mps" )
-#dtype = pt.float32
 device = pt.device("cpu")
-dtype=pt.float64
+dtype = pt.float64
 model = model.to(device=device, dtype=dtype)
 loss_fcn.to( device=device, dtype=dtype )
 

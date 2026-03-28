@@ -1,4 +1,3 @@
-import math
 import torch as pt
 import torch.nn as nn
 
@@ -35,8 +34,8 @@ class TrunkFilmNetwork( nn.Module ):
         self.act = nn.Tanh()
 
         # Initialize the last layer at zero.
-        #nn.init.zeros_( self.output_layer.weight )
-        #nn.init.zeros_( self.output_layer.bias )
+        nn.init.zeros_( self.output_layer.weight )
+        nn.init.zeros_( self.output_layer.bias )
         
     def forward( self, x : pt.Tensor,  # (Bt,1)
                        y : pt.Tensor,  # (Bt,1)
@@ -86,7 +85,7 @@ class TrunkFilmNetwork( nn.Module ):
         v = w[:,:,1]
 
         # Enforce the Dirichlet boundary condition
-        beta_x = x_repmat[:,:,0]**2
+        beta_x = x_repmat[:,:,0]
         u = beta_x * u
         v = beta_x * v
 
