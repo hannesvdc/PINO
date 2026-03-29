@@ -28,7 +28,7 @@ y = Y.flatten() # (Bt,1)
 # Setup the network
 n_hidden_layers = 4
 z = 128
-film_channels = [2, 8, 16, 32, 32, 32, 32, 32, 32, 32, 32] # increase gradually
+film_channels = [2, 32, 32, 64, 64, 64, 64, 64, 64 ] # increase gradually
 model = TrunkFilmNetwork( film_channels, n_grid_points, n_hidden_layers, z, nu_max )
 model.load_state_dict( pt.load('./Results/best_model.pth', weights_only=True, map_location=device ) )
 
