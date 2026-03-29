@@ -90,9 +90,8 @@ def train_epoch( epoch : int ):
     gx_b = gx_b.to( device=device, dtype=dtype )
     gy_b = gy_b.to( device=device, dtype=dtype )
 
-    # Compute the loss and its gradient
+    # Compute the loss (backward is called per-chunk inside loss_fcn)
     loss, loss_info = loss_fcn( model, x_b, y_b, w_b, nu_b, y_bc_b, gx_b, gy_b )
-    loss.backward()
     loss_grad = getGradientNorm( model )
 
     # Update the weights internally
@@ -104,14 +103,14 @@ def train_epoch( epoch : int ):
     boundary = loss_info["boundary"]
     traction = loss_info["traction"]
     train_counter.append( epoch-1)
-    train_losses.append( float(loss.item()) )
+    train_losses.append( float(loss) )
     train_grads.append( float(loss_grad.item()) )
     train_tractions.append( traction )
 
     # Print some diagnostics
     print_str = (
         f"\nEpoch {epoch:04d} "
-        f"Loss: {loss.item():.3e}  "
+        f"Loss: {loss:.3e}  "
         f"Grad: {loss_grad.item():.3e}  "
         f"Lr: {optimizer.param_groups[0]['lr']:.3e}"
     )
@@ -141,19 +140,19 @@ def validate_epoch( epoch : int ) -> float:
     y_bc_val = bc_dataset.all()
     y_bc_val = y_bc_val.to(device=device, dtype=dtype)
 
-    # Compute the loss and its gradient
-    loss, loss_info = loss_fcn( model, x_val, y_val, w_val, nu_val, y_bc_val, gx_val, gy_val )
+    # Compute the loss (no gradients needed for validation)
+    loss, loss_info = loss_fcn( model, x_val, y_val, w_val, nu_val, y_bc_val, gx_val, gy_val, training=False )
 
     # Store
     validation_counter.append( epoch )
-    validation_losses.append( float(loss.item()) )
+    validation_losses.append( float(loss) )
     validation_tractions.append( float(loss_info["traction"]) )
 
     # Print and done.
-    print_str = f'\nValidation Epoch {epoch:03d}: \tLoss: {loss.item():.3e} \tTraction: {loss_info["traction"]:.3e}'
+    print_str = f'\nValidation Epoch {epoch:03d}: \tLoss: {loss:.3e} \tTraction: {loss_info["traction"]:.3e}'
     print(print_str)
 
-    return float( loss.detach().item() )
+    return float( loss )
 
 # Main training loop
 store_directory = './Results/'
