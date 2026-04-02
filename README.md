@@ -32,11 +32,12 @@ There are currently four projects:
 - **`OperatorDiffusionEquation`**
   A *real* PINO for solving the 1D heat equation with unknown initial condition $T(x,0) = T_0(x)$. We study two alternative approaches for dealing with the initial condition: (1) embedding it as input to the 'trunk' network via a low-dimensional representation learned by a branch netwowrk; (2) feature-wise linear modulation of every trunk layer.
 
-- **2D Steady-State Linear Elasticity**
-  Experiments using PINNs / DeepONets / FiLM-based PINNs (see `PINN_DeepONet`, `Residual_PINN_DeepONet`, `FiLM_PINN`).  
-  This is currently exploratory and largely unsuccessful — which is what motivated me to go back to much simpler test cases. Given the three succesful projects above, I am ready to return to this model.
+- **`MetalicPlate`**
+  A PINO for learning elastic deformations of a 2D plate clamed to the left wall and subjecto to traction forces on the right boundary. The PINO can predict the complete displacement field $( u(x,y), v(x,y) )$ for any forcing function $g = (g_x(y), g_y(y))$, Poisson ratio $\nu$ and Young modulus $E$. The architecture uses FiLM conditioning for the branch network. Earlier experiments on this model largely failed (see the `Failed/` folder), which is what motivated me to go back to much simpler test cases above. Now it is finally working!
 
-I describe each experiment and my design choices in more detail in the individual project folders. Also check out my [blog](https://hvandecasteele.com/blog/) and [substack](https://hannesvdc.substack.com) where I regularly post about the things I learned, some results for each project, and the mathematics behind each problem (and many other things.)
+I describe each experiment and my design choices in more detail in the individual project folders. Also check out my [blog](https://hvandecasteele.com/blog/) and [Substack](https://hannesvdc.substack.com) where I regularly post about the things I learned, some results for each project, and the mathematics behind each problem (and many other things.)
+
+Feel free to fork this repository and start your own explorations with PINOs! Happy to have you along for journey.
 
 ## A small terminological nitpick
 

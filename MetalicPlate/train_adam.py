@@ -157,7 +157,6 @@ def validate_epoch( epoch : int ) -> float:
 # Main training loop
 store_directory = './Results/'
 warm_epochs = 0
-# n_epochs = warm_epochs + anneal_epochs
 n_epochs = step_size * n_steps
 best_val_loss = math.inf
 try:
