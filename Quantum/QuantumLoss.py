@@ -1,3 +1,4 @@
+import math
 import torch as pt
 import torch.nn as nn
 
@@ -10,38 +11,53 @@ class QuantumLoss( nn.Module ):
     Model signature:
         psi = model( input )
     """
-    def __init__( self ):
+    def __init__( self, chunk_size : int = 8 ):
         super().__init__()
+        self.chunk_size = chunk_size
 
     def forward(self, model : nn.Module,
                       R : pt.Tensor, # (B,)
                       xyz : pt.Tensor, # (N,3)
                       mc_weights : pt.Tensor, # (N,)
-                ) -> pt.Tensor:
+                      training : bool,
+                ) -> float:
         R = R.flatten()
         R = R.requires_grad_(False)
         P1 = pt.stack((-R, pt.zeros_like(R), pt.zeros_like(R)), dim=-1)[:, None, :] # (B, 1, 3)
         P2 = pt.stack(( R, pt.zeros_like(R), pt.zeros_like(R)), dim=-1)[:, None, :]
         if mc_weights.ndim > 1: mc_weights = mc_weights.flatten()
 
-        # Evaluate the model
-        psi, d_psi = fcn_and_grad( model, R, xyz ) # (B, N) and (B, N, 3)
+        n_chunks = int( math.ceil( len(R) / self.chunk_size ) )
+        total_loss = 0.0
+        for chunk in range( n_chunks ):
+            b = chunk * self.chunk_size
+            e = min( (chunk+1) * self.chunk_size, len(R) )
+            R_c = R[b:e]
+            P1_c = P1[b:e,:,:]
+            P2_c = P2[b:e,:,:]
 
-        # Compute the loss
-        xyz_ext = xyz[None,:,:] # (1, N, 3)
-        r1 = pt.linalg.norm(xyz_ext - P1, dim=2).clamp_min( 1e-8 )
-        r2 = pt.linalg.norm(xyz_ext - P2, dim=2).clamp_min( 1e-8 )
-        d_psi_term = 0.5 * pt.sum( d_psi * d_psi, dim=2 )
-        V_term = ( 1.0 / r1 + 1.0 / r2 ) * psi**2  #(B, N)
+            # Evaluate the model
+            psi, d_psi = fcn_and_grad( model, R_c, xyz ) # (B, N) and (B, N, 3)
+
+            # Compute the loss
+            xyz_ext = xyz[None,:,:] # (1, N, 3)
+            r1 = pt.linalg.norm(xyz_ext - P1_c, dim=2).clamp_min( 1e-8 )
+            r2 = pt.linalg.norm(xyz_ext - P2_c, dim=2).clamp_min( 1e-8 )
+            d_psi_term = 0.5 * pt.sum( d_psi * d_psi, dim=2 )
+            V_term = ( 1.0 / r1 + 1.0 / r2 ) * psi**2  #(B, N)
         
-        numerator = pt.sum( (d_psi_term - V_term) * mc_weights[None,:], dim=1 )
-        denominator = pt.sum( psi**2 * mc_weights[None,:], dim=1 )
-        electron_energy = numerator / denominator
+            numerator = pt.sum( (d_psi_term - V_term) * mc_weights[None,:], dim=1 )
+            denominator = pt.sum( psi**2 * mc_weights[None,:], dim=1 )
+            electron_energy = numerator / denominator
 
-        loss_val = electron_energy.mean()
+            chunk_loss = electron_energy.mean()
+            if training:
+                chunk_loss.backward()
+            total_loss += float( chunk_loss.item() )
 
         # Log some things to the training routine
-        return loss_val
+        loss_avg = total_loss / len(R)
+        return loss_avg
 
 def fcn_and_grad(model, R : pt.Tensor, 
                         xyz: pt.Tensor ):

@@ -39,7 +39,7 @@ def sampleBatch( B : int, N : int, R_cutoff : float = 5.0 ) -> Tuple[pt.Tensor, 
     xyz = xyz[inside_region]
 
     # Compute the MC weights
-    exponent = -0.5 * ( (x / sigma_x) ** 2 + (y / sigma_y) ** 2 + (z / sigma_z) ** 2 )
+    exponent = -0.5 * ( (xyz[:,0] / sigma_x) ** 2 + (xyz[:,1] / sigma_y) ** 2 + (xyz[:,2] / sigma_z) ** 2 )
     q = pt.exp(exponent)  # proportional to q(x)
     mc_weights = 1.0 / q.clamp_min(1e-12)
     mc_weights = mc_weights / mc_weights.mean()
@@ -60,14 +60,15 @@ model = QuantumNetwork( neurons_per_layer, R_cutoff)
 print('Number of Trainable Parameters: ', sum( [ p.numel() for p in model.parameters() if p.requires_grad ]))
 
 # Loss function.
-loss_fcn = QuantumLoss( )
+chunk_size = 4
+loss_fcn = QuantumLoss( chunk_size=chunk_size )
 
 # Setup the optimizer and learning rate scheduler
 lr = 1e-3
 optimizer = optim.Adam( model.parameters(), lr, amsgrad=True )
 
 # Scheduler: constant for the first `n_epochs` epochs, decrease by cosine for `annealing_epochs` later.
-step_size = 1000
+step_size = 500
 gamma = 0.1
 n_steps = 5
 scheduler = optim.lr_scheduler.StepLR( optimizer, step_size, gamma )
@@ -86,7 +87,7 @@ def train_epoch( epoch : int ):
     R, xyz, mc_weights = sampleBatch( B, N_train, R_cutoff=R_cutoff )
         
     # Compute the loss (backward is called per-chunk inside loss_fcn)
-    loss = loss_fcn( model, R, xyz, mc_weights )
+    loss = loss_fcn( model, R, xyz, mc_weights, training=True )
     loss_grad = getGradientNorm( model )
 
     # Update the weights internally
@@ -95,7 +96,7 @@ def train_epoch( epoch : int ):
 
     # Keep track of important metrics
     train_counter.append( epoch-1)
-    train_losses.append( float(loss) )
+    train_losses.append( loss )
     train_grads.append( float(loss_grad.item()) )
 
     # Print some diagnostics
@@ -108,23 +109,28 @@ def train_epoch( epoch : int ):
     print(print_str)
 
 # Validation function
-val_R, val_xyz, val_mc_weights = sampleBatch( B_val, N_validation )
+val_R = pt.tensor( [1.0], dtype=dtype )
+_, val_xyz, val_mc_weights = sampleBatch( B_val, N_validation )
 validation_counter : List = []
 validation_losses : List = []
 def validate_epoch( epoch : int ) -> float:
 
     # Compute the loss (no gradients needed for validation)
-    loss, loss_info = loss_fcn( model, val_R, val_xyz, val_mc_weights )
+    loss = loss_fcn( model, val_R, val_xyz, val_mc_weights, training=False )
+
+    # Log some interesting info
+    proton_energy = 1.0 / (2.0 * float(val_R.item()) )
+    total_energy = proton_energy + loss
 
     # Store
     validation_counter.append( epoch )
     validation_losses.append( float(loss) )
 
     # Print and done.
-    print_str = f'\nValidation Epoch {epoch:03d}: \tLoss: {loss:.3e}'
+    print_str = f'\nValidation Epoch {epoch:03d}: \tElectron Energy: {loss:.3e} \tTotal Energy {total_energy:.3e}'
     print(print_str)
 
-    return float( loss )
+    return loss
 
 # Main training loop
 store_directory = './Results/'

@@ -21,7 +21,7 @@ class QuantumNetwork( nn.Module ):
             raise ValueError("QuantumNetwork output dimension should be 1.")
 
         self.r_cutoff = r_cutoff
-        self.mlp = MultiLayerPerceptron( neurons_per_layer, nn.GELU )
+        self.mlp = MultiLayerPerceptron( neurons_per_layer, nn.GELU, init_zero=False )
 
     def forward(self, R : pt.Tensor,
                       xyz : pt.Tensor ) -> pt.Tensor:
