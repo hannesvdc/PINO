@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 
 from QuantumNetwork import QuantumNetwork
 from QuantumLoss import QuantumLoss
+from sampleBatch import sampleBatch
 
-from typing import List, Tuple
+from typing import List
 
 # Do everything on the CPU in double precision.
 dtype = pt.float64
@@ -17,34 +18,6 @@ pt.set_default_dtype( dtype )
 pt.set_default_device( 'cpu' )
 
 gen = pt.Generator()
-@pt.no_grad()
-def sampleBatch( B : int, N : int, R_cutoff : float = 5.0 ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
-    log_R_min = math.log( 0.1 )
-    log_R_max = math.log( 2.0 )
-    log_R = log_R_min + (log_R_max - log_R_min) * pt.rand( (B,1), generator=gen )
-    R = pt.exp( log_R )
-
-    # Sample (x,y,z) normal with a wider variance on the x-axis. 
-    sigma_x = 2.0
-    sigma_y = 1.0
-    sigma_z = 1.0
-    x = pt.normal( pt.zeros((N,)), sigma_x*pt.ones((N,)), generator=gen )
-    y = pt.normal( pt.zeros((N,)), sigma_y*pt.ones((N,)), generator=gen )
-    z = pt.normal( pt.zeros((N,)), sigma_z*pt.ones((N,)), generator=gen )
-
-    # Reject  at `R_cutoff`. The number of samples is not identical to `N` every run.
-    xyz = pt.stack( (x,y,z), dim=1 )
-    r_sq = pt.sum( xyz * xyz, dim=1 )
-    inside_region = ( r_sq <= R_cutoff**2 )
-    xyz = xyz[inside_region]
-
-    # Compute the MC weights
-    exponent = -0.5 * ( (xyz[:,0] / sigma_x) ** 2 + (xyz[:,1] / sigma_y) ** 2 + (xyz[:,2] / sigma_z) ** 2 )
-    q = pt.exp(exponent)  # proportional to q(x)
-    mc_weights = 1.0 / q.clamp_min(1e-12)
-    mc_weights = mc_weights / mc_weights.mean()
-
-    return R, xyz, mc_weights
 
 # Create a training and validation dataset
 B = 256
@@ -84,7 +57,7 @@ def train_epoch( epoch : int ):
     optimizer.zero_grad( set_to_none=True )
 
     # Sample new training points every epoch.
-    R, xyz, mc_weights = sampleBatch( B, N_train, R_cutoff=R_cutoff )
+    R, xyz, mc_weights = sampleBatch( B, N_train, R_cutoff, gen)
         
     # Compute the loss (backward is called per-chunk inside loss_fcn)
     loss = loss_fcn( model, R, xyz, mc_weights, training=True )
@@ -110,7 +83,7 @@ def train_epoch( epoch : int ):
 
 # Validation function
 val_R = pt.tensor( [1.0], dtype=dtype )
-_, val_xyz, val_mc_weights = sampleBatch( B_val, N_validation )
+_, val_xyz, val_mc_weights = sampleBatch( B_val, N_validation, R_cutoff, gen )
 validation_counter : List = []
 validation_losses : List = []
 def validate_epoch( epoch : int ) -> float:
